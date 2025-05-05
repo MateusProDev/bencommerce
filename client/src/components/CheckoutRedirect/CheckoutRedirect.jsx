@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../utils/api';
 
 const CheckoutRedirect = ({ currentUser }) => {
   const location = useLocation();
@@ -14,7 +15,7 @@ const CheckoutRedirect = ({ currentUser }) => {
       if (!currentUser) return;
 
       try {
-        const response = await axios.post('/api/create-preference', {
+        const response = await axios.post(`${API_BASE_URL}/api/create-preference`, {
           userId: currentUser.uid,
           planName,
           amount,

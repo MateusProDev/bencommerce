@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import API_BASE_URL from '../utils/api';
 
 const CheckoutTransparent = ({ currentUser }) => {
   const [loading, setLoading] = useState(false);
@@ -41,9 +42,9 @@ const CheckoutTransparent = ({ currentUser }) => {
     setError(null);
 
     try {
-      const response = await axios.post('/api/mercadopago', {
+      const response = await axios.post(`${API_BASE_URL}/api/mercadopago`, {
         userId: currentUser.uid,
-        amount: 39.90, // ou dinamicamente se quiser
+        amount: 39.90,
       });
 
       const preference = response.data.preference;
