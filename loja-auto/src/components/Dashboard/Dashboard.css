@@ -64,6 +64,6 @@
   }
 
   .MuiIconButton-root {
-    right: 10px; /* Ajuste da posição do botão no mobile */
+    right: -160 !important; /* Ajuste a posição do botão de menu */
   }
 }

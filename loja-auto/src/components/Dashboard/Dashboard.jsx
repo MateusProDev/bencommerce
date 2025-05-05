@@ -124,7 +124,7 @@ const Dashboard = () => {
             onClick={handleDrawerToggle}
             sx={{
               position: "absolute",
-              right: -160,
+              right: 0,
             }}
           >
             <MenuIcon />
