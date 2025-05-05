@@ -5,18 +5,30 @@ require('dotenv').config();
 
 const app = express();
 
+// ✅ Configuração de CORS para produção (Vercel) e desenvolvimento
 app.use(cors({
-  origin: ['https://storesync-two.vercel.app/'], // ajuste com seu domínio real
+  origin: [
+    'https://storesync.vercel.app',
+    'https://storesync-two.vercel.app',
+    'http://localhost:3000',
+  ],
   methods: ['GET', 'POST'],
+  credentials: true,
 }));
+
 app.use(express.json());
 
-// Configuração Mercado Pago
+// ✅ Configura Mercado Pago com token do arquivo .env
 MercadoPago.configure({
   access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN,
 });
 
-// 🎯 Checkout padrão via redirecionamento
+// 🏠 Rota de teste
+app.get('/', (req, res) => {
+  res.send('Servidor funcionando ✅');
+});
+
+// 🎯 Rota de checkout padrão (redirecionamento)
 app.post('/api/create-preference', async (req, res) => {
   const { userId, planName, amount } = req.body;
 
@@ -53,7 +65,7 @@ app.post('/api/create-preference', async (req, res) => {
   }
 });
 
-// 🧾 Checkout transparente
+// 💳 Rota de checkout transparente (embedado via SDK)
 app.post('/api/mercadopago', async (req, res) => {
   const { userId, amount } = req.body;
 
@@ -83,6 +95,8 @@ app.post('/api/mercadopago', async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log('Servidor rodando na porta 3001');
+// 🚀 Porta dinâmica para funcionar no Render
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT} 🚀`);
 });
