@@ -8,6 +8,7 @@ import HomePage from './components/HomePage/HomePage';
 import AuthForm from './components/AuthForm';
 import CreateStore from './components/CreateStore';
 import Dashboard from './components/Dashboard/Dashboard';
+import CheckoutRedirect from './components/CheckoutRedirect'; // ⬅️ novo componente
 
 const ProtectedRoute = ({ user, children }) => {
   return user ? children : <Navigate to="/login" />;
@@ -66,6 +67,15 @@ const App = () => {
             <StoreRequiredRoute user={user} storeCreated={storeCreated}>
               <Dashboard />
             </StoreRequiredRoute>
+          }
+        />
+
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute user={user}>
+              <CheckoutRedirect currentUser={user} />
+            </ProtectedRoute>
           }
         />
       </Routes>
