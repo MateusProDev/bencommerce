@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import API_BASE_URL from '../utils/api';
+import API_BASE_URL from '../../utils/api';
 
 const CheckoutRedirect = ({ currentUser }) => {
   const location = useLocation();
