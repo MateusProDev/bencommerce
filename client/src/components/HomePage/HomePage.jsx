@@ -17,7 +17,7 @@ const HomePage = () => {
   }, []);
 
   const handleWhatsappClick = () => {
-    window.open("https://wa.me/yourwhatsappnumber", "_blank"); // Substitua pelo seu número de WhatsApp
+    window.open("https://wa.me/5585991470709", "_blank"); // Substitua pelo seu número de WhatsApp
   };
 
   const toggleMenu = () => {
@@ -33,7 +33,7 @@ const HomePage = () => {
         </div>
         <ul className={`navbar-links ${menuOpen ? "active" : ""}`}>
           <li onClick={() => navigate("/login")}>Login</li>
-          <li onClick={() => navigate("/create-store")}>Criar Loja</li>
+          <li onClick={() => navigate("/criar-loja")}>Criar Loja</li>
         </ul>
         <button
           className={`navbar-toggle ${menuOpen ? "active" : ""}`}
@@ -85,16 +85,17 @@ const HomePage = () => {
             <h3>Plus</h3>
             <p>Para quem quer vender mais</p>
             <p>R$ 39,90/mês</p>
-            <button onClick={() => navigate("/login")}>Assinar Plus</button>
+            <button onClick={() => navigate("/checkout?plan=Plus&amount=39.90")}>Assinar Plus</button>
           </div>
           <div className="plan">
             <h3>Premium</h3>
             <p>Recursos avançados e relatórios</p>
             <p>R$ 99,90/mês</p>
-            <button onClick={() => navigate("/login")}>Assinar Premium</button>
+            <button onClick={() => navigate("/checkout?plan=Premium&amount=99.90")}>Assinar Premium</button>
           </div>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="footer">
