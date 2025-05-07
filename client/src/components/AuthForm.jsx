@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Firebase Firestore
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase'; // ajuste esse caminho se necessário
+import { db } from '../firebaseConfig'; // ajuste esse caminho se necessário
 
 const AuthForm = () => {
   const [isRegistering, setIsRegistering] = useState(false);

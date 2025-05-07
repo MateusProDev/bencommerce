@@ -17,7 +17,7 @@ const HomePage = () => {
   }, []);
 
   const handleWhatsappClick = () => {
-    window.open("https://wa.me/5585991470709", "_blank"); // Substitua pelo seu número de WhatsApp
+    window.open("https://wa.me/+5585991470709", "_blank"); // Substitua pelo seu número de WhatsApp
   };
 
   const toggleMenu = () => {

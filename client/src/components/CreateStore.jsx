@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Spinner, Alert } from 'react-bootstrap';
-import { db } from '../firebase';
+import { db } from '../firebaseConfig';
 import { setDoc, doc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -55,6 +55,10 @@ const CreateStore = ({ onStoreCreated }) => {
 
     setLoading(true);
 
+    const agora = new Date();
+    const expiracaoDate = new Date();
+    expiracaoDate.setDate(expiracaoDate.getDate() + 7);
+
     const lojaData = {
       nome: nomeLoja,
       segmento,
@@ -63,16 +67,26 @@ const CreateStore = ({ onStoreCreated }) => {
       donoUid: user.uid,
       status: 'ativa',
       slug: nomeLoja.toLowerCase().replace(/\s+/g, '-'),
-      criadaEm: new Date().toISOString(),
+      criadaEm: agora.toISOString(),
+    };
+
+    const usuarioData = {
+      planoAtual: plano,
+      dataInicioPlano: agora.toISOString(),
+      expiracaoPlano: plano === 'free' ? null : expiracaoDate.toISOString(),
+      emTeste: plano !== 'free',
+      lojaCriada: true,
+      storeCreated: true,
     };
 
     try {
+      // Cria a loja com o ID do usuário
       await setDoc(doc(db, 'lojas', user.uid), lojaData);
 
-      // Garante que o documento do usuário exista (com merge)
-      await setDoc(doc(db, 'usuarios', user.uid), { storeCreated: true }, { merge: true });
+      // Atualiza os dados do usuário com o plano e outras infos
+      await setDoc(doc(db, 'usuarios', user.uid), usuarioData, { merge: true });
 
-      if (onStoreCreated) onStoreCreated(); // Atualiza App para redirecionar
+      if (onStoreCreated) onStoreCreated();
       navigate('/dashboard');
     } catch (err) {
       console.error('Erro ao criar loja:', err);
@@ -90,12 +104,20 @@ const CreateStore = ({ onStoreCreated }) => {
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Nome da Loja</Form.Label>
-          <Form.Control value={nomeLoja} onChange={(e) => setNomeLoja(e.target.value)} />
+          <Form.Control
+            value={nomeLoja}
+            onChange={(e) => setNomeLoja(e.target.value)}
+            placeholder="Ex: Loja da Maria"
+          />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Segmento</Form.Label>
-          <Form.Control value={segmento} onChange={(e) => setSegmento(e.target.value)} />
+          <Form.Control
+            value={segmento}
+            onChange={(e) => setSegmento(e.target.value)}
+            placeholder="Ex: Roupas, Calçados, Eletrônicos"
+          />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -115,8 +137,8 @@ const CreateStore = ({ onStoreCreated }) => {
           <Form.Select value={plano} onChange={(e) => setPlano(e.target.value)}>
             <option value="">Selecione</option>
             <option value="free">Free - R$0</option>
-            <option value="plus">Plus - R$39,90</option>
-            <option value="premium">Premium - R$99,90</option>
+            <option value="plus">Plus - R$39,90 (7 dias grátis)</option>
+            <option value="premium">Premium - R$99,90 (7 dias grátis)</option>
           </Form.Select>
         </Form.Group>
 
