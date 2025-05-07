@@ -1,5 +1,4 @@
-// src/components/Dashboard/Dashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer, List, ListItem, ListItemIcon, ListItemText, IconButton,
   Toolbar, AppBar, Typography, Box, CssBaseline
@@ -9,28 +8,29 @@ import {
   Image as ImageIcon, ShoppingCart as ShoppingCartIcon,
   WhatsApp as WhatsAppIcon, People as PeopleIcon,
   Inventory as InventoryIcon, PointOfSale as PointOfSaleIcon,
-  Assessment as AssessmentIcon, Home as HomeIcon
-  
+  Assessment as AssessmentIcon, Home as HomeIcon,
+  Upgrade as UpgradeIcon
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import { verificarPlanoUsuario } from '../../utils/verificarPlanoUsuario';
 
+// ✅ Componente para upgrade
+import UpgradePlano from "../PlanoUpgrade/PlanoUpgrade";
 
-// import { auth } from "../../../firebase/firebaseConfig"; // Comentado para evitar erro
-
-// Importação dos componentes
-// import EditLojinhaHeader from "../../Admin/EditLojinhaHeader/EditLojinhaHeader"; // Comentado para evitar erro
-// import BannerAdmin from "../../Admin/EditBanner/EditBanner"; // Comentado para evitar erro
-// import EditProdutos from "../../Admin/EditProducts/EditProducts"; // Comentado para evitar erro
-// import EditWhatsApp from "../../Admin/EditWhatsApp/EditWhatsApp"; // Comentado para evitar erro
-// import ClientManagement from "../../Lojinha/ClientManagement/ClientManagement"; // Comentado para evitar erro
-// import ViewUsers from "../../ViewUsers/ViewUsers"; // Comentado para evitar erro
-// import StockManagement from "../../Lojinha/StockManagement/StockManagement"; // Comentado para evitar erro
-// import SalesEntry from "../../Lojinha/SalesEntry/SalesEntry"; // Comentado para evitar erro
-// import SalesReports from "../../Lojinha/SalesReports/SalesReports"; // Comentado para evitar erro
-// import HomeContent from "../../Lojinha/HomeContent/HomeContent"; // Comentado para evitar erro
-
-// import { AdminContext } from "../../Lojinha/AdminContext/AdminContext"; // Comentado para evitar erro
+// ❌ Comentados para evitar erro
+// import { auth } from "../../../firebase/firebaseConfig";
+// import EditLojinhaHeader from "../../Admin/EditLojinhaHeader/EditLojinhaHeader";
+// import BannerAdmin from "../../Admin/EditBanner/EditBanner";
+// import EditProdutos from "../../Admin/EditProducts/EditProducts";
+// import EditWhatsApp from "../../Admin/EditWhatsApp/EditWhatsApp";
+// import ClientManagement from "../../Lojinha/ClientManagement/ClientManagement";
+// import ViewUsers from "../../ViewUsers/ViewUsers";
+// import StockManagement from "../../Lojinha/StockManagement/StockManagement";
+// import SalesEntry from "../../Lojinha/SalesEntry/SalesEntry";
+// import SalesReports from "../../Lojinha/SalesReports/SalesReports";
+// import HomeContent from "../../Lojinha/HomeContent/HomeContent";
+// import { AdminContext } from "../../Lojinha/AdminContext/AdminContext";
 
 import "./Dashboard.css";
 
@@ -38,6 +38,16 @@ const Dashboard = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState("Home");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await verificarPlanoUsuario(user.uid);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
@@ -50,25 +60,29 @@ const Dashboard = () => {
       console.error("Erro ao fazer logout:", error);
     }
   };
-  
 
   const menuItems = [
-    { text: "Home", icon: <HomeIcon />, component: "HomeContent" }, // Comentado para evitar erro
-    { text: "Editar Cabeçalho", icon: <EditIcon />, component: "EditLojinhaHeader" }, // Comentado para evitar erro
-    { text: "Editar Banner", icon: <ImageIcon />, component: "BannerAdmin" }, // Comentado para evitar erro
-    { text: "Editar Produtos", icon: <ShoppingCartIcon />, component: "EditProdutos" }, // Comentado para evitar erro
-    { text: "Editar WhatsApp", icon: <WhatsAppIcon />, component: "EditWhatsApp" }, // Comentado para evitar erro
-    { text: "Gerenciar Clientes", icon: <PeopleIcon />, component: "ClientManagement" }, // Comentado para evitar erro
-    { text: "Ver Usuários", icon: <PeopleIcon />, component: "ViewUsers" }, // Comentado para evitar erro
-    { text: "Gerenciar Estoque", icon: <InventoryIcon />, component: "StockManagement" }, // Comentado para evitar erro
-    { text: "Registrar Venda", icon: <PointOfSaleIcon />, component: "SalesEntry" }, // Comentado para evitar erro
-    { text: "Relatórios de Vendas", icon: <AssessmentIcon />, component: "SalesReports" }, // Comentado para evitar erro
+    { text: "Home", icon: <HomeIcon />, component: "HomeContent" },
+    { text: "Editar Cabeçalho", icon: <EditIcon />, component: "EditLojinhaHeader" },
+    { text: "Editar Banner", icon: <ImageIcon />, component: "BannerAdmin" },
+    { text: "Editar Produtos", icon: <ShoppingCartIcon />, component: "EditProdutos" },
+    { text: "Editar WhatsApp", icon: <WhatsAppIcon />, component: "EditWhatsApp" },
+    { text: "Gerenciar Clientes", icon: <PeopleIcon />, component: "ClientManagement" },
+    { text: "Ver Usuários", icon: <PeopleIcon />, component: "ViewUsers" },
+    { text: "Gerenciar Estoque", icon: <InventoryIcon />, component: "StockManagement" },
+    { text: "Registrar Venda", icon: <PointOfSaleIcon />, component: "SalesEntry" },
+    { text: "Relatórios de Vendas", icon: <AssessmentIcon />, component: "SalesReports" },
+    { text: "Upgrade de Plano", icon: <UpgradeIcon />, component: "UpgradePlano" },
   ];
 
   const renderContent = () => {
-    const selectedItem = menuItems.find((item) => item.text === selectedSection);
-    const Component = selectedItem ? selectedItem.component : "HomeContent"; // Comentado para evitar erro
-    return <Component />; // Comentado para evitar erro
+    switch (selectedSection) {
+      case "Upgrade de Plano":
+        return <UpgradePlano />;
+      // ❌ Aqui você adiciona os outros cases se quiser reativar os imports futuramente
+      default:
+        return <div>Bem-vindo ao painel!</div>;
+    }
   };
 
   const drawerContent = (
@@ -102,7 +116,6 @@ const Dashboard = () => {
   );
 
   return (
-    // <AdminContext.Provider value={{ selectedSection, setSelectedSection }}> // Comentado para evitar erro
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
       <AppBar
@@ -184,7 +197,6 @@ const Dashboard = () => {
         <div className="admin-loja-dashboard">{renderContent()}</div>
       </Box>
     </Box>
-    // </AdminContext.Provider> // Comentado para evitar erro
   );
 };
 
