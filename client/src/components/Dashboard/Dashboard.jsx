@@ -11,6 +11,7 @@ import {
   Assessment as AssessmentIcon, Home as HomeIcon,
   Upgrade as UpgradeIcon
 } from "@mui/icons-material";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { verificarPlanoUsuario } from '../../utils/verificarPlanoUsuario';
@@ -31,6 +32,8 @@ import UpgradePlano from "../PlanoUpgrade/PlanoUpgrade";
 // import SalesReports from "../../Lojinha/SalesReports/SalesReports";
 // import HomeContent from "../../Lojinha/HomeContent/HomeContent";
 // import { AdminContext } from "../../Lojinha/AdminContext/AdminContext";
+import RelatorioAnalytics from "../RelatorioAnalytics/RelatorioAnalytics";
+
 
 import "./Dashboard.css";
 
@@ -73,17 +76,22 @@ const Dashboard = () => {
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, component: "SalesEntry" },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, component: "SalesReports" },
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, component: "UpgradePlano" },
+    { text: "Relatórios de Acessos", icon: <AnalyticsIcon />, component: "RelatorioAnalytics" },
   ];
 
   const renderContent = () => {
     switch (selectedSection) {
       case "Upgrade de Plano":
         return <UpgradePlano />;
-      // ❌ Aqui você adiciona os outros cases se quiser reativar os imports futuramente
+  
+      case "Relatórios de Acessos":
+        return <RelatorioAnalytics />;
+  
       default:
         return <div>Bem-vindo ao painel!</div>;
     }
   };
+  
 
   const drawerContent = (
     <div className="admin-loja-drawer-container">
