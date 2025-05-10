@@ -433,7 +433,7 @@ const CreateStore = ({ onStoreCreated }) => {
                 </div>
                 <div className="step-info">
                   <div className="step-title">{step.title}</div>
-                  <div className="step-description">{step.description}</div>
+                  {/* <div className="step-description">{step.description}</div> */}
                 </div>
               </div>
             ))}
