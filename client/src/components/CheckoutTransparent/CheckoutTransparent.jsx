@@ -1,16 +1,17 @@
-// src/components/CheckoutTransparent.jsx
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Spinner } from 'react-bootstrap';
+import { Button, Form, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import API_BASE_URL from '../utils/api';
+import API_BASE_URL from '../../utils/api';  // Caminho corrigido
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutTransparent = ({ currentUser }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!window.MercadoPago) {
+    if (!window.MercadoPago && !loading) {
       const script = document.createElement('script');
       script.src = 'https://sdk.mercadopago.com/js/v2';
       script.async = true;
@@ -23,7 +24,7 @@ const CheckoutTransparent = ({ currentUser }) => {
       };
       document.body.appendChild(script);
     }
-  }, []);
+  }, [loading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,6 +46,7 @@ const CheckoutTransparent = ({ currentUser }) => {
       const response = await axios.post(`${API_BASE_URL}/api/mercadopago`, {
         userId: currentUser.uid,
         amount: 39.90,
+        description: "Upgrade para Plano Plus"
       });
 
       const preference = response.data.preference;
@@ -62,6 +64,7 @@ const CheckoutTransparent = ({ currentUser }) => {
           container: '.checkout-container',
           label: 'Pagar agora',
         },
+        autoOpen: true,
       });
 
       setPaymentStatus('Aguardando pagamento...');
@@ -77,25 +80,38 @@ const CheckoutTransparent = ({ currentUser }) => {
     <div className="container py-5">
       <h1 className="mb-4">Upgrade da Conta</h1>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
       <Form onSubmit={handleSubmit}>
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">Plano Plus</h5>
             <p className="card-text">R$39,90/mês</p>
+            <ul className="list-unstyled mb-3">
+              <li>✔ 7 dias grátis</li>
+              <li>✔ Gerenciamento de estoque</li>
+              <li>✔ Relatórios de vendas</li>
+            </ul>
             <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? <Spinner animation="border" size="sm" /> : 'Escolher Plano Plus'}
+              {loading ? (
+                <Spinner animation="border" size="sm" />
+              ) : (
+                'Escolher Plano Plus'
+              )}
             </Button>
           </div>
         </div>
       </Form>
 
-      <div className="checkout-container mt-4">
-        {/* Checkout Mercado Pago será renderizado aqui */}
-      </div>
+      <div className="checkout-container mt-4"></div>
 
-      {paymentStatus && <div className="alert alert-info mt-3">{paymentStatus}</div>}
+      {paymentStatus && <Alert variant="info mt-3">{paymentStatus}</Alert>}
+
+      <div className="mt-3">
+        <Button variant="outline-secondary" onClick={() => navigate('/dashboard')}>
+          Voltar ao Dashboard
+        </Button>
+      </div>
     </div>
   );
 };
