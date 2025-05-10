@@ -1,97 +1,150 @@
 import React, { useState, useEffect } from "react";
 import {
-  Drawer, List, ListItem, ListItemIcon, ListItemText, IconButton,
-  Toolbar, AppBar, Typography, Box, CssBaseline
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemIcon, 
+  ListItemText, 
+  IconButton,
+  Toolbar, 
+  AppBar, 
+  Typography, 
+  Box, 
+  CssBaseline,
+  CircularProgress,
+  Alert,
+  Button
 } from "@mui/material";
 import {
-  Menu as MenuIcon, Logout as LogoutIcon, Edit as EditIcon,
-  Image as ImageIcon, ShoppingCart as ShoppingCartIcon,
-  WhatsApp as WhatsAppIcon, People as PeopleIcon,
-  Inventory as InventoryIcon, PointOfSale as PointOfSaleIcon,
-  Assessment as AssessmentIcon, Home as HomeIcon,
+  Menu as MenuIcon, 
+  Logout as LogoutIcon, 
+  Edit as EditIcon,
+  Image as ImageIcon, 
+  ShoppingCart as ShoppingCartIcon,
+  WhatsApp as WhatsAppIcon, 
+  People as PeopleIcon,
+  Inventory as InventoryIcon, 
+  PointOfSale as PointOfSaleIcon,
+  Assessment as AssessmentIcon, 
+  Home as HomeIcon,
   Upgrade as UpgradeIcon
 } from "@mui/icons-material";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
-import { verificarPlanoUsuario } from '../../utils/verificarPlanoUsuario';
+import { getAuth, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
 
-// ✅ Componente para upgrade
-import UpgradePlano from "../PlanoUpgrade/PlanoUpgrade";
-
-// ❌ Comentados para evitar erro
-// import { auth } from "../../../firebase/firebaseConfig";
-// import EditLojinhaHeader from "../../Admin/EditLojinhaHeader/EditLojinhaHeader";
-// import BannerAdmin from "../../Admin/EditBanner/EditBanner";
-// import EditProdutos from "../../Admin/EditProducts/EditProducts";
-// import EditWhatsApp from "../../Admin/EditWhatsApp/EditWhatsApp";
-// import ClientManagement from "../../Lojinha/ClientManagement/ClientManagement";
-// import ViewUsers from "../../ViewUsers/ViewUsers";
-// import StockManagement from "../../Lojinha/StockManagement/StockManagement";
-// import SalesEntry from "../../Lojinha/SalesEntry/SalesEntry";
-// import SalesReports from "../../Lojinha/SalesReports/SalesReports";
-// import HomeContent from "../../Lojinha/HomeContent/HomeContent";
-// import { AdminContext } from "../../Lojinha/AdminContext/AdminContext";
-import RelatorioAnalytics from "../RelatorioAnalytics/RelatorioAnalytics";
-
-
+import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
 import "./Dashboard.css";
 
-const Dashboard = () => {
+const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState("Home");
+  const [userPlan, setUserPlan] = useState("free");
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
+  const auth = getAuth();
+
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await verificarPlanoUsuario(user.uid);
+    const loadUserData = async () => {
+      try {
+        // Se não temos user nos props, tentamos pegar do auth atual
+        const currentAuthUser = user || auth.currentUser;
+        
+        if (currentAuthUser) {
+          setCurrentUser(currentAuthUser);
+          
+          const [userSnap, storeSnap] = await Promise.all([
+            getDoc(doc(db, "usuarios", currentAuthUser.uid)),
+            getDoc(doc(db, "lojas", currentAuthUser.uid))
+          ]);
+          
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserPlan(userData.planoAtual || userData.plano || "free");
+          }
+          
+          if (!storeSnap.exists()) {
+            navigate('/criar-loja');
+          }
+        } else {
+          // Se não temos usuário autenticado, redirecionamos para login
+          navigate('/login');
+        }
+      } catch (err) {
+        console.error("Erro ao carregar dados:", err);
+      } finally {
+        setLoading(false);
       }
-    });
-    return () => unsubscribe();
-  }, []);
+    };
+
+    loadUserData();
+  }, [user, navigate, auth]);
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   const handleLogout = async () => {
     try {
-      const auth = getAuth();
       await signOut(auth);
-      navigate("/loja/login");
+      navigate("/");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
   };
 
   const menuItems = [
-    { text: "Home", icon: <HomeIcon />, component: "HomeContent" },
-    { text: "Editar Cabeçalho", icon: <EditIcon />, component: "EditLojinhaHeader" },
-    { text: "Editar Banner", icon: <ImageIcon />, component: "BannerAdmin" },
-    { text: "Editar Produtos", icon: <ShoppingCartIcon />, component: "EditProdutos" },
-    { text: "Editar WhatsApp", icon: <WhatsAppIcon />, component: "EditWhatsApp" },
-    { text: "Gerenciar Clientes", icon: <PeopleIcon />, component: "ClientManagement" },
-    { text: "Ver Usuários", icon: <PeopleIcon />, component: "ViewUsers" },
-    { text: "Gerenciar Estoque", icon: <InventoryIcon />, component: "StockManagement" },
-    { text: "Registrar Venda", icon: <PointOfSaleIcon />, component: "SalesEntry" },
-    { text: "Relatórios de Vendas", icon: <AssessmentIcon />, component: "SalesReports" },
-    { text: "Upgrade de Plano", icon: <UpgradeIcon />, component: "UpgradePlano" },
-    { text: "Relatórios de Acessos", icon: <AnalyticsIcon />, component: "RelatorioAnalytics" },
+    { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Produtos", icon: <ShoppingCartIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Gerenciar Clientes", icon: <PeopleIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Ver Usuários", icon: <PeopleIcon />, allowedPlans: ["premium"] },
+    { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["plus", "premium"] },
+    { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
+    { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
+    { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
   ];
 
   const renderContent = () => {
+    if (loading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
     switch (selectedSection) {
       case "Upgrade de Plano":
-        return <UpgradePlano />;
-  
-      case "Relatórios de Acessos":
-        return <RelatorioAnalytics />;
-  
+        return currentUser ? <PlanoUpgrade user={currentUser} /> : null;
       default:
-        return <div>Bem-vindo ao painel!</div>;
+        return (
+          <div>
+            <h2>Bem-vindo ao Painel</h2>
+            <p>Selecione uma opção no menu para começar.</p>
+            {userPlan === "free" && (
+              <Alert severity="info">
+                Você está no plano Free. <Button 
+                  variant="contained" 
+                  color="primary" 
+                  size="small"
+                  onClick={() => setSelectedSection("Upgrade de Plano")}
+                >
+                  Faça upgrade agora
+                </Button> para acessar todos os recursos.
+              </Alert>
+            )}
+          </div>
+        );
     }
   };
-  
+
+  const filteredMenuItems = menuItems.filter(item => 
+    item.allowedPlans.includes(userPlan)
+  );
 
   const drawerContent = (
     <div className="admin-loja-drawer-container">
@@ -100,8 +153,9 @@ const Dashboard = () => {
           Painel Admin
         </Typography>
       </Toolbar>
+
       <List className="admin-loja-menu-list">
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <ListItem
             button
             key={index}
@@ -116,6 +170,7 @@ const Dashboard = () => {
           </ListItem>
         ))}
       </List>
+
       <div className="admin-loja-logout-button" onClick={handleLogout}>
         <LogoutIcon sx={{ mr: 1 }} />
         Sair
@@ -135,35 +190,30 @@ const Dashboard = () => {
         }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            Painel Admin
-          </Typography>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{
-              position: "absolute",
-              right: 0,
-            }}
+            sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
+            Painel Admin
+          </Typography>
         </Toolbar>
       </AppBar>
 
       <Drawer
         variant="permanent"
         sx={{
+          width: 260,
           flexShrink: 0,
-          display: { xs: "none", sm: "block" },
-          "& .MuiDrawer-paper": {
+          display: { xs: 'none', sm: 'block' },
+          '& .MuiDrawer-paper': {
             width: 260,
-            position: "fixed",
-            height: "100vh",
-            boxSizing: "border-box",
-            zIndex: 1200,
+            boxSizing: 'border-box',
           },
         }}
         open
@@ -177,12 +227,8 @@ const Dashboard = () => {
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          flexShrink: 0,
-          display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": {
-            width: 260,
-            boxSizing: "border-box",
-          },
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': { width: 260 },
         }}
       >
         {drawerContent}
@@ -190,19 +236,15 @@ const Dashboard = () => {
 
       <Box
         component="main"
-        className="admin-loja-main"
         sx={{
           flexGrow: 1,
-          p: 0,
-          width: { xs: "100%", sm: "calc(100% - 260px)" },
-          ml: { sm: "260px" },
-          mt: { xs: 8, sm: 0 },
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
+          p: 3,
+          width: { sm: `calc(100% - 260px)` },
+          ml: { sm: '260px' },
+          mt: { xs: '56px', sm: 0 }
         }}
       >
-        <div className="admin-loja-dashboard">{renderContent()}</div>
+        {renderContent()}
       </Box>
     </Box>
   );
