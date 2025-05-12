@@ -1,0 +1,118 @@
+.auth-container {
+    max-width: 480px;
+    padding: 20px;
+}
+
+.auth-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    transition: all 0.3s ease;
+}
+
+.auth-header h2 {
+    font-weight: 600;
+    color: #333;
+}
+
+.auth-toggle {
+    width: 80%;
+    margin: 0 auto 20px;
+}
+
+.auth-form {
+    margin-top: 20px;
+}
+
+.auth-input {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.auth-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.auth-button {
+    padding: 12px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.auth-button:hover {
+    transform: translateY(-2px);
+}
+
+.auth-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: #6c757d;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.auth-separator span {
+    padding: 0 10px;
+}
+
+.google-button {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.google-button:hover {
+    transform: translateY(-2px);
+    background-color: #f8f9fa;
+}
+
+.forgot-password-link,
+.back-to-login-link {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.forgot-password-link:hover,
+.back-to-login-link:hover {
+    color: #343a40;
+    text-decoration: underline;
+}
+
+/* Animation for page transitions */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .auth-container {
+        padding: 10px;
+    }
+    
+    .auth-card {
+        padding: 20px;
+    }
+}
