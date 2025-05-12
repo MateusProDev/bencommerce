@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Spinner, Alert, ProgressBar, Card, Modal, Row, Col } from 'react-bootstrap';
 import { db } from '../../firebaseConfig';
 import { setDoc, doc, writeBatch } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { useNavigate, useLocation } from 'react-router-dom';
 import JSConfetti from 'js-confetti';
 import { FiArrowLeft, FiArrowRight, FiCheck, FiUpload, FiShoppingBag, FiTag, FiImage, FiDollarSign } from 'react-icons/fi';
 import './CreateStore.css';
@@ -41,27 +41,27 @@ const CreateStore = ({ onStoreCreated }) => {
   const [nomeLoja, setNomeLoja] = useState('');
   const [segmento, setSegmento] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
-  const [plano, setPlano] = useState('');
-  const [user, setUser] = useState(null);
+  const [plano, setPlano] = useState('free');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(5);
   const [jsConfetti, setJsConfetti] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const auth = getAuth();
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) setUser(currentUser);
-      else navigate('/login');
-    });
-    
+    // Inicializa o JSConfetti
     setJsConfetti(new JSConfetti());
-    return () => unsubscribe();
-  }, [navigate]);
+    
+    // Verifica se há um plano selecionado na navegação
+    if (location.state?.selectedPlan) {
+      setPlano(location.state.selectedPlan);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (showSuccess && countdown > 0) {
@@ -121,6 +121,10 @@ const CreateStore = ({ onStoreCreated }) => {
           setErrorMsg('Por favor, insira um nome para sua loja');
           return false;
         }
+        if (nomeLoja.length < 3) {
+          setErrorMsg('O nome da loja deve ter pelo menos 3 caracteres');
+          return false;
+        }
         break;
       case 1:
         if (!segmento.trim()) {
@@ -159,50 +163,66 @@ const CreateStore = ({ onStoreCreated }) => {
   };
 
   const handleCreateStore = async () => {
+    if (!validateStep()) return;
+    
     setLoading(true);
 
-    const agora = new Date();
-    const expiracaoDate = new Date();
-    expiracaoDate.setDate(expiracaoDate.getDate() + 7);
-
-    const slug = nomeLoja.toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\w\s]/g, '')
-      .replace(/\s+/g, '-');
-
-    const lojaData = {
-      nome: nomeLoja,
-      segmento,
-      logoUrl,
-      plano,
-      donoUid: user.uid,
-      status: 'ativa',
-      slug,
-      criadaEm: agora.toISOString(),
-      atualizadaEm: agora.toISOString()
-    };
-
-    const usuarioData = {
-      planoAtual: plano,
-      plano: plano,
-      dataInicioPlano: agora.toISOString(),
-      expiracaoPlano: plano === 'free' ? null : expiracaoDate.toISOString(),
-      emTeste: plano !== 'free',
-      testeGratuito: plano !== 'free',
-      inicioTeste: plano !== 'free' ? agora.toISOString() : null,
-      fimTeste: plano !== 'free' ? expiracaoDate.toISOString() : null,
-      storeCreated: true,
-      descontoAplicado: false,
-      planoAtivo: false
-    };
-
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const agora = new Date();
+      const expiracaoDate = new Date();
+      expiracaoDate.setDate(expiracaoDate.getDate() + 7);
+
+      // Cria um slug amigável para a URL da loja
+      const slug = nomeLoja.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, '-');
+
+      const lojaData = {
+        nome: nomeLoja,
+        segmento,
+        logoUrl,
+        plano,
+        donoUid: user.uid,
+        status: 'ativa',
+        slug,
+        criadaEm: agora.toISOString(),
+        atualizadaEm: agora.toISOString(),
+        configs: {
+          corPrimaria: '#4a6bff',
+          corSecundaria: '#2541b2',
+          tema: 'claro'
+        }
+      };
+
+      const usuarioData = {
+        planoAtual: plano,
+        plano,
+        dataInicioPlano: agora.toISOString(),
+        expiracaoPlano: plano === 'free' ? null : expiracaoDate.toISOString(),
+        emTeste: plano !== 'free',
+        testeGratuito: plano !== 'free',
+        inicioTeste: plano !== 'free' ? agora.toISOString() : null,
+        fimTeste: plano !== 'free' ? expiracaoDate.toISOString() : null,
+        storeCreated: true,
+        descontoAplicado: false,
+        planoAtivo: false,
+        ultimoLogin: agora.toISOString()
+      };
+
+      // Usa uma transação batch para garantir que ambas as operações sejam completadas
       const batch = writeBatch(db);
       batch.set(doc(db, 'lojas', user.uid), lojaData);
       batch.set(doc(db, 'usuarios', user.uid), usuarioData, { merge: true });
       await batch.commit();
 
+      // Efeito de confetti para celebrar a criação da loja
       if (jsConfetti) {
         jsConfetti.addConfetti({
           emojis: ['🛍️', '💰', '🛒', '💳', '✨', '🎉'],
@@ -234,9 +254,10 @@ const CreateStore = ({ onStoreCreated }) => {
                 placeholder="Ex: Loja da Maria"
                 className="form-control-custom"
                 required
+                maxLength={50}
               />
               <Form.Text className="form-text-custom">
-                Este será o nome que seus clientes verão
+                Este será o nome que seus clientes verão (máx. 50 caracteres)
               </Form.Text>
             </Form.Group>
           </div>
@@ -252,9 +273,10 @@ const CreateStore = ({ onStoreCreated }) => {
                 placeholder="Ex: Roupas, Calçados, Eletrônicos"
                 className="form-control-custom"
                 required
+                maxLength={30}
               />
               <Form.Text className="form-text-custom">
-                Nos ajude a entender melhor seu negócio
+                Escolha o segmento que melhor descreve seu negócio
               </Form.Text>
             </Form.Group>
           </div>
@@ -366,57 +388,55 @@ const CreateStore = ({ onStoreCreated }) => {
             </Form.Group>
           </div>
         );
-        case 4:
-          return (
-            <div className="step-content-inner confirmation-step">
-              <h5 className="confirmation-title">Confira os dados da sua loja</h5>
-              <Card className="confirmation-card">
-                <Card.Body>
-                  <Row>
-                    <Col md={6}>
-                      <div className="confirmation-item">
-                        <span className="confirmation-label">Nome:</span>
-                        <span className="confirmation-value">{nomeLoja}</span>
-                      </div>
-                      <div className="confirmation-item">
-                        <span className="confirmation-label">Segmento:</span>
-                        <span className="confirmation-value">{segmento}</span>
-                      </div>
-                      <div className="confirmation-item">
-                        <span className="confirmation-label">Plano:</span>
-                        <span className="confirmation-value">
-                          {plano === 'free' ? 'Free' : 
-                           plano === 'plus' ? 'Plus' : 'Premium'}
-                        </span>
-                      </div>
-                    </Col>
-                    <Col md={6}>
-                      <div className="confirmation-image-wrapper">
-                        <span className="confirmation-label">Logo:</span>
-                        {logoUrl ? (
-                          <div className="confirmation-image-container">
-                            <img
-                              src={logoUrl}
-                              alt="Logo preview"
-                              className="confirmation-image"
-                            />
-                          </div>
-                        ) : (
-                          <div className="text-muted">Nenhum logo adicionado</div>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </div>
-          );
+      case 4:
+        return (
+          <div className="step-content-inner confirmation-step">
+            <h5 className="confirmation-title">Confira os dados da sua loja</h5>
+            <Card className="confirmation-card">
+              <Card.Body>
+                <Row>
+                  <Col md={6}>
+                    <div className="confirmation-item">
+                      <span className="confirmation-label">Nome:</span>
+                      <span className="confirmation-value">{nomeLoja}</span>
+                    </div>
+                    <div className="confirmation-item">
+                      <span className="confirmation-label">Segmento:</span>
+                      <span className="confirmation-value">{segmento}</span>
+                    </div>
+                    <div className="confirmation-item">
+                      <span className="confirmation-label">Plano:</span>
+                      <span className="confirmation-value">
+                        {plano === 'free' ? 'Free' : 
+                         plano === 'plus' ? 'Plus' : 'Premium'}
+                      </span>
+                    </div>
+                  </Col>
+                  <Col md={6}>
+                    <div className="confirmation-image-wrapper">
+                      <span className="confirmation-label">Logo:</span>
+                      {logoUrl ? (
+                        <div className="confirmation-image-container">
+                          <img
+                            src={logoUrl}
+                            alt="Logo preview"
+                            className="confirmation-image"
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-muted">Nenhum logo adicionado</div>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </div>
+        );
       default:
         return null;
     }
   };
-
-  if (!user) return null;
 
   return (
     <div className="create-store-wrapper">
@@ -433,7 +453,9 @@ const CreateStore = ({ onStoreCreated }) => {
                 </div>
                 <div className="step-info">
                   <div className="step-title">{step.title}</div>
-                  {/* <div className="step-description">{step.description}</div> */}
+                  {currentStep === index && (
+                    <div className="step-description">{step.description}</div>
+                  )}
                 </div>
               </div>
             ))}
