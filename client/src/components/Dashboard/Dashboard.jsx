@@ -48,6 +48,11 @@ import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
 import { verificarPlanoUsuario } from "../../utils/verificarPlanoUsuario";
 import { useTheme } from "@mui/material/styles";
 import "./Dashboard.css";
+import EditHeader from "../Admin/EditHeader/EditHeader";
+import EditBanner from "../Admin/EditBanner/EditBanner";
+// Removido ManageProducts import, pois o ManageStock já gerencia os produtos
+import ManageStock from "../ManageStock/ManageStock";
+import SalesReports from "../SalesReports/SalesReports";
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -62,13 +67,13 @@ const Dashboard = ({ user }) => {
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerImages, setBannerImages] = useState([]);
   const [newBannerImage, setNewBannerImage] = useState("");
-  const [storeTheme, setStoreTheme] = useState("claro"); // Renomeado
+  const [storeTheme, setStoreTheme] = useState("claro");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
   const [corSecundaria, setCorSecundaria] = useState("#2541b2");
   const navigate = useNavigate();
   const auth = getAuth();
   const theme = useTheme();
-  console.log(theme); // Verifique se o tema está definido corretamente
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -77,7 +82,7 @@ const Dashboard = ({ user }) => {
           setCurrentUser(currentAuthUser);
           setLoading(true);
           // Verifica plano do usuário
-          await verificarPlanoUsuario(currentUser.uid);
+          await verificarPlanoUsuario(currentAuthUser.uid);
           // Verifica se o usuário tem uma loja
           const [userSnap, storeSnap] = await Promise.all([
             getDoc(doc(db, "usuarios", currentAuthUser.uid)),
@@ -85,7 +90,6 @@ const Dashboard = ({ user }) => {
           ]);
           const userData = userSnap.exists() ? userSnap.data() : {};
           const storeDataExists = storeSnap.exists();
-          // Define plano atual do usuário
           setUserPlan(userData.planoAtual || userData.plano || "free");
           if (storeDataExists) {
             const storeData = storeSnap.data();
@@ -94,7 +98,6 @@ const Dashboard = ({ user }) => {
             setWhatsappNumber(storeData.whatsappNumber || "");
             setLogoUrl(storeData.logoUrl || "");
             setBannerImages(storeData.bannerImages || []);
-            setStoreTheme(storeData.configs?.tema || "claro");
             setStoreTheme(storeData.configs?.tema || "claro");
             setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
             setCorSecundaria(storeData.configs?.corSecundaria || "#2541b2");
@@ -123,6 +126,7 @@ const Dashboard = ({ user }) => {
     };
     loadUserData();
   }, [user, navigate, auth, selectedSection]);
+
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleLogout = async () => {
     try {
@@ -182,11 +186,12 @@ const Dashboard = ({ user }) => {
       alert("Erro ao remover imagem");
     }
   };
+
+  // Atualize os itens do menu, removendo a opção "Gerenciar Produtos"
   const menuItems = [
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Gerenciar Produtos", icon: <ShoppingCartIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
@@ -194,7 +199,7 @@ const Dashboard = ({ user }) => {
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
   ];
-  // Removed duplicate declaration of drawerContent
+  
   const renderContent = () => {
     if (loading) {
       return (
@@ -238,7 +243,7 @@ const Dashboard = ({ user }) => {
                     <Button
                       variant="contained"
                       startIcon={<AddIcon />}
-                      onClick={() => setSelectedSection("Gerenciar Produtos")}
+                      onClick={() => setSelectedSection("Gerenciar Estoque")}
                       sx={{ mt: 1, mr: 1 }}
                     >
                       Adicionar Produto
@@ -274,122 +279,38 @@ const Dashboard = ({ user }) => {
         );
       case "Editar Cabeçalho":
         return (
-          <div>
-            <h2>Editar Cabeçalho da Loja</h2>
-            <TextField
-              label="Título da Loja"
-              fullWidth
-              value={headerTitle}
-              onChange={(e) => setHeaderTitle(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Button 
-              variant="contained" 
-              onClick={saveHeaderChanges}
-            >
-              Salvar Alterações
-            </Button>
-          </div>
+          <EditHeader
+            headerTitle={headerTitle}
+            setHeaderTitle={setHeaderTitle}
+            logoUrl={logoUrl}
+            setLogoUrl={setLogoUrl}
+            onSave={saveHeaderChanges}
+            currentUser={currentUser}
+          />
         );
       case "Editar Banner":
         return (
-          <div>
-            <h2>Editar Banner Rotativo</h2>
-            <p>Adicione URLs de imagens para exibir no banner da sua loja</p>
-            <TextField
-              label="URL da Imagem"
-              fullWidth
-              value={newBannerImage}
-              onChange={(e) => setNewBannerImage(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Button 
-              variant="contained" 
-              startIcon={<AddIcon />}
-              onClick={addBannerImage}
-              sx={{ mb: 3 }}
-            >
-              Adicionar Imagem
-            </Button>
-            <Divider sx={{ my: 2 }} />
-            <h3>Imagens do Banner</h3>
-            {bannerImages.length === 0 ? (
-              <p>Nenhuma imagem adicionada ainda.</p>
-            ) : (
-              <Grid container spacing={2}>
-                {bannerImages.map((image, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={image}
-                        alt={`Banner ${index + 1}`}
-                      />
-                      <CardActions>
-                        <Button 
-                          size="small" 
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                          onClick={() => removeBannerImage(index)}
-                        >
-                          Remover
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </div>
+          <EditBanner
+            bannerImages={bannerImages}
+            setBannerImages={setBannerImages}
+            newBannerImage={newBannerImage}
+            setNewBannerImage={setNewBannerImage}
+            onAddBanner={addBannerImage}
+            onRemoveBanner={removeBannerImage}
+            currentUser={currentUser}
+            userPlan={userPlan} // "free", "plus", or "premium"
+          />
         );
-      case "Gerenciar Produtos":
+      case "Gerenciar Estoque":
         return (
-          <div>
-            <h2>Gerenciar Produtos</h2>
-            <Button 
-              variant="contained" 
-              startIcon={<AddIcon />}
-              onClick={() => navigate('/dashboard/adicionar-produto')}
-              sx={{ mb: 3 }}
-            >
-              Adicionar Novo Produto
-            </Button>
-            {products.length === 0 ? (
-              <p>Nenhum produto cadastrado ainda.</p>
-            ) : (
-              <Grid container spacing={3}>
-                {products.map((product) => (
-                  <Grid item xs={12} sm={6} md={4} key={product.id}>
-                    <Card>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={product.imageUrl || "/placeholder-product.jpg"}
-                        alt={product.name}
-                      />
-                      <CardContent>
-                        <Typography gutterBottom variant="h6">
-                          {product.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          R$ {product.price?.toFixed(2) || "0.00"}
-                        </Typography>
-                        <Typography variant="body2">
-                          Estoque: {product.stock || 0}
-                        </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button size="small">Editar</Button>
-                        <Button size="small" color="error">Remover</Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </div>
+          <ManageStock
+            products={products}
+            setProducts={setProducts}
+            currentUser={currentUser}
+          />
         );
+      case "Relatórios de Vendas":
+        return <SalesReports currentUser={currentUser} />;
       case "Configurar WhatsApp":
         return (
           <div>
@@ -402,10 +323,7 @@ const Dashboard = ({ user }) => {
               sx={{ mb: 2 }}
               placeholder="Ex: 5585999999999"
             />
-            <Button 
-              variant="contained" 
-              onClick={saveWhatsappChanges}
-            >
+            <Button variant="contained" onClick={saveWhatsappChanges}>
               Salvar Número
             </Button>
             <Typography variant="body2" sx={{ mt: 2 }}>
@@ -416,8 +334,8 @@ const Dashboard = ({ user }) => {
       case "Visualizar Loja":
         return (
           <Box sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               size="large"
               onClick={() => navigate(`/loja/${currentUser.uid}`)}
               startIcon={<PreviewIcon />}
@@ -482,6 +400,7 @@ const Dashboard = ({ user }) => {
         );
     }
   };
+  
   const filteredMenuItems = menuItems.filter((item) =>
     item.allowedPlans.includes(userPlan)
   );
@@ -514,6 +433,7 @@ const Dashboard = ({ user }) => {
       </div>
     </div>
   );
+  
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
@@ -582,4 +502,5 @@ const Dashboard = ({ user }) => {
     </Box>
   );
 };
+
 export default Dashboard;
