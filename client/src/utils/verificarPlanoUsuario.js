@@ -61,13 +61,8 @@ export const verificarPlanoUsuario = async (uid) => {
     // Atualizar o documento se necessário
     if (atualizacoes) {
       await updateDoc(userRef, atualizacoes);
-      console.log(`Usuário ${uid} teve seu plano atualizado para free.`);
-      
-      // Retornar os dados atualizados
-      return {
-        ...userData,
-        ...atualizacoes
-      };
+      console.log(`Usuário ${uid} teve seu plano atualizado para ${atualizacoes.plano}.`);
+      return { ...userData, ...atualizacoes };
     }
     
     return null; // Nenhuma atualização foi necessária

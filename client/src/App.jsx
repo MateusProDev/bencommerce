@@ -18,16 +18,12 @@ import LojinhaPreview from './components/LojinhaPreview/LojinhaPreview';
 // Utils
 import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
 
-/**
- * Protected route component - redirects to login if user is not authenticated
- */
+// Componente de rota protegida
 const ProtectedRoute = ({ user, children }) => {
   return user ? children : <Navigate to="/login" replace />;
 };
 
-/**
- * Store required route - redirects to store creation if user doesn't have a store
- */
+// Rota que requer loja criada
 const StoreRequiredRoute = ({ user, hasStore, children }) => {
   if (!user) return <Navigate to="/login" replace />;
   return hasStore ? children : <Navigate to="/criar-loja" replace />;
@@ -39,17 +35,17 @@ const AppContent = () => {
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
   const location = useLocation();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
 
       if (currentUser) {
-        // Verify user's subscription plan
+        // Verifica plano do usuário
         await verificarPlanoUsuario(currentUser.uid);
 
-        // Check if user has a store by checking both documents
+        // Verifica se o usuário tem uma loja
         const [userSnap, storeSnap] = await Promise.all([
           getDoc(doc(db, 'usuarios', currentUser.uid)),
           getDoc(doc(db, 'lojas', currentUser.uid))
@@ -58,7 +54,7 @@ const AppContent = () => {
         const userData = userSnap.exists() ? userSnap.data() : {};
         const storeExists = storeSnap.exists();
 
-        // User has a store if either flag is set or store document exists
+        // Define se o usuário tem loja criada
         setHasStore(!!(userData.storeCreated || storeExists));
       } else {
         setHasStore(false);
@@ -67,11 +63,11 @@ const AppContent = () => {
       setLoading(false);
     });
 
-    // Cleanup subscription
+    // Limpa a assinatura
     return () => unsubscribe();
   }, [auth]);
 
-  // Show loading spinner while checking authentication status
+  // Mostra um spinner enquanto verifica o status de autenticação
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
@@ -84,10 +80,10 @@ const AppContent = () => {
 
   return (
     <Routes location={location}>
-      {/* Public routes */}
+      {/* Rotas públicas */}
       <Route path="/" element={<HomePage />} />
-      
-      {/* Authentication routes - both /login and /auth should work */}
+
+      {/* Rotas de autenticação */}
       <Route
         path="/login"
         element={
@@ -101,7 +97,6 @@ const AppContent = () => {
           )
         }
       />
-      
       <Route
         path="/signup"
         element={
@@ -115,8 +110,7 @@ const AppContent = () => {
           )
         }
       />
-      
-      {/* Keep /auth for backward compatibility */}
+      {/* Mantém /auth para compatibilidade com versões anteriores */}
       <Route
         path="/auth"
         element={
@@ -130,10 +124,18 @@ const AppContent = () => {
           )
         }
       />
-      
-      <Route path="/loja/:storeId" element={<Lojinha />} />
 
-      {/* Protected routes that only require authentication */}
+      {/* Loja do usuário */}
+      <Route
+        path="/loja/:storeId"
+        element={
+          <ProtectedRoute user={user}>
+            <Lojinha />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rotas protegidas que requerem apenas autenticação */}
       <Route
         path="/criar-loja"
         element={
@@ -159,7 +161,7 @@ const AppContent = () => {
         }
       />
 
-      {/* Protected routes that require both authentication and a store */}
+      {/* Rotas protegidas que requerem autenticação e uma loja */}
       <Route
         path="/dashboard"
         element={
@@ -177,7 +179,7 @@ const AppContent = () => {
         }
       />
 
-      {/* Catch-all route */}
+      {/* Rota para todos os outros casos */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
