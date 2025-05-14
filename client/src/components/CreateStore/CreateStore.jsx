@@ -84,32 +84,24 @@ const CreateStore = ({ onStoreCreated }) => {
 
     setLoading(true);
     setUploadProgress(0);
-    
+
     try {
-      const xhr = new XMLHttpRequest();
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(percentComplete);
-        }
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData,
       });
 
-      xhr.open('POST', `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`);
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.response);
-          setLogoUrl(response.secure_url);
-          setUploadProgress(100);
-          setLoading(false);
-          nextStep();
-        } else {
-          throw new Error('Erro no upload da imagem');
-        }
-      };
-      xhr.send(formData);
+      if (response.ok) {
+        const data = await response.json();
+        setLogoUrl(data.secure_url);
+        setUploadProgress(100);
+      } else {
+        throw new Error('Erro ao fazer upload da imagem');
+      }
     } catch (err) {
       console.error('Erro no upload da imagem:', err);
       setErrorMsg('Erro ao enviar imagem. Verifique sua conexão e tente novamente.');
+    } finally {
       setLoading(false);
     }
   };
@@ -382,10 +374,9 @@ const CreateStore = ({ onStoreCreated }) => {
                 </div>
               </div>
               
-              <Form.Text className="form-text-custom mt-3">
+              <Form.Text className="form-text-custom mt-3"></Form.Text>
                 Você pode alterar seu plano a qualquer momento no painel administrativo.
-              </Form.Text>
-            </Form.Group>
+              </Form.Group>
           </div>
         );
       case 4:

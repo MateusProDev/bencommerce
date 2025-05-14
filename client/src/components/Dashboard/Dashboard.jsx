@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemIcon, 
-  ListItemText, 
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   IconButton,
-  Toolbar, 
-  AppBar, 
-  Typography, 
-  Box, 
+  Toolbar,
+  AppBar,
+  Typography,
+  Box,
   CssBaseline,
   CircularProgress,
   Alert,
@@ -20,32 +20,33 @@ import {
   CardMedia,
   CardActions,
   TextField,
-  Divider
+  Divider,
 } from "@mui/material";
 import {
-  Menu as MenuIcon, 
-  Logout as LogoutIcon, 
+  Menu as MenuIcon,
+  Logout as LogoutIcon,
   Edit as EditIcon,
-  Image as ImageIcon, 
+  Image as ImageIcon,
   ShoppingCart as ShoppingCartIcon,
-  WhatsApp as WhatsAppIcon, 
+  WhatsApp as WhatsAppIcon,
   People as PeopleIcon,
-  Inventory as InventoryIcon, 
+  Inventory as InventoryIcon,
   PointOfSale as PointOfSaleIcon,
-  Assessment as AssessmentIcon, 
+  Assessment as AssessmentIcon,
   Home as HomeIcon,
   Upgrade as UpgradeIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   Settings as SettingsIcon,
-  Preview as PreviewIcon
+  Preview as PreviewIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import { doc, getDoc, collection, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-
 import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
+import { verificarPlanoUsuario } from "../../utils/verificarPlanoUsuario";
+import { useTheme } from "@mui/material/styles";
 import "./Dashboard.css";
 
 const Dashboard = ({ user }) => {
@@ -58,50 +59,61 @@ const Dashboard = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [headerTitle, setHeaderTitle] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
   const [bannerImages, setBannerImages] = useState([]);
   const [newBannerImage, setNewBannerImage] = useState("");
+  const [storeTheme, setStoreTheme] = useState("claro"); // Renomeado
+  const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
+  const [corSecundaria, setCorSecundaria] = useState("#2541b2");
   const navigate = useNavigate();
-
   const auth = getAuth();
-
+  const theme = useTheme();
+  console.log(theme); // Verifique se o tema está definido corretamente
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const currentAuthUser = user || auth.currentUser;
-        
         if (currentAuthUser) {
           setCurrentUser(currentAuthUser);
-          
+          setLoading(true);
+          // Verifica plano do usuário
+          await verificarPlanoUsuario(currentUser.uid);
+          // Verifica se o usuário tem uma loja
           const [userSnap, storeSnap] = await Promise.all([
             getDoc(doc(db, "usuarios", currentAuthUser.uid)),
-            getDoc(doc(db, "lojas", currentAuthUser.uid))
+            getDoc(doc(db, "lojas", currentAuthUser.uid)),
           ]);
-          
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            setUserPlan(userData.planoAtual || userData.plano || "free");
-          }
-          
-          if (storeSnap.exists()) {
+          const userData = userSnap.exists() ? userSnap.data() : {};
+          const storeDataExists = storeSnap.exists();
+          // Define plano atual do usuário
+          setUserPlan(userData.planoAtual || userData.plano || "free");
+          if (storeDataExists) {
             const storeData = storeSnap.data();
             setStoreData(storeData);
             setHeaderTitle(storeData.headerTitle || "Minha Loja");
             setWhatsappNumber(storeData.whatsappNumber || "");
+            setLogoUrl(storeData.logoUrl || "");
             setBannerImages(storeData.bannerImages || []);
-            
+            setStoreTheme(storeData.configs?.tema || "claro");
+            setStoreTheme(storeData.configs?.tema || "claro");
+            setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
+            setCorSecundaria(storeData.configs?.corSecundaria || "#2541b2");
             // Carrega produtos
-            const productsCollection = collection(db, `lojas/${currentAuthUser.uid}/produtos`);
+            const productsCollection = collection(
+              db,
+              `lojas/${currentAuthUser.uid}/produtos`
+            );
             const productsSnapshot = await getDocs(productsCollection);
-            const productsList = productsSnapshot.docs.map(doc => ({
+            const productsList = productsSnapshot.docs.map((doc) => ({
               id: doc.id,
-              ...doc.data()
+              ...doc.data(),
             }));
             setProducts(productsList);
           } else {
-            navigate('/criar-loja');
+            navigate("/criar-loja");
           }
         } else {
-          navigate('/login');
+          navigate("/login");
         }
       } catch (err) {
         console.error("Erro ao carregar dados:", err);
@@ -109,12 +121,9 @@ const Dashboard = ({ user }) => {
         setLoading(false);
       }
     };
-
     loadUserData();
   }, [user, navigate, auth, selectedSection]);
-
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -123,11 +132,10 @@ const Dashboard = ({ user }) => {
       console.error("Erro ao fazer logout:", error);
     }
   };
-
   const saveHeaderChanges = async () => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
-        headerTitle
+        headerTitle,
       });
       alert("Cabeçalho atualizado com sucesso!");
     } catch (error) {
@@ -135,11 +143,10 @@ const Dashboard = ({ user }) => {
       alert("Erro ao salvar cabeçalho");
     }
   };
-
   const saveWhatsappChanges = async () => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
-        whatsappNumber
+        whatsappNumber,
       });
       alert("WhatsApp atualizado com sucesso!");
     } catch (error) {
@@ -147,14 +154,12 @@ const Dashboard = ({ user }) => {
       alert("Erro ao salvar WhatsApp");
     }
   };
-
   const addBannerImage = async () => {
     if (!newBannerImage) return;
-    
     try {
       const updatedBannerImages = [...bannerImages, newBannerImage];
       await updateDoc(doc(db, "lojas", currentUser.uid), {
-        bannerImages: updatedBannerImages
+        bannerImages: updatedBannerImages,
       });
       setBannerImages(updatedBannerImages);
       setNewBannerImage("");
@@ -164,12 +169,11 @@ const Dashboard = ({ user }) => {
       alert("Erro ao adicionar imagem");
     }
   };
-
   const removeBannerImage = async (index) => {
     try {
       const updatedBannerImages = bannerImages.filter((_, i) => i !== index);
       await updateDoc(doc(db, "lojas", currentUser.uid), {
-        bannerImages: updatedBannerImages
+        bannerImages: updatedBannerImages,
       });
       setBannerImages(updatedBannerImages);
       alert("Imagem removida do banner!");
@@ -178,38 +182,33 @@ const Dashboard = ({ user }) => {
       alert("Erro ao remover imagem");
     }
   };
-
   const menuItems = [
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Gerenciar Produtos", icon: <ShoppingCartIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Gerenciar Clientes", icon: <PeopleIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Ver Usuários", icon: <PeopleIcon />, allowedPlans: ["premium"] },
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
   ];
-
+  // Removed duplicate declaration of drawerContent
   const renderContent = () => {
     if (loading) {
       return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       );
     }
-
     switch (selectedSection) {
       case "Home":
         return (
           <div>
             <h2>Bem-vindo ao Painel da sua Loja</h2>
             <p>Aqui você pode gerenciar todos os aspectos da sua loja virtual.</p>
-            
             <Grid container spacing={3} mt={2}>
               <Grid item xs={12} md={6}>
                 <Card>
@@ -217,13 +216,13 @@ const Dashboard = ({ user }) => {
                     <Typography variant="h6">Resumo da Loja</Typography>
                     <Typography variant="body2">
                       <strong>Nome:</strong> {storeData?.storeName || "Não definido"}<br />
-                      <strong>Produtos cadastrados:</strong> {products.length}<br />
-                      <strong>Plano atual:</strong> {userPlan}
+                      <strong>Segmento:</strong> {storeData?.segmento || "Não definido"}<br />
+                      <strong>Plano:</strong> {userPlan}
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button 
-                      size="small" 
+                    <Button
+                      size="small"
                       startIcon={<PreviewIcon />}
                       onClick={() => navigate(`/loja/${currentUser.uid}`)}
                     >
@@ -232,21 +231,20 @@ const Dashboard = ({ user }) => {
                   </CardActions>
                 </Card>
               </Grid>
-              
               <Grid item xs={12} md={6}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6">Ações Rápidas</Typography>
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       startIcon={<AddIcon />}
                       onClick={() => setSelectedSection("Gerenciar Produtos")}
                       sx={{ mt: 1, mr: 1 }}
                     >
                       Adicionar Produto
                     </Button>
-                    <Button 
-                      variant="outlined" 
+                    <Button
+                      variant="outlined"
                       startIcon={<SettingsIcon />}
                       onClick={() => setSelectedSection("Editar Cabeçalho")}
                       sx={{ mt: 1 }}
@@ -257,23 +255,23 @@ const Dashboard = ({ user }) => {
                 </Card>
               </Grid>
             </Grid>
-
             {userPlan === "free" && (
               <Alert severity="info" sx={{ mt: 3 }}>
-                Você está no plano Free. <Button 
-                  variant="contained" 
-                  color="primary" 
+                Você está no plano Free.{" "}
+                <Button
+                  variant="contained"
+                  color="primary"
                   size="small"
                   onClick={() => setSelectedSection("Upgrade de Plano")}
                   sx={{ ml: 1 }}
                 >
                   Faça upgrade agora
-                </Button> para acessar todos os recursos.
+                </Button>{" "}
+                para acessar todos os recursos.
               </Alert>
             )}
           </div>
         );
-      
       case "Editar Cabeçalho":
         return (
           <div>
@@ -293,13 +291,11 @@ const Dashboard = ({ user }) => {
             </Button>
           </div>
         );
-      
       case "Editar Banner":
         return (
           <div>
             <h2>Editar Banner Rotativo</h2>
             <p>Adicione URLs de imagens para exibir no banner da sua loja</p>
-            
             <TextField
               label="URL da Imagem"
               fullWidth
@@ -315,9 +311,7 @@ const Dashboard = ({ user }) => {
             >
               Adicionar Imagem
             </Button>
-            
             <Divider sx={{ my: 2 }} />
-            
             <h3>Imagens do Banner</h3>
             {bannerImages.length === 0 ? (
               <p>Nenhuma imagem adicionada ainda.</p>
@@ -349,7 +343,6 @@ const Dashboard = ({ user }) => {
             )}
           </div>
         );
-      
       case "Gerenciar Produtos":
         return (
           <div>
@@ -362,7 +355,6 @@ const Dashboard = ({ user }) => {
             >
               Adicionar Novo Produto
             </Button>
-            
             {products.length === 0 ? (
               <p>Nenhum produto cadastrado ainda.</p>
             ) : (
@@ -398,7 +390,6 @@ const Dashboard = ({ user }) => {
             )}
           </div>
         );
-      
       case "Configurar WhatsApp":
         return (
           <div>
@@ -422,7 +413,6 @@ const Dashboard = ({ user }) => {
             </Typography>
           </div>
         );
-      
       case "Visualizar Loja":
         return (
           <Box sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -436,10 +426,53 @@ const Dashboard = ({ user }) => {
             </Button>
           </Box>
         );
-      
       case "Upgrade de Plano":
         return currentUser ? <PlanoUpgrade user={currentUser} /> : null;
-      
+      case "Preview Estático":
+        return (
+          <div>
+            <h2>Preview Estático da Loja</h2>
+            <div
+              style={{
+                backgroundColor: corPrimaria,
+                color: "white",
+                padding: "20px",
+                borderRadius: "8px",
+              }}
+            >
+              <h1>{headerTitle}</h1>
+              <img src={logoUrl} alt="Logo da Loja" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+              <div>
+                {bannerImages.length === 0 ? (
+                  <p>Nenhuma imagem adicionada ainda.</p>
+                ) : (
+                  <Grid container spacing={2}>
+                    {bannerImages.map((image, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card>
+                          <CardMedia
+                            component="img"
+                            height="140"
+                            image={image}
+                            alt={`Banner ${index + 1}`}
+                          />
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/loja/${currentUser.uid}`)}
+              startIcon={<PreviewIcon />}
+              sx={{ mt: 3 }}
+            >
+              Publicar Loja
+            </Button>
+          </div>
+        );
       default:
         return (
           <div>
@@ -449,11 +482,9 @@ const Dashboard = ({ user }) => {
         );
     }
   };
-
-  const filteredMenuItems = menuItems.filter(item => 
+  const filteredMenuItems = menuItems.filter((item) =>
     item.allowedPlans.includes(userPlan)
   );
-
   const drawerContent = (
     <div className="admin-loja-drawer-container">
       <Toolbar className="admin-loja-drawer-header">
@@ -461,7 +492,6 @@ const Dashboard = ({ user }) => {
           {storeData?.storeName || "Minha Loja"}
         </Typography>
       </Toolbar>
-
       <List className="admin-loja-menu-list">
         {filteredMenuItems.map((item, index) => (
           <ListItem
@@ -478,14 +508,12 @@ const Dashboard = ({ user }) => {
           </ListItem>
         ))}
       </List>
-
       <div className="admin-loja-logout-button" onClick={handleLogout}>
         <LogoutIcon sx={{ mr: 1 }} />
         Sair
       </div>
     </div>
   );
-
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
@@ -493,7 +521,7 @@ const Dashboard = ({ user }) => {
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          background: "#2c3e50",
+          backgroundColor: (theme) => theme.palette.primary.main || "#4a6bff",
           display: { sm: "none" },
         }}
       >
@@ -512,7 +540,6 @@ const Dashboard = ({ user }) => {
           </Typography>
         </Toolbar>
       </AppBar>
-
       <Drawer
         variant="permanent"
         sx={{
@@ -528,7 +555,6 @@ const Dashboard = ({ user }) => {
       >
         {drawerContent}
       </Drawer>
-
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -541,7 +567,6 @@ const Dashboard = ({ user }) => {
       >
         {drawerContent}
       </Drawer>
-
       <Box
         component="main"
         sx={{
@@ -557,5 +582,4 @@ const Dashboard = ({ user }) => {
     </Box>
   );
 };
-
 export default Dashboard;

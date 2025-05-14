@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Form, Spinner, ToggleButtonGroup, ToggleButton, Alert, Row, Col } from 'react-bootstrap';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  sendPasswordResetEmail
-} from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 import { FaGoogle, FaLock } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -18,7 +11,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
   // Use location to get state passed from navigation
   const location = useLocation();
   const { selectedPlan = 'free' } = location.state || {};
-  
   const [isRegistering, setIsRegistering] = useState(initialMode === 'signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,19 +22,17 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
   const [resetPasswordMode, setResetPasswordMode] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
-
   const navigate = useNavigate();
   const auth = getAuth();
-  
+
   useEffect(() => {
     // Set initial mode based on props
     setIsRegistering(initialMode === 'signup');
-    
+
     // Check if user login is locked due to too many attempts
     const lockedUntil = localStorage.getItem('authLockUntil');
     if (lockedUntil && new Date(lockedUntil) > new Date()) {
       setIsLocked(true);
-      
       // Set timer to unlock
       const timeRemaining = new Date(lockedUntil) - new Date();
       const unlockTimer = setTimeout(() => {
@@ -50,7 +40,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
         localStorage.removeItem('authLockUntil');
         setLoginAttempts(0);
       }, timeRemaining);
-      
       return () => clearTimeout(unlockTimer);
     }
   }, [initialMode]);
@@ -58,7 +47,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
   const criarUsuarioNoFirestore = async (user) => {
     const userRef = doc(db, 'usuarios', user.uid);
     const snapshot = await getDoc(userRef);
-
     if (!snapshot.exists()) {
       await setDoc(userRef, {
         email: user.email,
@@ -73,7 +61,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
         planoAtivo: false,
         ultimoLogin: serverTimestamp()
       });
-      
       // After account creation, redirect to store creation
       navigate('/criar-loja', { 
         state: { selectedPlan } 
@@ -84,7 +71,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
         ultimoLogin: serverTimestamp(),
         atualizadaEm: serverTimestamp()
       }, { merge: true });
-      
       // For existing users, let onLoginSuccess handle redirection
       if (onLoginSuccess) {
         onLoginSuccess();
@@ -94,16 +80,13 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (resetPasswordMode) {
       handleResetPassword();
       return;
     }
-    
     setLoading(true);
     setError('');
     setSuccessMessage('');
-
     try {
       let userCredential;
       if (isRegistering) {
@@ -111,7 +94,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       } else {
         // Check login attempts
         if (loginAttempts >= 5) {
-          // Lock login for 15 minutes
           const lockUntil = new Date(new Date().getTime() + 15 * 60000);
           localStorage.setItem('authLockUntil', lockUntil.toISOString());
           setIsLocked(true);
@@ -119,22 +101,18 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
           setLoading(false);
           return;
         }
-        
         userCredential = await signInWithEmailAndPassword(auth, email, password);
         // Reset login attempts on successful login
         setLoginAttempts(0);
         localStorage.removeItem('authLockUntil');
       }
-
       await criarUsuarioNoFirestore(userCredential.user);
     } catch (err) {
       console.error('Erro de autenticação:', err);
-      
       // Increment login attempts if this is a failed login
       if (!isRegistering) {
         setLoginAttempts(prev => prev + 1);
       }
-      
       // Translate common Firebase errors to user-friendly messages
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('Email ou senha incorretos.');
@@ -147,7 +125,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       } else {
         setError(err.message);
       }
-      
       setLoading(false);
     }
   };
@@ -157,7 +134,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
     setError('');
     setSuccessMessage('');
     const provider = new GoogleAuthProvider();
-
     try {
       const result = await signInWithPopup(auth, provider);
       await criarUsuarioNoFirestore(result.user);
@@ -171,16 +147,14 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       setLoadingProvider(false);
     }
   };
-  
+
   const handleResetPassword = async () => {
     if (!email) {
       setError('Digite seu email para recuperar a senha.');
       return;
     }
-    
     setLoadingReset(true);
     setError('');
-    
     try {
       await sendPasswordResetEmail(auth, email);
       setSuccessMessage('Email de recuperação enviado. Verifique sua caixa de entrada.');
@@ -200,14 +174,13 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       setLoadingReset(false);
     }
   };
-  
+
   const toggleAuthMode = (value) => {
     const isSignup = value === 1;
     setIsRegistering(isSignup);
     setResetPasswordMode(false);
     setError('');
     setSuccessMessage('');
-    
     // Update URL without page reload
     navigate(isSignup ? '/signup' : '/login', { 
       state: { selectedPlan },
@@ -227,7 +200,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
                 : 'Entrar'
             }
           </h2>
-
           {!resetPasswordMode && (
             <ToggleButtonGroup
               type="radio"
@@ -244,10 +216,8 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
               </ToggleButton>
             </ToggleButtonGroup>
           )}
-
           {error && <Alert variant="danger">{error}</Alert>}
           {successMessage && <Alert variant="success">{successMessage}</Alert>}
-          
           {isLocked && (
             <Alert variant="warning">
               <Row className="align-items-center">
@@ -262,7 +232,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
             </Alert>
           )}
         </div>
-
         <Form onSubmit={handleSubmit} className="auth-form">
           <Form.Group controlId="formEmail" className="mb-3">
             <Form.Label>Email</Form.Label>
@@ -275,7 +244,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
               className="auth-input"
             />
           </Form.Group>
-
           {!resetPasswordMode && (
             <Form.Group controlId="formPassword" className="mb-3">
               <Form.Label>Senha</Form.Label>
@@ -295,7 +263,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
               )}
             </Form.Group>
           )}
-
           <Button
             variant={resetPasswordMode ? "info" : isRegistering ? "success" : "primary"}
             type="submit"
@@ -320,7 +287,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
                 : 'Entrar'
             }
           </Button>
-          
           {!resetPasswordMode && !isRegistering && (
             <div className="text-center mt-2">
               <Button 
@@ -332,7 +298,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
               </Button>
             </div>
           )}
-          
           {resetPasswordMode && (
             <div className="text-center mt-2">
               <Button 
@@ -345,13 +310,11 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
             </div>
           )}
         </Form>
-
         {!resetPasswordMode && (
           <div className="auth-separator">
             <span>ou</span>
           </div>
         )}
-
         {!resetPasswordMode && (
           <Button
             variant="outline-danger"

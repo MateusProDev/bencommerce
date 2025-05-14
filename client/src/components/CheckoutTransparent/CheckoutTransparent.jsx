@@ -11,20 +11,16 @@ const CheckoutTransparent = ({ currentUser }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!window.MercadoPago && !loading) {
+    if (!window.MercadoPago) {
       const script = document.createElement('script');
       script.src = 'https://sdk.mercadopago.com/js/v2';
       script.async = true;
       script.onload = () => {
-        const mp = new window.MercadoPago(
-          process.env.REACT_APP_MERCADO_PAGO_PUBLIC_KEY,
-          { locale: 'pt-BR' }
-        );
-        window.mpInstance = mp;
+        window.mpInstance = new window.MercadoPago(process.env.REACT_APP_MERCADO_PAGO_PUBLIC_KEY, { locale: 'pt-BR' });
       };
       document.body.appendChild(script);
     }
-  }, [loading]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

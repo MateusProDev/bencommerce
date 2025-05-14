@@ -1,0 +1,53 @@
+/* Cart */
+.lojinha-cart-modal {
+    position: fixed;
+    right: -350px;
+    top: 0;
+    width: 320px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+    transition: right 0.3s;
+    z-index: 30;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .lojinha-cart-modal.open {
+    right: 0;
+  }
+  .lojinha-cart-modal .close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    cursor: pointer;
+  }
+  .lojinha-cart-modal h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  .lojinha-cart-modal ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .lojinha-cart-modal li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  .lojinha-cart-modal button {
+    background: #ff3d00;
+    color: #fff;
+    border: none;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+  }

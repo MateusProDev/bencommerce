@@ -87,7 +87,7 @@ const PlanoUpgrade = ({ user }) => {
       alert("Usuário não autenticado. Faça login novamente.");
       return;
     }
-    
+
     const desconto = isInTrial && !userData.descontoAplicado ? 0.95 : 1;
     const precoFinal = plano.preco * desconto;
     navigate(`/checkout?plan=${encodeURIComponent(plano.nome.toLowerCase())}&amount=${precoFinal.toFixed(2)}`);
