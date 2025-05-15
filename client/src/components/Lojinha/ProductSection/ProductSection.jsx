@@ -7,9 +7,9 @@ const ProductSection = ({ title, products, onAddToCart }) => (
     <div className="lojinha-products">
       {products.map((prod) => (
         <div key={prod.id} className="lojinha-product-card">
-          <img src={prod.imageUrl} alt={prod.nome} />
-          <div>{prod.nome}</div>
-          <div>R$ {prod.preco.toFixed(2)}</div>
+          <img src={prod.images?.[0] || "/placeholder-product.jpg"} alt={prod.name} />
+          <div>{prod.name}</div>
+          <div>R$ {Number(prod.price).toFixed(2)}</div>
           <button onClick={() => onAddToCart(prod)}>Adicionar</button>
         </div>
       ))}

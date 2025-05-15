@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Button, Grid, Card, CardMedia, CardContent, CardActions, Typography } from "@mui/material";
 import ProductEditModal from "../Admin/ProductEditModal/ProductEditModal";
+import "./ManageStock.css";
 
-const ManageStock = ({ products, setProducts }) => {
+const ManageStock = ({ products, setProducts, categories = [], userPlan = "free", lojaId }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  // Estado local para categorias
+  const [localCategories, setLocalCategories] = useState(categories);
 
   // Abrir modal para adicionar
   const handleAdd = () => {
@@ -40,34 +43,47 @@ const ManageStock = ({ products, setProducts }) => {
     setProducts((prev) => prev.filter((p) => p.id !== product.id));
   };
 
+  // Atualiza o estado local de categorias ao criar uma nova
+  const handleCreateCategory = (category) => {
+    setLocalCategories((prev) =>
+      prev.includes(category) ? prev : [...prev, category]
+    );
+  };
+
   return (
-    <div>
-      <h2>Gerenciar Produtos</h2>
-      <Button variant="contained" sx={{ mb: 2 }} onClick={handleAdd}>
+    <div className="manage-stock-container">
+      <h2 className="manage-stock-title">Gerenciar Produtos</h2>
+      <Button
+        variant="contained"
+        className="manage-stock-add-btn"
+        sx={{ mb: 2 }}
+        onClick={handleAdd}
+      >
         Adicionar Produto
       </Button>
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card>
+            <Card className="manage-stock-card">
               <CardMedia
                 component="img"
                 height="140"
-                image={product.imageUrl || "/placeholder-product.jpg"}
+                image={product.images?.[0] || "/placeholder-product.jpg"}
                 alt={product.name}
+                className="manage-stock-card-img"
               />
               <CardContent>
-                <Typography gutterBottom variant="h6">
+                <Typography gutterBottom variant="h6" className="manage-stock-card-title">
                   {product.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  R$ {product.price?.toFixed(2) || "0.00"}
+                <Typography variant="body2" color="text.secondary" className="manage-stock-card-price">
+                  R$ {Number(product.price)?.toFixed(2) || "0.00"}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" className="manage-stock-card-stock">
                   Estoque: {product.stock || 0}
                 </Typography>
               </CardContent>
-              <CardActions>
+              <CardActions className="manage-stock-card-actions">
                 <Button size="small" onClick={() => handleEdit(product)}>
                   Editar
                 </Button>
@@ -85,6 +101,10 @@ const ManageStock = ({ products, setProducts }) => {
         onSave={handleSave}
         initialProduct={editingProduct}
         isEdit={!!editingProduct}
+        categories={localCategories}
+        onCreateCategory={handleCreateCategory}
+        userPlan={userPlan}
+        lojaId={lojaId}
       />
     </div>
   );
