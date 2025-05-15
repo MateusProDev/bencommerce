@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Form, Spinner, ToggleButtonGroup, ToggleButton, Alert, Row, Col } from 'react-bootstrap';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 import { FaGoogle, FaLock } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import './AuthForm.css';
 
 const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
-  // Use location to get state passed from navigation
   const location = useLocation();
   const { selectedPlan = 'free' } = location.state || {};
   const [isRegistering, setIsRegistering] = useState(initialMode === 'signup');
@@ -26,14 +24,10 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
   const auth = getAuth();
 
   useEffect(() => {
-    // Set initial mode based on props
     setIsRegistering(initialMode === 'signup');
-
-    // Check if user login is locked due to too many attempts
     const lockedUntil = localStorage.getItem('authLockUntil');
     if (lockedUntil && new Date(lockedUntil) > new Date()) {
       setIsLocked(true);
-      // Set timer to unlock
       const timeRemaining = new Date(lockedUntil) - new Date();
       const unlockTimer = setTimeout(() => {
         setIsLocked(false);
@@ -61,20 +55,13 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
         planoAtivo: false,
         ultimoLogin: serverTimestamp()
       });
-      // After account creation, redirect to store creation
-      navigate('/criar-loja', { 
-        state: { selectedPlan } 
-      });
+      navigate('/criar-loja', { state: { selectedPlan } });
     } else {
-      // Update lastLogin timestamp for existing users
       await setDoc(userRef, {
         ultimoLogin: serverTimestamp(),
         atualizadaEm: serverTimestamp()
       }, { merge: true });
-      // For existing users, let onLoginSuccess handle redirection
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
+      if (onLoginSuccess) onLoginSuccess();
     }
   };
 
@@ -92,7 +79,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       if (isRegistering) {
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
       } else {
-        // Check login attempts
         if (loginAttempts >= 5) {
           const lockUntil = new Date(new Date().getTime() + 15 * 60000);
           localStorage.setItem('authLockUntil', lockUntil.toISOString());
@@ -102,18 +88,12 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
           return;
         }
         userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Reset login attempts on successful login
         setLoginAttempts(0);
         localStorage.removeItem('authLockUntil');
       }
       await criarUsuarioNoFirestore(userCredential.user);
     } catch (err) {
-      console.error('Erro de autenticação:', err);
-      // Increment login attempts if this is a failed login
-      if (!isRegistering) {
-        setLoginAttempts(prev => prev + 1);
-      }
-      // Translate common Firebase errors to user-friendly messages
+      if (!isRegistering) setLoginAttempts(prev => prev + 1);
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('Email ou senha incorretos.');
       } else if (err.code === 'auth/email-already-in-use') {
@@ -138,7 +118,6 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       const result = await signInWithPopup(auth, provider);
       await criarUsuarioNoFirestore(result.user);
     } catch (err) {
-      console.error('Erro de login com Google:', err);
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Login cancelado. Tente novamente.');
       } else {
@@ -159,12 +138,10 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
       await sendPasswordResetEmail(auth, email);
       setSuccessMessage('Email de recuperação enviado. Verifique sua caixa de entrada.');
       setResetPasswordMode(false);
-      // Reset login attempts after password reset
       setLoginAttempts(0);
       localStorage.removeItem('authLockUntil');
       setIsLocked(false);
     } catch (err) {
-      console.error('Erro ao enviar email de recuperação:', err);
       if (err.code === 'auth/user-not-found') {
         setError('Não existe conta com este email.');
       } else {
@@ -181,15 +158,11 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
     setResetPasswordMode(false);
     setError('');
     setSuccessMessage('');
-    // Update URL without page reload
-    navigate(isSignup ? '/signup' : '/login', { 
-      state: { selectedPlan },
-      replace: true
-    });
+    navigate(isSignup ? '/signup' : '/login', { state: { selectedPlan }, replace: true });
   };
 
   return (
-    <Container className="auth-container mt-5">
+    <div className="auth-container mt-5">
       <div className="auth-card">
         <div className="auth-header text-center">
           <h2 className="mb-4">
@@ -201,41 +174,39 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
             }
           </h2>
           {!resetPasswordMode && (
-            <ToggleButtonGroup
-              type="radio"
-              name="authType"
-              className="auth-toggle mb-4"
-              value={isRegistering ? 1 : 0}
-              onChange={toggleAuthMode}
-            >
-              <ToggleButton id="login-toggle" variant="outline-primary" value={0}>
+            <div className="auth-toggle mb-4">
+              <button
+                type="button"
+                className={`toggle-btn ${!isRegistering ? 'active' : ''}`}
+                onClick={() => toggleAuthMode(0)}
+              >
                 Entrar
-              </ToggleButton>
-              <ToggleButton id="register-toggle" variant="outline-success" value={1}>
+              </button>
+              <button
+                type="button"
+                className={`toggle-btn ${isRegistering ? 'active' : ''}`}
+                onClick={() => toggleAuthMode(1)}
+              >
                 Criar Conta
-              </ToggleButton>
-            </ToggleButtonGroup>
+              </button>
+            </div>
           )}
-          {error && <Alert variant="danger">{error}</Alert>}
-          {successMessage && <Alert variant="success">{successMessage}</Alert>}
+          {error && <div className="alert alert-danger">{error}</div>}
+          {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {isLocked && (
-            <Alert variant="warning">
-              <Row className="align-items-center">
-                <Col xs="auto">
-                  <FaLock size={20} />
-                </Col>
-                <Col>
-                  Conta temporariamente bloqueada devido a muitas tentativas de login.
-                  Use a recuperação de senha ou tente novamente mais tarde.
-                </Col>
-              </Row>
-            </Alert>
+            <div className="alert alert-warning d-flex align-items-center">
+              <FaLock size={20} style={{ marginRight: 8 }} />
+              <span>
+                Conta temporariamente bloqueada devido a muitas tentativas de login.
+                Use a recuperação de senha ou tente novamente mais tarde.
+              </span>
+            </div>
           )}
         </div>
-        <Form onSubmit={handleSubmit} className="auth-form">
-          <Form.Group controlId="formEmail" className="mb-3">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="mb-3">
+            <label>Email</label>
+            <input
               type="email"
               placeholder="Digite seu email"
               value={email}
@@ -243,91 +214,67 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
               required
               className="auth-input"
             />
-          </Form.Group>
-          {!resetPasswordMode && (
-            <Form.Group controlId="formPassword" className="mb-3">
-              <Form.Label>Senha</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="auth-input"
-              />
-              {isRegistering && (
-                <Form.Text className="text-muted">
-                  A senha deve ter pelo menos 6 caracteres.
-                </Form.Text>
-              )}
-            </Form.Group>
-          )}
-          <Button
-            variant={resetPasswordMode ? "info" : isRegistering ? "success" : "primary"}
+          </div>
+          <div className="mb-3">
+            <label>Senha</label>
+            <input
+              type="password"
+              placeholder="Digite sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="auth-input"
+            />
+          </div>
+          <button
             type="submit"
-            className="auth-button w-100"
-            disabled={loading || loadingReset || (isLocked && !resetPasswordMode)}
+            className="auth-button"
+            disabled={loading}
           >
-            {(loading || loadingReset) ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />{' '}
-                Carregando...
-              </>
-            ) : resetPasswordMode 
-              ? 'Enviar Email de Recuperação' 
-              : isRegistering 
-                ? 'Criar Conta' 
-                : 'Entrar'
-            }
-          </Button>
-          {!resetPasswordMode && !isRegistering && (
+            Entrar
+          </button>
+        </form>
+        {!resetPasswordMode && !isRegistering && (
             <div className="text-center mt-2">
-              <Button 
-                variant="link" 
+              <button 
+                type="button"
                 className="forgot-password-link"
                 onClick={() => setResetPasswordMode(true)}
               >
                 Esqueceu sua senha?
-              </Button>
+              </button>
             </div>
           )}
           {resetPasswordMode && (
             <div className="text-center mt-2">
-              <Button 
-                variant="link" 
+              <button 
+                type="button"
                 className="back-to-login-link"
                 onClick={() => setResetPasswordMode(false)}
               >
                 Voltar para o login
-              </Button>
+              </button>
             </div>
           )}
-        </Form>
         {!resetPasswordMode && (
           <div className="auth-separator">
             <span>ou</span>
           </div>
         )}
         {!resetPasswordMode && (
-          <Button
-            variant="outline-danger"
+          <button
+            type="button"
             onClick={handleLoginWithGoogle}
             disabled={loadingProvider || isLocked}
             className="google-button w-100"
           >
             <FaGoogle className="me-2" />
             {loadingProvider ? 'Carregando...' : 'Entrar com Google'}
-          </Button>
+          </button>
         )}
       </div>
-    </Container>
+    </div>
   );
 };
 
