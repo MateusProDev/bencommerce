@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Spinner, Alert, ProgressBar, Card, Modal, Row, Col } from 'react-bootstrap';
 import { db } from '../../firebaseConfig';
 import { setDoc, doc, writeBatch } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -238,9 +237,9 @@ const CreateStore = ({ onStoreCreated }) => {
       case 0:
         return (
           <div className="step-content-inner">
-            <Form.Group className="mb-4">
-              <Form.Label className="form-label-custom">Nome da Loja*</Form.Label>
-              <Form.Control
+            <div className="form-group mb-4">
+              <label className="form-label-custom">Nome da Loja*</label>
+              <input
                 value={nomeLoja}
                 onChange={(e) => setNomeLoja(e.target.value)}
                 placeholder="Ex: Loja da Maria"
@@ -248,18 +247,18 @@ const CreateStore = ({ onStoreCreated }) => {
                 required
                 maxLength={50}
               />
-              <Form.Text className="form-text-custom">
+              <small className="form-text-custom">
                 Este será o nome que seus clientes verão (máx. 50 caracteres)
-              </Form.Text>
-            </Form.Group>
+              </small>
+            </div>
           </div>
         );
       case 1:
         return (
           <div className="step-content-inner">
-            <Form.Group className="mb-4">
-              <Form.Label className="form-label-custom">Segmento*</Form.Label>
-              <Form.Control
+            <div className="form-group mb-4">
+              <label className="form-label-custom">Segmento*</label>
+              <input
                 value={segmento}
                 onChange={(e) => setSegmento(e.target.value)}
                 placeholder="Ex: Roupas, Calçados, Eletrônicos"
@@ -267,17 +266,17 @@ const CreateStore = ({ onStoreCreated }) => {
                 required
                 maxLength={30}
               />
-              <Form.Text className="form-text-custom">
+              <small className="form-text-custom">
                 Escolha o segmento que melhor descreve seu negócio
-              </Form.Text>
-            </Form.Group>
+              </small>
+            </div>
           </div>
         );
       case 2:
         return (
           <div className="step-content-inner">
-            <Form.Group className="mb-4">
-              <Form.Label className="form-label-custom">Logo*</Form.Label>
+            <div className="form-group mb-4">
+              <label className="form-label-custom">Logo*</label>
               <div className="file-upload-wrapper">
                 <label className="file-upload-label">
                   <FiUpload className="me-2" />
@@ -291,16 +290,12 @@ const CreateStore = ({ onStoreCreated }) => {
                   />
                 </label>
               </div>
-              
               {uploadProgress > 0 && uploadProgress < 100 && (
-                <ProgressBar 
-                  now={uploadProgress} 
-                  label={`${uploadProgress}%`} 
-                  className="upload-progress mt-3" 
-                  variant="gradient"
-                />
+                <div className="upload-progress mt-3">
+                  <div style={{ width: `${uploadProgress}%`, background: 'var(--gradient)', height: 8, borderRadius: 4 }} />
+                  <span>{uploadProgress}%</span>
+                </div>
               )}
-              
               {logoUrl && (
                 <div className="image-preview-wrapper mt-4">
                   <div className="image-preview-container">
@@ -312,14 +307,14 @@ const CreateStore = ({ onStoreCreated }) => {
                   </div>
                 </div>
               )}
-            </Form.Group>
+            </div>
           </div>
         );
       case 3:
         return (
           <div className="step-content-inner">
-            <Form.Group className="mb-4">
-              <Form.Label className="form-label-custom">Plano*</Form.Label>
+            <div className="form-group mb-4">
+              <label className="form-label-custom">Plano*</label>
               <div className="plan-options">
                 <div 
                   className={`plan-option ${plano === 'free' ? 'selected' : ''}`}
@@ -373,20 +368,20 @@ const CreateStore = ({ onStoreCreated }) => {
                   <div className="plan-badge">Premium</div>
                 </div>
               </div>
-              
-              <Form.Text className="form-text-custom mt-3"></Form.Text>
+              <small className="form-text-custom mt-3">
                 Você pode alterar seu plano a qualquer momento no painel administrativo.
-              </Form.Group>
+              </small>
+            </div>
           </div>
         );
       case 4:
         return (
           <div className="step-content-inner confirmation-step">
             <h5 className="confirmation-title">Confira os dados da sua loja</h5>
-            <Card className="confirmation-card">
-              <Card.Body>
-                <Row>
-                  <Col md={6}>
+            <div className="confirmation-card">
+              <div className="confirmation-body">
+                <div className="row">
+                  <div className="col col-6">
                     <div className="confirmation-item">
                       <span className="confirmation-label">Nome:</span>
                       <span className="confirmation-value">{nomeLoja}</span>
@@ -402,8 +397,8 @@ const CreateStore = ({ onStoreCreated }) => {
                          plano === 'plus' ? 'Plus' : 'Premium'}
                       </span>
                     </div>
-                  </Col>
-                  <Col md={6}>
+                  </div>
+                  <div className="col col-6">
                     <div className="confirmation-image-wrapper">
                       <span className="confirmation-label">Logo:</span>
                       {logoUrl ? (
@@ -418,10 +413,10 @@ const CreateStore = ({ onStoreCreated }) => {
                         <div className="text-muted">Nenhum logo adicionado</div>
                       )}
                     </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         );
       default:
@@ -431,7 +426,7 @@ const CreateStore = ({ onStoreCreated }) => {
 
   return (
     <div className="create-store-wrapper">
-      <Container className="create-store-container">
+      <div className="create-store-container">
         <div className="progress-steps-wrapper">
           <div className="progress-steps">
             {steps.map((step, index) => (
@@ -451,101 +446,92 @@ const CreateStore = ({ onStoreCreated }) => {
               </div>
             ))}
           </div>
-          
-          <ProgressBar 
-            now={(currentStep + 1) * (100 / steps.length)} 
-            className="progress-bar-main" 
-            variant="gradient"
-          />
+          <div className="progress-bar-main">
+            <div
+              className="progress-bar-inner"
+              style={{
+                width: `${(currentStep + 1) * (100 / steps.length)}%`,
+                background: 'var(--gradient)',
+                height: 8,
+                borderRadius: 4,
+                transition: 'width 0.3s'
+              }}
+            />
+          </div>
         </div>
-        
-        <Card className="main-card">
-          <Card.Body>
+        <div className="main-card">
+          <div className="main-card-body">
             {errorMsg && (
-              <Alert variant="danger" className="error-alert">
-                {errorMsg}
-              </Alert>
+              <div className="error-alert">{errorMsg}</div>
             )}
-            
             <div className="step-content-wrapper">
               {renderStepContent()}
             </div>
-            
             <div className="navigation-buttons">
-              <Button 
-                variant="outline-secondary" 
+              <button 
+                type="button"
                 onClick={prevStep} 
                 disabled={currentStep === 0 || loading}
                 className="nav-button prev-button"
               >
                 <FiArrowLeft className="me-2" />
                 Voltar
-              </Button>
-              
+              </button>
               {currentStep < steps.length - 1 ? (
-                <Button 
-                  variant="primary" 
+                <button 
+                  type="button"
                   onClick={nextStep} 
                   disabled={loading}
                   className="nav-button next-button"
                 >
                   {loading ? (
-                    <>
-                      <Spinner animation="border" size="sm" className="me-2" />
-                      Carregando...
-                    </>
+                    <>Carregando...</>
                   ) : (
-                    <>
-                      Próximo <FiArrowRight className="ms-2" />
-                    </>
+                    <>Próximo <FiArrowRight className="ms-2" /></>
                   )}
-                </Button>
+                </button>
               ) : (
-                <Button 
-                  variant="success" 
+                <button 
+                  type="button"
                   onClick={handleCreateStore} 
                   disabled={loading}
                   className="nav-button submit-button"
                 >
                   {loading ? (
-                    <>
-                      <Spinner animation="border" size="sm" className="me-2" />
-                      Finalizando...
-                    </>
+                    <>Finalizando...</>
                   ) : (
-                    <>
-                      Criar Minha Loja <FiCheck className="ms-2" />
-                    </>
+                    <>Criar Minha Loja <FiCheck className="ms-2" /></>
                   )}
-                </Button>
+                </button>
               )}
             </div>
-          </Card.Body>
-        </Card>
-      </Container>
-
-      {/* Modal de sucesso */}
-      <Modal show={showSuccess} centered backdrop="static" keyboard={false} className="success-modal">
-        <Modal.Body className="success-modal-body">
-          <div className="success-animation">
-            <div className="checkmark">✓</div>
           </div>
-          <h2 className="success-title">Loja criada com sucesso!</h2>
-          <p className="success-message">
-            Parabéns! Sua loja <strong>{nomeLoja}</strong> está pronta para começar a vender.
-          </p>
-          <p className="redirect-message">
-            Redirecionando para o dashboard em <span className="countdown">{countdown}</span> segundos...
-          </p>
-          <Button 
-            variant="primary" 
-            onClick={() => navigate('/dashboard')}
-            className="go-to-dashboard-button"
-          >
-            Acessar Dashboard Agora
-          </Button>
-        </Modal.Body>
-      </Modal>
+        </div>
+      </div>
+      {/* Modal de sucesso */}
+      {showSuccess && (
+        <div className="success-modal">
+          <div className="success-modal-body">
+            <div className="success-animation">
+              <div className="checkmark">✓</div>
+            </div>
+            <h2 className="success-title">Loja criada com sucesso!</h2>
+            <p className="success-message">
+              Parabéns! Sua loja <strong>{nomeLoja}</strong> está pronta para começar a vender.
+            </p>
+            <p className="redirect-message">
+              Redirecionando para o dashboard em <span className="countdown">{countdown}</span> segundos...
+            </p>
+            <button 
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="go-to-dashboard-button"
+            >
+              Acessar Dashboard Agora
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
