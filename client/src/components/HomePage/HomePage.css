@@ -6,6 +6,20 @@
   line-height: 1.6;
   color: #333;
   overflow-x: hidden;
+  width: 100% !important; /* Alterado de 100vw para 100% */
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important; /* Alterado de 100vw para 100% */
+  min-height: 100vh !important;
+  box-sizing: border-box !important;
+  background: #f6f8fa !important;
 }
 
 /* Navbar */
@@ -21,17 +35,19 @@
   height: 4rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   z-index: 50;
-  padding: 0 1.5rem;
+  padding: 0;
 }
 
 .homepage-navbar-logo {
   font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
+  margin-left: 30px;
 }
 
 .homepage-nav-links {
   display: none;
+  margin-right: 30px;
 }
 
 .homepage-mobile-menu-open {
@@ -105,7 +121,7 @@
 .homepage-mobile-menu {
   position: absolute;
   top: 4rem;
-  left: 0;
+  left: 20px;
   width: 100%;
   background-color: #2E7D32;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -1262,4 +1278,37 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+html, body, #root, .homepage-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important; /* Alterado de 100vw para 100% */
+  min-height: 100vh !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+section, footer {
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .homepage-hero,
+  .homepage-features,
+  .homepage-clients,
+  .homepage-plans,
+  .homepage-testimonials,
+  .homepage-cta,
+  .homepage-footer {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  .homepage-hero {
+    padding-top: 6rem !important;
+    padding-bottom: 3rem !important;
+  }
 }

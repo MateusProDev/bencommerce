@@ -1,0 +1,95 @@
+/* Container principal */
+.manage-stock-container {
+  padding: 32px 0;
+  background: #f6f8fa;
+  min-height: 100vh;
+}
+
+/* Título */
+.manage-stock-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2541b2;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+
+/* Botão de adicionar */
+.manage-stock-add-btn {
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, #4a6bff 0%, #2541b2 100%);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 22px;
+  transition: background 0.2s;
+}
+
+.manage-stock-add-btn:hover {
+  background: linear-gradient(90deg, #2541b2 0%, #4a6bff 100%);
+}
+
+/* Cards dos produtos */
+.manage-stock-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(80, 112, 255, 0.08);
+  padding: 18px 12px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+
+.manage-stock-card:hover {
+  box-shadow: 0 8px 32px 0 rgba(80, 112, 255, 0.18);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.manage-stock-card-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e0e7ef;
+  background: #f6f8fa;
+}
+
+.manage-stock-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.manage-stock-card-price {
+  color: #2541b2;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.manage-stock-card-stock {
+  color: #888;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.manage-stock-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .manage-stock-container {
+    padding: 16px 0;
+  }
+  .manage-stock-card {
+    padding: 10px 4px 8px 4px;
+  }
+  .manage-stock-card-img {
+    width: 70px;
+    height: 70px;
+  }
+}
