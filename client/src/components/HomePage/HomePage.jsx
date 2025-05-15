@@ -128,7 +128,8 @@ const HomePage = () => {
       {/* Navbar */}
       <nav className="homepage-navbar">
         <div className="homepage-navbar-logo" onClick={() => navigate('/')}>StoreSync</div>
-        <ul className={`homepage-nav-links ${mobileMenuOpen ? 'homepage-mobile-menu-open' : ''}`}>
+        {/* Menu Desktop */}
+        <ul className="homepage-nav-links">
           <li className="homepage-nav-link" onClick={() => navigate('/')}>Início</li>
           <li className="homepage-nav-link" onClick={() => navigate('/recursos')}>Recursos</li>
           <li className="homepage-nav-link" onClick={() => navigate('/planos')}>Planos</li>
@@ -136,11 +137,11 @@ const HomePage = () => {
           <li className="homepage-nav-link" onClick={handleLoginClick}>Login</li>
           <li className="homepage-nav-button" onClick={() => handleSignupClick('free')}>Teste Grátis</li>
         </ul>
+        {/* Botão do menu mobile */}
         <button className="homepage-mobile-menu-button toggle-button" onClick={toggleMobileMenu}>
           <FaBars className="homepage-mobile-menu-icon" />
         </button>
-        
-        {/* Mobile Menu */}
+        {/* Menu Mobile */}
         {mobileMenuOpen && (
           <div className="homepage-mobile-menu">
             <ul className="homepage-mobile-menu-list">
@@ -474,4 +475,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;
