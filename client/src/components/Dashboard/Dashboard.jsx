@@ -229,7 +229,7 @@ const Dashboard = ({ user }) => {
                     <Button
                       size="small"
                       startIcon={<PreviewIcon />}
-                      onClick={() => navigate(`/loja/${currentUser.uid}`)}
+                      onClick={() => navigate(`/loja/${storeData.slug}`)}
                     >
                       Visualizar Loja
                     </Button>
@@ -337,7 +337,7 @@ const Dashboard = ({ user }) => {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate(`/loja/${currentUser.uid}`)}
+              onClick={() => window.open(`/loja/${storeData.slug}`, "_blank")}
               startIcon={<PreviewIcon />}
             >
               Abrir Loja em Nova Guia
