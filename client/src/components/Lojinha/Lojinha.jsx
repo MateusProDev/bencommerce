@@ -1,28 +1,69 @@
-import React, { useState } from "react";
+import { collection, onSnapshot, query, doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import React, { useEffect, useState, useRef } from "react";
 import NavBar from "./NavBar/NavBar";
 import SideMenu from "./SideMenu/SideMenu";
 import Cart from "./Cart/Cart";
-import Banner from "./Banner/Banner";
 import ProductSection from "./ProductSection/ProductSection";
 import Footer from "./Footer/Footer";
 import "./Lojinha.css";
+import { Route } from "react-router-dom";
 
 const Lojinha = ({
+  lojaId,
   logoUrl,
   menuItems = [],
-  banners = [],
-  sections = [],
   footerInfo = {},
   initialCart = [],
 }) => {
-  // Estados locais para gerenciar o carrinho e menus
   const [cart, setCart] = useState(initialCart);
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  
-  // Cálculo da quantidade total de itens no carrinho
-  const cartCount = cart.reduce((sum, item) => sum + (item.qtd || 1), 0);
-  
+  const [categorias, setCategorias] = useState([]);
+  const [produtosPorCategoria, setProdutosPorCategoria] = useState({});
+  const categoriasRefs = useRef({});
+  const [nomeLoja, setNomeLoja] = useState("");
+
+  useEffect(() => {
+    if (!lojaId) return;
+    const lojaRef = doc(db, "lojas", lojaId);
+    getDoc(lojaRef).then((snap) => {
+      if (snap.exists()) {
+        setNomeLoja(snap.data().nome || "");
+      }
+    });
+  }, [lojaId]);
+
+  useEffect(() => {
+    if (!lojaId) return;
+    const q = query(collection(db, `lojas/${lojaId}/produtos`));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log("Produtos recebidos do Firestore:", produtos);
+      // Agrupa produtos por categoria
+      const agrupados = {};
+      produtos.forEach(prod => {
+        const catId = prod.category || "sem-categoria";
+        if (!agrupados[catId]) agrupados[catId] = [];
+        agrupados[catId].push(prod);
+      });
+      setProdutosPorCategoria(agrupados);
+
+      // Gera categorias dinamicamente a partir dos produtos
+      const categoriasDinamicas = Object.keys(agrupados)
+        .filter(cat => cat && cat !== "sem-categoria")
+        .map(cat => ({ id: cat, nome: cat }));
+      setCategorias(categoriasDinamicas);
+    });
+    return () => unsubscribe();
+  }, [lojaId]);
+
+  const scrollToCategoria = (catId) => {
+    if (categoriasRefs.current[catId]) {
+      categoriasRefs.current[catId].scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   // Handlers para o menu lateral
   const handleMenuToggle = () => {
     setSideMenuOpen(!sideMenuOpen);
@@ -97,15 +138,18 @@ const Lojinha = ({
     setCartOpen(false);
   };
 
+  console.log("Categorias:", categorias);
+  console.log("Produtos agrupados:", produtosPorCategoria);
+
   return (
     <div className="lojinha-container">
       <NavBar
         logoUrl={logoUrl}
         onMenuClick={handleMenuToggle}
         onCartClick={handleCartToggle}
-        cartCount={cartCount}
+        cartCount={cart.reduce((sum, item) => sum + (item.qtd || 1), 0)}
       />
-      
+
       {sideMenuOpen && (
         <SideMenu
           open={sideMenuOpen}
@@ -114,7 +158,7 @@ const Lojinha = ({
           onSelect={handleSideMenuSelect}
         />
       )}
-      
+
       {cartOpen && (
         <Cart
           items={cart}
@@ -124,29 +168,43 @@ const Lojinha = ({
           onClose={handleCartClose}
         />
       )}
-      
-      <main className="lojinha-main">
-        {banners && banners.length > 0 && <Banner banners={banners} />}
-        
-        {sections.map((section, index) => (
-          <ProductSection
-            key={`section-${index}`}
-            title={section.title}
-            products={section.products}
-            onAddToCart={handleAddToCart}
-          />
+
+      <div className="lojinha-categorias-scroll">
+        {categorias.map(cat => (
+          <button
+            key={cat.id}
+            className="lojinha-categoria-btn"
+            onClick={() => scrollToCategoria(cat.id)}
+          >
+            {cat.nome}
+          </button>
         ))}
+      </div>
+
+      <main className="lojinha-main">
+        {categorias.map(cat => (
+          <section key={cat.id} ref={el => categoriasRefs.current[cat.id] = el} className="lojinha-categoria-section">
+            <h2>{cat.nome}</h2>
+            <ProductSection
+              title={cat.nome}
+              products={produtosPorCategoria[cat.id] || []}
+              onAddToCart={handleAddToCart}
+            />
+          </section>
+        ))}
+        {produtosPorCategoria["sem-categoria"] && (
+          <section>
+            <h2>Outros Produtos</h2>
+            <ProductSection
+              title="Outros Produtos"
+              products={produtosPorCategoria["sem-categoria"]}
+              onAddToCart={handleAddToCart}
+            />
+          </section>
+        )}
       </main>
-      
-      <Footer info={{
-        nomeLoja: "Minha Lojinha",
-        endereco: "Rua Exemplo, 123",
-        whatsapp: "(11) 99999-9999",
-        email: "contato@minhaloja.com",
-        instagram: "https://instagram.com/minhaloja",
-        facebook: "https://facebook.com/minhaloja",
-        copyright: "© 2025 Minha Lojinha"
-      }} />
+
+      <Footer info={footerInfo} />
     </div>
   );
 };

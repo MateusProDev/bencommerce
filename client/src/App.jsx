@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import { Spinner } from 'react-bootstrap';
 
@@ -28,6 +28,29 @@ const StoreRequiredRoute = ({ user, hasStore, children }) => {
   if (!user) return <Navigate to="/login" replace />;
   return hasStore ? children : <Navigate to="/criar-loja" replace />;
 };
+
+function LojinhaPage() {
+  const { slug } = useParams();
+  const [lojaId, setLojaId] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!slug) return;
+    async function fetchLojaId() {
+      const q = query(collection(db, "lojas"), where("slug", "==", slug));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        setLojaId(snap.docs[0].id);
+      }
+      setLoading(false);
+    }
+    fetchLojaId();
+  }, [slug]);
+
+  if (loading) return <div>Carregando loja...</div>;
+  if (!lojaId) return <div>Loja não encontrada.</div>;
+  return <Lojinha lojaId={lojaId} />;
+}
 
 const AppContent = () => {
   const [user, setUser] = useState(null);
@@ -127,11 +150,9 @@ const AppContent = () => {
 
       {/* Loja do usuário */}
       <Route
-        path="/loja/:storeId"
+        path="/loja/:slug"
         element={
-          <ProtectedRoute user={user}>
-            <Lojinha />
-          </ProtectedRoute>
+          <LojinhaPage />
         }
       />
 

@@ -76,12 +76,12 @@ const ManageStock = ({ products, setProducts, categories = [], userPlan = "free"
                 <Typography gutterBottom variant="h6" className="manage-stock-card-title">
                   {product.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" className="manage-stock-card-price">
-                  R$ {Number(product.price)?.toFixed(2) || "0.00"}
-                </Typography>
-                <Typography variant="body2" className="manage-stock-card-stock">
-                  Estoque: {product.stock || 0}
-                </Typography>
+                <div className="lojinha-product-price">
+                  R$ {Number(product.price).toFixed(2)}
+                </div>
+                <div className="lojinha-product-stock">
+                  Estoque: {Number(product.stock) ?? 0}
+                </div>
               </CardContent>
               <CardActions className="manage-stock-card-actions">
                 <Button size="small" onClick={() => handleEdit(product)}>
