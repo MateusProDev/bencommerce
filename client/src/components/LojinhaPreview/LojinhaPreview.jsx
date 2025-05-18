@@ -8,13 +8,16 @@ import Lojinha from "../Lojinha/Lojinha";
 import "./LojinhaPreview.css";
 
 const DEVICES = [
-  { key: "iphone14", name: "iPhone 14", width: 390, height: 844 },
-  { key: "iphonese", name: "iPhone SE", width: 320, height: 568 },
-  { key: "galaxys23", name: "Galaxy S23", width: 360, height: 780 },
-  { key: "redminote", name: "Redmi Note", width: 393, height: 873 },
-  { key: "xiaomimi", name: "Xiaomi Mi", width: 360, height: 800 },
-  // { key: "ipad", name: "iPad", width: 820, height: 1180 },
-  // { key: "galaxytab", name: "Galaxy Tab", width: 800, height: 1280 },
+  { key: "iphone15pro", name: "iPhone 15 Pro", width: 340, height: 720 },
+  { key: "iphone14", name: "iPhone 14", width: 335, height: 700 },
+  { key: "galaxys24ultra", name: "Galaxy S24 Ultra", width: 350, height: 740 },
+  { key: "galaxys23", name: "Galaxy S23", width: 340, height: 720 },
+  { key: "galaxya54", name: "Galaxy A54", width: 340, height: 720 },
+  { key: "xiaomiredmi12", name: "Redmi Note 12", width: 340, height: 720 },
+  { key: "xiaomimi13", name: "Xiaomi Mi 13", width: 340, height: 720 },
+  { key: "motorolaedge40", name: "Motorola Edge 40", width: 340, height: 720 },
+  { key: "realme11pro", name: "Realme 11 Pro", width: 340, height: 720 },
+  { key: "pixel8", name: "Pixel 8", width: 340, height: 720 },
 ];
 
 const MENU_WIDTH = -200;
