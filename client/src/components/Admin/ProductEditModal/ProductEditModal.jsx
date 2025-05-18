@@ -104,6 +104,14 @@ const ProductEditModal = ({
     }
   };
 
+  const generateSlug = (name) =>
+    name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s]/g, '')
+      .replace(/\s+/g, '-');
+
   const handleSave = async () => {
     if (!product.name || !product.price) {
       alert("Nome e preço são obrigatórios!");
@@ -113,17 +121,19 @@ const ProductEditModal = ({
       alert("Adicione pelo menos uma imagem do produto.");
       return;
     }
+    const productSlug = generateSlug(product.name);
+    const productData = { ...product, slug: productSlug };
     if (initialProduct && initialProduct.id) {
       // Editar produto existente
       await updateDoc(
         doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
-        product
+        productData
       );
     } else {
       // Adicionar novo produto
-      await addDoc(collection(db, `lojas/${resolvedLojaId}/produtos`), product);
+      await addDoc(collection(db, `lojas/${resolvedLojaId}/produtos`), productData);
     }
-    onSave(product);
+    onSave(productData);
   };
 
   return (

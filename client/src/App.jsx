@@ -14,6 +14,8 @@ import CheckoutRedirect from './components/CheckoutRedirect/CheckoutRedirect';
 import CheckoutTransparent from './components/CheckoutTransparent/CheckoutTransparent';
 import Lojinha from './components/Lojinha/Lojinha';
 import LojinhaPreview from './components/LojinhaPreview/LojinhaPreview';
+import CategoriaPage from "./components/Lojinha/CategoriaPage/CategoriaPage";
+import ProdutoPage from "./components/Lojinha/ProdutoPage/ProdutoPage";
 
 // Utils
 import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
@@ -150,11 +152,14 @@ const AppContent = () => {
 
       {/* Loja do usuário */}
       <Route
-        path="/loja/:slug"
+        path="/:slug"
         element={
           <LojinhaPage />
         }
       />
+      <Route path="/:slug/categoria/:categoria" element={<CategoriaPage />} />
+      {/* <Route path="/:slug/produto/:produtoId" element={<ProdutoPage />} /> */}
+      <Route path="/:slug/produto/:produtoSlug" element={<ProdutoPage />} />
 
       {/* Rotas protegidas que requerem apenas autenticação */}
       <Route

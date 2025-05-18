@@ -6,8 +6,9 @@ import SideMenu from "./SideMenu/SideMenu";
 import Cart from "./Cart/Cart";
 import ProductSection from "./ProductSection/ProductSection";
 import Footer from "./Footer/Footer";
+import Banner from "./Banner/Banner";
 import "./Lojinha.css";
-import { Route } from "react-router-dom";
+import { Route, useNavigate, useParams } from "react-router-dom";
 
 const Lojinha = ({
   lojaId,
@@ -23,13 +24,25 @@ const Lojinha = ({
   const [produtosPorCategoria, setProdutosPorCategoria] = useState({});
   const categoriasRefs = useRef({});
   const [nomeLoja, setNomeLoja] = useState("");
+  const [bannerImages, setBannerImages] = useState([]);
+  const navigate = useNavigate();
+  const { slug } = useParams();
 
   useEffect(() => {
     if (!lojaId) return;
     const lojaRef = doc(db, "lojas", lojaId);
     getDoc(lojaRef).then((snap) => {
       if (snap.exists()) {
-        setNomeLoja(snap.data().nome || "");
+        const lojaData = snap.data();
+        setNomeLoja(lojaData.nome || "");
+        // Ajuste para pegar banners do Firestore
+        if (lojaData.bannerImages) {
+          setBannerImages(Array.isArray(lojaData.bannerImages)
+            ? lojaData.bannerImages.map(b => b.url || b)
+            : Object.values(lojaData.bannerImages).map(b => b.url));
+        } else {
+          setBannerImages([]);
+        }
       }
     });
   }, [lojaId]);
@@ -169,12 +182,15 @@ const Lojinha = ({
         />
       )}
 
+      {/* Banner logo abaixo do NavBar */}
+      {bannerImages?.length > 0 && <Banner banners={bannerImages} />}
+
       <div className="lojinha-categorias-scroll">
         {categorias.map(cat => (
           <button
             key={cat.id}
             className="lojinha-categoria-btn"
-            onClick={() => scrollToCategoria(cat.id)}
+            onClick={() => navigate(`/${slug}/categoria/${encodeURIComponent(cat.id)}`)}
           >
             {cat.nome}
           </button>
