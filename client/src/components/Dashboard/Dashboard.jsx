@@ -53,6 +53,7 @@ import EditBanner from "../Admin/EditBanner/EditBanner";
 // Removido ManageProducts import, pois o ManageStock já gerencia os produtos
 import ManageStock from "../ManageStock/ManageStock";
 import SalesReports from "../SalesReports/SalesReports";
+import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -229,7 +230,7 @@ const Dashboard = ({ user }) => {
                     <Button
                       size="small"
                       startIcon={<PreviewIcon />}
-                      onClick={() => navigate(`/loja/${storeData.slug}`)}
+                      onClick={() => navigate(`/${storeData.slug}`)}
                     >
                       Visualizar Loja
                     </Button>
@@ -333,16 +334,7 @@ const Dashboard = ({ user }) => {
         );
       case "Visualizar Loja":
         return (
-          <Box sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => window.open(`/loja/${storeData.slug}`, "_blank")}
-              startIcon={<PreviewIcon />}
-            >
-              Abrir Loja em Nova Guia
-            </Button>
-          </Box>
+          <LojinhaPreview user={storeData} />
         );
       case "Upgrade de Plano":
         return currentUser ? <PlanoUpgrade user={currentUser} /> : null;

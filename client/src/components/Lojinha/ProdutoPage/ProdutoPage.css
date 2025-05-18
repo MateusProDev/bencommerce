@@ -1,0 +1,21 @@
+/* Exemplo para src/components/Lojinha/ProdutoPage.css */
+.produto-detalhe-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(39,174,96,0.08);
+  padding: 2rem;
+  text-align: center;
+}
+.produto-detalhe-preco {
+  color: #219150;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+.produto-detalhe-stock {
+  color: #888;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
