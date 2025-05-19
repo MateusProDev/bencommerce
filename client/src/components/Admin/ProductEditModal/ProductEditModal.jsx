@@ -57,8 +57,18 @@ const ProductEditModal = ({
 
   const maxImages = MAX_IMAGES[userPlan] || 1;
 
+  // Debug: categorias recebidas
+  console.log("Categorias recebidas no modal:", categories);
+
+  // Debug: produto inicial
+  console.log("Produto inicial:", initialProduct);
+
+  // Debug: estado do produto editado/criado
+  console.log("Estado atual do produto:", product);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Alterando campo: ${name} para valor:`, value);
     setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -92,18 +102,6 @@ const ProductEditModal = ({
     }));
   };
 
-  const handleAddCategory = async () => {
-    if (newCategory.trim() && resolvedLojaId) {
-      await updateDoc(
-        doc(db, `lojas/${resolvedLojaId}`),
-        { categorias: arrayUnion(newCategory.trim()) }
-      );
-      setProduct((prev) => ({ ...prev, category: newCategory.trim() }));
-      setNewCategory("");
-      if (onCreateCategory) onCreateCategory(newCategory.trim());
-    }
-  };
-
   const generateSlug = (name) =>
     name
       .toLowerCase()
@@ -113,27 +111,41 @@ const ProductEditModal = ({
       .replace(/\s+/g, '-');
 
   const handleSave = async () => {
-    if (!product.name || !product.price) {
-      alert("Nome e preço são obrigatórios!");
-      return;
+    try {
+      console.log("Tentando salvar produto:", product);
+      if (!product.name || !product.price) {
+        alert("Nome e preço são obrigatórios!");
+        console.error("Erro: Nome ou preço não preenchidos.");
+        return;
+      }
+      if (product.images.length === 0) {
+        alert("Adicione pelo menos uma imagem do produto.");
+        console.error("Erro: Nenhuma imagem adicionada.");
+        return;
+      }
+      const productSlug = generateSlug(product.name);
+      const productData = { ...product, slug: productSlug };
+      if (initialProduct && initialProduct.id) {
+        // Editar produto existente
+        console.log("Editando produto existente:", initialProduct.id, productData);
+        await updateDoc(
+          doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
+          productData
+        );
+      } else {
+        // Adicionar novo produto
+        console.log("Adicionando novo produto:", productData);
+        await addDoc(collection(db, `lojas/${resolvedLojaId}/produtos`), productData);
+      }
+      onSave(productData);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("produto-adicionado"));
+      }
+      console.log("Produto salvo com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+      alert("Erro ao salvar produto: " + err.message);
     }
-    if (product.images.length === 0) {
-      alert("Adicione pelo menos uma imagem do produto.");
-      return;
-    }
-    const productSlug = generateSlug(product.name);
-    const productData = { ...product, slug: productSlug };
-    if (initialProduct && initialProduct.id) {
-      // Editar produto existente
-      await updateDoc(
-        doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
-        productData
-      );
-    } else {
-      // Adicionar novo produto
-      await addDoc(collection(db, `lojas/${resolvedLojaId}/produtos`), productData);
-    }
-    onSave(productData);
   };
 
   return (
@@ -194,29 +206,18 @@ const ProductEditModal = ({
               value={product.category}
               onChange={handleChange}
               fullWidth
+              required
               sx={{ mb: 1 }}
             >
+              <MenuItem value="">
+                <em>Selecione uma categoria</em>
+              </MenuItem>
               {categories.map((cat, idx) => (
                 <MenuItem key={idx} value={cat}>
                   {cat}
                 </MenuItem>
               ))}
             </TextField>
-            <Box display="flex" gap={1} alignItems="center">
-              <TextField
-                label="Nova categoria"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                size="small"
-              />
-              <Button
-                variant="outlined"
-                onClick={handleAddCategory}
-                disabled={!newCategory.trim()}
-              >
-                Criar Categoria
-              </Button>
-            </Box>
           </Box>
           {/* Variantes */}
           <Box>

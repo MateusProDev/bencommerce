@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { useAuth } from "../../../utils/useAuth"; // Caminho corrigido!
 
 const ProdutoPage = () => {
   const { slug, produtoSlug } = useParams();
   const [produto, setProduto] = useState(null);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!slug || !produtoSlug) return;
@@ -24,6 +26,8 @@ const ProdutoPage = () => {
     fetchProduto();
   }, [slug, produtoSlug]);
 
+  if (loading) return <div>Carregando...</div>;
+  if (!user) return <div>Você não está autenticado.</div>;
   if (!produto) return <div>Carregando...</div>;
 
   return (
@@ -33,7 +37,6 @@ const ProdutoPage = () => {
       <div className="produto-detalhe-preco">R$ {Number(produto.price).toFixed(2)}</div>
       <div className="produto-detalhe-stock">Estoque: {Number(produto.stock) ?? 0}</div>
       <p>{produto.description}</p>
-      {/* Adicione mais detalhes se quiser */}
     </div>
   );
 };

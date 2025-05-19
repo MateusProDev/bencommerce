@@ -31,9 +31,11 @@ const Lojinha = ({
   useEffect(() => {
     if (!lojaId) return;
     const lojaRef = doc(db, "lojas", lojaId);
-    getDoc(lojaRef).then((snap) => {
-      if (snap.exists()) {
-        const lojaData = snap.data();
+
+    // Listener para atualizar as categorias em tempo real
+    const unsubscribeCategorias = onSnapshot(lojaRef, (doc) => {
+      if (doc.exists()) {
+        const lojaData = doc.data();
         setNomeLoja(lojaData.nome || "");
         // Ajuste para pegar banners do Firestore
         if (lojaData.bannerImages) {
@@ -43,8 +45,12 @@ const Lojinha = ({
         } else {
           setBannerImages([]);
         }
+        setCategorias(lojaData.categorias || []); // Atualiza as categorias
       }
     });
+
+    // Limpa o listener ao desmontar o componente
+    return () => unsubscribeCategorias();
   }, [lojaId]);
 
   useEffect(() => {
@@ -97,10 +103,6 @@ const Lojinha = ({
   const handleCartToggle = () => {
     setCartOpen(!cartOpen);
     if (sideMenuOpen) setSideMenuOpen(false); // Fecha o menu lateral se estiver aberto
-  };
-  
-  const handleCartClose = () => {
-    setCartOpen(false);
   };
   
   const handleAddToCart = (product) => {
