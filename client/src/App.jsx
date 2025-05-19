@@ -16,9 +16,13 @@ import Lojinha from './components/Lojinha/Lojinha';
 import LojinhaPreview from './components/LojinhaPreview/LojinhaPreview';
 import CategoriaPage from "./components/Lojinha/CategoriaPage/CategoriaPage";
 import ProdutoPage from "./components/Lojinha/ProdutoPage/ProdutoPage";
+import ProdutosPage from "./pages/ProdutosPage";
 
 // Utils
 import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
+
+// Context
+import { CategoriasProvider } from "./context/CategoriasContext";
 
 // Componente de rota protegida
 const ProtectedRoute = ({ user, children }) => {
@@ -192,7 +196,9 @@ const AppContent = () => {
         path="/dashboard"
         element={
           <StoreRequiredRoute user={user} hasStore={hasStore}>
-            <Dashboard user={user} />
+            <CategoriasProvider lojaId={user?.uid}>
+              <Dashboard user={user} />
+            </CategoriasProvider>
           </StoreRequiredRoute>
         }
       />
@@ -201,6 +207,14 @@ const AppContent = () => {
         element={
           <StoreRequiredRoute user={user} hasStore={hasStore}>
             <LojinhaPreview user={user} />
+          </StoreRequiredRoute>
+        }
+      />
+      <Route
+        path="/dashboard/produtos"
+        element={
+          <StoreRequiredRoute user={user} hasStore={hasStore}>
+            <ProdutosPage lojaId={user?.uid} />
           </StoreRequiredRoute>
         }
       />

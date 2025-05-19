@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebaseConfig';
-import { setDoc, doc, writeBatch } from 'firebase/firestore';
+import { setDoc, doc, writeBatch, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import JSConfetti from 'js-confetti';
@@ -185,6 +185,7 @@ const CreateStore = ({ onStoreCreated }) => {
         slug,
         criadaEm: agora.toISOString(),
         atualizadaEm: agora.toISOString(),
+        categorias: [], // Inicializa array vazio
         configs: {
           corPrimaria: '#4a6bff',
           corSecundaria: '#2541b2',
@@ -212,6 +213,20 @@ const CreateStore = ({ onStoreCreated }) => {
       batch.set(doc(db, 'lojas', user.uid), lojaData);
       batch.set(doc(db, 'usuarios', user.uid), usuarioData, { merge: true });
       await batch.commit();
+
+      // Crie a subcoleção 'produtos' com um documento vazio (ou placeholder)
+      const produtoRef = doc(collection(db, "lojas", user.uid, "produtos"));
+      await setDoc(produtoRef, {
+        name: "Produto de exemplo",
+        price: "0.00",
+        stock: "0",
+        images: [],
+        category: "",
+        description: "",
+        variants: [],
+        createdAt: new Date().toISOString(),
+        isPlaceholder: true // para você poder filtrar depois se quiser
+      });
 
       // Efeito de confetti para celebrar a criação da loja
       if (jsConfetti) {

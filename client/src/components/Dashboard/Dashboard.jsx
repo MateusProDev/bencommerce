@@ -12,32 +12,23 @@ import {
   Box,
   CssBaseline,
   CircularProgress,
-  Alert,
   Button,
   Grid,
   Card,
-  CardContent,
-  CardMedia,
-  CardActions,
   TextField,
-  Divider,
+  CardMedia, // Adicione esta importação
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Logout as LogoutIcon,
   Edit as EditIcon,
   Image as ImageIcon,
-  ShoppingCart as ShoppingCartIcon,
   WhatsApp as WhatsAppIcon,
-  People as PeopleIcon,
   Inventory as InventoryIcon,
   PointOfSale as PointOfSaleIcon,
   Assessment as AssessmentIcon,
   Home as HomeIcon,
   Upgrade as UpgradeIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Settings as SettingsIcon,
   Preview as PreviewIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +37,6 @@ import { doc, getDoc, collection, getDocs, updateDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig";
 import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
 import { verificarPlanoUsuario } from "../../utils/verificarPlanoUsuario";
-import { useTheme } from "@mui/material/styles";
 import "./Dashboard.css";
 import EditHeader from "../Admin/EditHeader/EditHeader";
 import EditBanner from "../Admin/EditBanner/EditBanner";
@@ -54,6 +44,7 @@ import EditBanner from "../Admin/EditBanner/EditBanner";
 import ManageStock from "../ManageStock/ManageStock";
 import SalesReports from "../SalesReports/SalesReports";
 import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
+import DashboardHome from "./DashboardHome";
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -68,12 +59,9 @@ const Dashboard = ({ user }) => {
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerImages, setBannerImages] = useState([]);
   const [newBannerImage, setNewBannerImage] = useState("");
-  const [storeTheme, setStoreTheme] = useState("claro");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
-  const [corSecundaria, setCorSecundaria] = useState("#2541b2");
   const navigate = useNavigate();
   const auth = getAuth();
-  const theme = useTheme();
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -99,9 +87,7 @@ const Dashboard = ({ user }) => {
             setWhatsappNumber(storeData.whatsappNumber || "");
             setLogoUrl(storeData.logoUrl || "");
             setBannerImages(storeData.bannerImages || []);
-            setStoreTheme(storeData.configs?.tema || "claro");
             setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
-            setCorSecundaria(storeData.configs?.corSecundaria || "#2541b2");
             // Carrega produtos
             const productsCollection = collection(
               db,
@@ -199,6 +185,7 @@ const Dashboard = ({ user }) => {
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Produtos", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
   ];
   
   const renderContent = () => {
@@ -212,71 +199,12 @@ const Dashboard = ({ user }) => {
     switch (selectedSection) {
       case "Home":
         return (
-          <div>
-            <h2>Bem-vindo ao Painel da sua Loja</h2>
-            <p>Aqui você pode gerenciar todos os aspectos da sua loja virtual.</p>
-            <Grid container spacing={3} mt={2}>
-              <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6">Resumo da Loja</Typography>
-                    <Typography variant="body2">
-                      <strong>Nome:</strong> {storeData?.storeName || "Não definido"}<br />
-                      <strong>Segmento:</strong> {storeData?.segmento || "Não definido"}<br />
-                      <strong>Plano:</strong> {userPlan}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      startIcon={<PreviewIcon />}
-                      onClick={() => navigate(`/${storeData.slug}`)}
-                    >
-                      Visualizar Loja
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6">Ações Rápidas</Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={() => setSelectedSection("Gerenciar Estoque")}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      Adicionar Produto
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<SettingsIcon />}
-                      onClick={() => setSelectedSection("Editar Cabeçalho")}
-                      sx={{ mt: 1 }}
-                    >
-                      Configurar Loja
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-            {userPlan === "free" && (
-              <Alert severity="info" sx={{ mt: 3 }}>
-                Você está no plano Free.{" "}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setSelectedSection("Upgrade de Plano")}
-                  sx={{ ml: 1 }}
-                >
-                  Faça upgrade agora
-                </Button>{" "}
-                para acessar todos os recursos.
-              </Alert>
-            )}
-          </div>
+          <DashboardHome
+            storeData={storeData}
+            userPlan={userPlan}
+            navigate={navigate}
+            setSelectedSection={setSelectedSection}
+          />
         );
       case "Editar Cabeçalho":
         return (
@@ -489,6 +417,10 @@ const Dashboard = ({ user }) => {
           mt: { xs: '56px', sm: 0 }
         }}
       >
+        <Grid container>
+          <Grid>...</Grid>
+          <Grid>...</Grid>
+        </Grid>
         {renderContent()}
       </Box>
     </Box>

@@ -1,66 +1,51 @@
-import React, { useState } from "react";
-import { Button, Grid, Card, CardMedia, CardContent, CardActions, Typography } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Button, Grid, Dialog, Card, CardMedia, CardContent, CardActions, Typography } from "@mui/material";
 import ProductEditModal from "../Admin/ProductEditModal/ProductEditModal";
-import "./ManageStock.css";
+import CategoriasManager from "../CategoriasManager/CategoriasManager";
+import { useCategorias } from "../../context/CategoriasContext";
 
-const ManageStock = ({ products, setProducts, categories = [], userPlan = "free", lojaId }) => {
+const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
+  const { categorias } = useCategorias(); // <-- use o contexto
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  // Estado local para categorias
-  const [localCategories, setLocalCategories] = useState(categories);
+  const [categoriasModalOpen, setCategoriasModalOpen] = useState(false);
 
-  // Abrir modal para adicionar
+  // Não precisa mais de fetchCategories nem setCategories
+
   const handleAdd = () => {
     setEditingProduct(null);
     setModalOpen(true);
   };
 
-  // Abrir modal para editar
   const handleEdit = (product) => {
     setEditingProduct(product);
     setModalOpen(true);
   };
 
-  // Salvar produto (adicionar ou editar)
-  const handleSave = (product) => {
-    if (editingProduct) {
-      // Editar
-      setProducts((prev) =>
-        prev.map((p) => (p.id === editingProduct.id ? { ...p, ...product } : p))
-      );
-    } else {
-      // Adicionar
-      setProducts((prev) => [
-        ...prev,
-        { ...product, id: Date.now().toString() },
-      ]);
-    }
-    setModalOpen(false);
-  };
-
-  // Remover produto
   const handleRemove = (product) => {
     setProducts((prev) => prev.filter((p) => p.id !== product.id));
-  };
-
-  // Atualiza o estado local de categorias ao criar uma nova
-  const handleCreateCategory = (category) => {
-    setLocalCategories((prev) =>
-      prev.includes(category) ? prev : [...prev, category]
-    );
   };
 
   return (
     <div className="manage-stock-container">
       <h2 className="manage-stock-title">Gerenciar Produtos</h2>
-      <Button
-        variant="contained"
-        className="manage-stock-add-btn"
-        sx={{ mb: 2 }}
-        onClick={handleAdd}
-      >
-        Adicionar Produto
-      </Button>
+      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+        <Button
+          variant="contained"
+          className="manage-stock-add-btn"
+          sx={{ mb: 2 }}
+          onClick={handleAdd}
+        >
+          Adicionar Produto
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setCategoriasModalOpen(true)}
+          style={{ marginRight: 8 }}
+        >
+          Criar Categoria
+        </Button>
+      </div>
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
@@ -98,14 +83,15 @@ const ManageStock = ({ products, setProducts, categories = [], userPlan = "free"
       <ProductEditModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSave={handleSave}
+        onSave={() => setModalOpen(false)}
         initialProduct={editingProduct}
-        isEdit={!!editingProduct}
-        categories={localCategories}
-        onCreateCategory={handleCreateCategory}
+        categories={categorias}
         userPlan={userPlan}
         lojaId={lojaId}
       />
+      <Dialog open={categoriasModalOpen} onClose={() => setCategoriasModalOpen(false)} maxWidth="sm" fullWidth>
+        <CategoriasManager lojaId={lojaId} />
+      </Dialog>
     </div>
   );
 };
