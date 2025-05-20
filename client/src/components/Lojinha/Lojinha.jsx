@@ -62,9 +62,15 @@ const Lojinha = ({
       // Agrupa produtos por categoria
       const agrupados = {};
       produtos.forEach(prod => {
-        const catId = prod.category || "sem-categoria";
-        if (!agrupados[catId]) agrupados[catId] = [];
-        agrupados[catId].push(prod);
+        if (Array.isArray(prod.categorias) && prod.categorias.length > 0) {
+          prod.categorias.forEach(catId => {
+            if (!agrupados[catId]) agrupados[catId] = [];
+            agrupados[catId].push(prod);
+          });
+        } else {
+          if (!agrupados["sem-categoria"]) agrupados["sem-categoria"] = [];
+          agrupados["sem-categoria"].push(prod);
+        }
       });
       setProdutosPorCategoria(agrupados);
 
@@ -180,7 +186,7 @@ const Lojinha = ({
           onRemove={handleRemoveFromCart}
           onCheckout={handleCheckout}
           open={cartOpen}
-          onClose={handleCartClose}
+          onClose={handleCartToggle} // Troque para handleCartToggle
         />
       )}
 

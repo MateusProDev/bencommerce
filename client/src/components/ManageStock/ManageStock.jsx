@@ -15,7 +15,7 @@ const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
   const handleAdd = () => {
     setEditingProduct(null);
     setModalOpen(true);
-  };
+  }; 
 
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -37,13 +37,6 @@ const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
           onClick={handleAdd}
         >
           Adicionar Produto
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => setCategoriasModalOpen(true)}
-          style={{ marginRight: 8 }}
-        >
-          Criar Categoria
         </Button>
       </div>
       <Grid container spacing={3}>
@@ -67,6 +60,13 @@ const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
                 <div className="lojinha-product-stock">
                   Estoque: {Number(product.stock) ?? 0}
                 </div>
+                {product.categorias && product.categorias.length > 0 && (
+                  <div style={{ marginTop: 4 }}>
+                    <Typography variant="caption" color="textSecondary">
+                      Categorias: {product.categorias.join(", ")}
+                    </Typography>
+                  </div>
+                )}
               </CardContent>
               <CardActions className="manage-stock-card-actions">
                 <Button size="small" onClick={() => handleEdit(product)}>
@@ -85,7 +85,7 @@ const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
         onClose={() => setModalOpen(false)}
         onSave={() => setModalOpen(false)}
         initialProduct={editingProduct}
-        categories={categorias}
+        categories={categorias} // <-- passa as categorias globais
         userPlan={userPlan}
         lojaId={lojaId}
       />

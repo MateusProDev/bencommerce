@@ -49,11 +49,12 @@ const ProductEditModal = ({
     stock: safeProduct.stock || "",
     description: safeProduct.description || "",
     images: safeProduct.images || [],
-    category: safeProduct.category || "",
+    categorias: safeProduct.categorias || [], // <-- ALTERE AQUI
     variants: safeProduct.variants || [],
   });
   const [variantInput, setVariantInput] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState("");
 
   const maxImages = MAX_IMAGES[userPlan] || 1;
 
@@ -148,6 +149,27 @@ const ProductEditModal = ({
     }
   };
 
+  const handleCreateCategory = async () => {
+    const trimmed = newCategory.trim();
+    if (!trimmed) return;
+    setCreatingCategory(true);
+    try {
+      // Atualiza o campo global categorias da loja
+      await updateDoc(
+        doc(db, "lojas", resolvedLojaId),
+        { categorias: arrayUnion(trimmed) }
+      );
+      // Seleciona a nova categoria para o produto
+      setProduct(prev => ({ ...prev, category: trimmed }));
+      setNewCategory("");
+      // Opcional: notifique o contexto/callback para atualizar categorias globais
+      if (onCreateCategory) onCreateCategory(trimmed);
+    } catch (err) {
+      alert("Erro ao criar categoria: " + err.message);
+    }
+    setCreatingCategory(false);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
@@ -203,7 +225,7 @@ const ProductEditModal = ({
               select
               label="Categoria"
               name="category"
-              value={product.category}
+              value={product.category || ""}
               onChange={handleChange}
               fullWidth
               required
@@ -218,6 +240,22 @@ const ProductEditModal = ({
                 </MenuItem>
               ))}
             </TextField>
+            <Box display="flex" gap={1} mt={1}>
+              <TextField
+                label="Nova categoria"
+                value={newCategory}
+                onChange={e => setNewCategory(e.target.value)}
+                size="small"
+                disabled={creatingCategory}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleCreateCategory}
+                disabled={!newCategory.trim() || creatingCategory}
+              >
+                Criar e Selecionar
+              </Button>
+            </Box>
           </Box>
           {/* Variantes */}
           <Box>
@@ -305,4 +343,4 @@ const ProductEditModal = ({
   );
 };
 
-export default ProductEditModal; 
+export default ProductEditModal;
