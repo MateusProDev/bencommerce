@@ -61,7 +61,7 @@ const Dashboard = ({ user }) => {
   const [newBannerImage, setNewBannerImage] = useState("");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
   const navigate = useNavigate();
-  const auth = getAuth();
+  const auth = getAuth(); 
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -417,10 +417,6 @@ const Dashboard = ({ user }) => {
           mt: { xs: '56px', sm: 0 }
         }}
       >
-        <Grid container>
-          <Grid>...</Grid>
-          <Grid>...</Grid>
-        </Grid>
         {renderContent()}
       </Box>
     </Box>
