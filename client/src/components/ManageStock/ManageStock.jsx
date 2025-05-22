@@ -11,7 +11,7 @@ const ManageStock = ({ products, setProducts, userPlan = "free", lojaId }) => {
   const [categoriasModalOpen, setCategoriasModalOpen] = useState(false);
 
   // Não precisa mais de fetchCategories nem setCategories
-
+ 
   const handleAdd = () => {
     setEditingProduct(null);
     setModalOpen(true);

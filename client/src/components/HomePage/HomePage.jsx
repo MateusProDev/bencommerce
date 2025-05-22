@@ -113,21 +113,21 @@ const HomePage = () => {
   ];
 
   const clients = [
-    { name: "Jl InforCell", logo: "/api/placeholder/120/120" },
-    { name: "Favela Chique", logo: "/api/placeholder/120/120" },
-    { name: "Vitoria Carvalho", logo: "/api/placeholder/120/120" },
-    { name: "Sport Gear", logo: "/api/placeholder/120/120" },
-    { name: "Home & Decor", logo: "/api/placeholder/120/120" },
-    { name: "Fashion Forward", logo: "/api/placeholder/120/120" },
-    { name: "Pet Paradise", logo: "/api/placeholder/120/120" },
-    { name: "Jewelry Box", logo: "/api/placeholder/120/120" }
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" },
+    { name: "BenCommerce", logo: "/Ben.png" }
   ];
 
   return (
     <div className="homepage-container">
       {/* Navbar */}
       <nav className="homepage-navbar">
-        <div className="homepage-navbar-logo" onClick={() => navigate('/')}>StoreSync</div>
+        <div className="homepage-navbar-logo" onClick={() => navigate('/')}>BenCommerce</div>
         {/* Menu Desktop */}
         <ul className="homepage-nav-links">
           <li className="homepage-nav-link" onClick={() => navigate('/')}>Início</li>
@@ -329,7 +329,7 @@ const HomePage = () => {
               <div className="homepage-testimonial-avatar">
                 <img src="/api/placeholder/80/80" alt="Cliente" />
               </div>
-              <p className="homepage-testimonial-text">"Aumentei minhas vendas em 200% no primeiro mês usando a plataforma StoreSync. O sistema é muito fácil de usar e o suporte é excelente!"</p>
+              <p className="homepage-testimonial-text">"Aumentei minhas vendas em 200% no primeiro mês usando a plataforma BenCommerce. O sistema é muito fácil de usar e o suporte é excelente!"</p>
               <div>
                 <p className="homepage-testimonial-author">Maria Silva</p>
                 <p className="homepage-testimonial-company">Boutique Elegance</p>
@@ -366,7 +366,7 @@ const HomePage = () => {
       <footer className="homepage-footer">
         <div className="homepage-footer-container">
           <div className="homepage-footer-brand-section">
-            <div className="homepage-footer-brand">StoreSync</div>
+            <div className="homepage-footer-brand">BenCommerce</div>
             <p className="homepage-footer-description">
               Plataforma completa para criação de lojas virtuais. Simples, rápido e acessível.
             </p>
@@ -413,7 +413,7 @@ const HomePage = () => {
             <ul className="homepage-footer-contact">
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span className="homepage-footer-contact-text">contato@StoreSync.com.br</span>
+                <span className="homepage-footer-contact-text">contato@BenCommerce.com.br</span>
               </li>
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
@@ -428,7 +428,7 @@ const HomePage = () => {
         </div>
         
         <div className="homepage-footer-bottom">
-          <p className="homepage-footer-copyright">© 2025 StoreSync. Todos os direitos reservados.</p>
+          <p className="homepage-footer-copyright">© 2025 BenCommerce. Todos os direitos reservados.</p>
           <div className="homepage-footer-legal">
             <a href="/termos" className="homepage-footer-legal-link">Termos de Uso</a>
             <a href="/privacidade" className="homepage-footer-legal-link">Privacidade</a>

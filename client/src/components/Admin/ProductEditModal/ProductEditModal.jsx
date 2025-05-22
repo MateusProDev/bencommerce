@@ -26,7 +26,7 @@ const MAX_IMAGES = {
   plus: 3,
   premium: 5,
 };
-
+ 
 const ProductEditModal = ({
   open,
   onClose,
@@ -49,7 +49,7 @@ const ProductEditModal = ({
     stock: safeProduct.stock || "",
     description: safeProduct.description || "",
     images: safeProduct.images || [],
-    categorias: safeProduct.categorias || [], // <-- ALTERE AQUI
+    category: safeProduct.category || "", // <-- Corrigido para singular
     variants: safeProduct.variants || [],
   });
   const [variantInput, setVariantInput] = useState("");
@@ -160,7 +160,7 @@ const ProductEditModal = ({
         { categorias: arrayUnion(trimmed) }
       );
       // Seleciona a nova categoria para o produto
-      setProduct(prev => ({ ...prev, category: trimmed }));
+      setProduct(prev => ({ ...prev, category: trimmed })); // <-- Corrigido para singular
       setNewCategory("");
       // Opcional: notifique o contexto/callback para atualizar categorias globais
       if (onCreateCategory) onCreateCategory(trimmed);
