@@ -235,7 +235,8 @@ const Dashboard = ({ user }) => {
           <ManageStock
             products={products}
             setProducts={setProducts}
-            currentUser={currentUser}
+            userPlan={storeData?.plano || "free"}
+            lojaId={storeData?.id || currentUser?.uid}
           />
         );
       case "Relatórios de Vendas":
