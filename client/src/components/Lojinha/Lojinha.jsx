@@ -58,19 +58,12 @@ const Lojinha = ({
     const q = query(collection(db, `lojas/${lojaId}/produtos`));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      console.log("Produtos recebidos do Firestore:", produtos);
-      // Agrupa produtos por categoria
+      // Agrupa produtos por category (string)
       const agrupados = {};
       produtos.forEach(prod => {
-        if (Array.isArray(prod.categorias) && prod.categorias.length > 0) {
-          prod.categorias.forEach(catId => {
-            if (!agrupados[catId]) agrupados[catId] = [];
-            agrupados[catId].push(prod);
-          });
-        } else {
-          if (!agrupados["sem-categoria"]) agrupados["sem-categoria"] = [];
-          agrupados["sem-categoria"].push(prod);
-        }
+        const cat = prod.category || "sem-categoria";
+        if (!agrupados[cat]) agrupados[cat] = [];
+        agrupados[cat].push(prod);
       });
       setProdutosPorCategoria(agrupados);
 
