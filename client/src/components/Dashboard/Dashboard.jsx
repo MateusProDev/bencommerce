@@ -186,6 +186,7 @@ const Dashboard = ({ user }) => {
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Produtos", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Pagamentos", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium", "free"] },
   ];
   
   const renderContent = () => {
@@ -309,6 +310,59 @@ const Dashboard = ({ user }) => {
               sx={{ mt: 3 }}
             >
               Publicar Loja
+            </Button>
+          </div>
+        );
+      case "Pagamentos":
+        return (
+          <div>
+            <h2>Configurações de Pagamento</h2>
+            <TextField
+              label="Chave Pública Mercado Pago"
+              fullWidth
+              value={storeData?.mpPublicKey || ""}
+              onChange={e => setStoreData({ ...storeData, mpPublicKey: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Chave Secreta Mercado Pago"
+              fullWidth
+              value={storeData?.mpAccessToken || ""}
+              onChange={e => setStoreData({ ...storeData, mpAccessToken: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <Box sx={{ mb: 2 }}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={storeData?.enableWhatsappCheckout ?? true}
+                  onChange={e => setStoreData({ ...storeData, enableWhatsappCheckout: e.target.checked })}
+                />
+                Permitir finalizar pelo WhatsApp
+              </label>
+              <label style={{ marginLeft: 24 }}>
+                <input
+                  type="checkbox"
+                  checked={storeData?.enableMpCheckout ?? false}
+                  onChange={e => setStoreData({ ...storeData, enableMpCheckout: e.target.checked })}
+                  disabled={userPlan === "free"}
+                />
+                Permitir finalizar pelo Cartão (Mercado Pago)
+              </label>
+            </Box>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await updateDoc(doc(db, "lojas", currentUser.uid), {
+                  mpPublicKey: storeData.mpPublicKey,
+                  mpAccessToken: storeData.mpAccessToken,
+                  enableWhatsappCheckout: storeData.enableWhatsappCheckout,
+                  enableMpCheckout: storeData.enableMpCheckout,
+                });
+                alert("Configurações de pagamento salvas!");
+              }}
+            >
+              Salvar Configurações
             </Button>
           </div>
         );

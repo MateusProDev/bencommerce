@@ -1,36 +1,129 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../../firebaseConfig";
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
-import ProductSection from "../ProductSection/ProductSection";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import "./CategoriaPage.css";
+
+const SkeletonCard = () => (
+  <div className="categoria-produto-card skeleton">
+    <div className="categoria-produto-img skeleton-img" />
+    <div className="categoria-produto-nome skeleton-line" />
+    <div className="categoria-produto-preco skeleton-line" />
+    <div className="categoria-produto-btn skeleton-btn" />
+  </div>
+);
 
 const CategoriaPage = () => {
   const { slug, categoria } = useParams();
   const [lojaId, setLojaId] = useState(null);
   const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Carrossel drag
+  const carouselRef = useRef(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
 
   useEffect(() => {
     async function fetchLojaIdAndProdutos() {
-      // Busca o id da loja pelo slug
+      setLoading(true);
       const lojaSnap = await getDocs(query(collection(db, "lojas"), where("slug", "==", slug)));
       if (!lojaSnap.empty) {
         const lojaId = lojaSnap.docs[0].id;
         setLojaId(lojaId);
-        // Busca produtos da categoria
+
+        // Busca produtos da categoria (case insensitive)
         const produtosSnap = await getDocs(query(
           collection(db, `lojas/${lojaId}/produtos`),
-          where("category", "==", categoria)
+          where("category", "==", categoria.toLowerCase())
         ));
+
         setProdutos(produtosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       }
+      setLoading(false);
     }
     fetchLojaIdAndProdutos();
   }, [slug, categoria]);
 
+  // Funções de drag para carrossel
+  const handleMouseDown = (e) => {
+    isDragging.current = true;
+    startX.current = e.pageX - carouselRef.current.offsetLeft;
+    scrollLeft.current = carouselRef.current.scrollLeft;
+  };
+  const handleMouseLeave = () => { isDragging.current = false; };
+  const handleMouseUp = () => { isDragging.current = false; };
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const x = e.pageX - carouselRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.2;
+    carouselRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  // Touch events
+  const handleTouchStart = (e) => {
+    isDragging.current = true;
+    startX.current = e.touches[0].pageX - carouselRef.current.offsetLeft;
+    scrollLeft.current = carouselRef.current.scrollLeft;
+  };
+  const handleTouchEnd = () => { isDragging.current = false; };
+  const handleTouchMove = (e) => {
+    if (!isDragging.current) return;
+    const x = e.touches[0].pageX - carouselRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.2;
+    carouselRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  // Badge de desconto
+  const getDiscount = (price, anchorPrice) => {
+    if (!anchorPrice || !price) return 0;
+    return Math.round(((anchorPrice - price) / anchorPrice) * 100);
+  };
+
   return (
-    <div>
-      <h1>Categoria: {categoria}</h1>
-      <ProductSection title={categoria} products={produtos} onAddToCart={() => {}} />
+    <div className="categoria-page-container">
+      <h1 className="categoria-titulo">Categoria: {categoria}</h1>
+      <div
+        className="categoria-produtos-carousel"
+        ref={carouselRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+      >
+        {loading
+          ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
+          : produtos.map(produto => {
+              const desconto = getDiscount(produto.price, produto.anchorPrice);
+              return (
+                <div className="categoria-produto-card" key={produto.id}>
+                  {desconto > 0 && (
+                    <span className="categoria-produto-desconto">{desconto}% OFF</span>
+                  )}
+                  <img
+                    src={produto.images?.[0] || "/placeholder-product.jpg"}
+                    alt={produto.name}
+                    className="categoria-produto-img"
+                  />
+                  <div className="categoria-produto-nome">{produto.name}</div>
+                  <div className="categoria-produto-preco">
+                    {produto.anchorPrice && (
+                      <span className="categoria-produto-preco-antigo">
+                        R$ {Number(produto.anchorPrice).toFixed(2)}
+                      </span>
+                    )}
+                    R$ {Number(produto.price).toFixed(2)}
+                  </div>
+                  <button className="categoria-produto-btn">Adicionar ao carrinho</button>
+                </div>
+              );
+            })}
+      </div>
     </div>
   );
 };

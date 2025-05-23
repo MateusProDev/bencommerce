@@ -17,7 +17,10 @@ const Lojinha = ({
   footerInfo = {},
   initialCart = [],
 }) => {
-  const [cart, setCart] = useState(initialCart);
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem("lojinha_cart");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [categorias, setCategorias] = useState([]);
@@ -27,6 +30,19 @@ const Lojinha = ({
   const [bannerImages, setBannerImages] = useState([]);
   const navigate = useNavigate();
   const { slug } = useParams();
+  const [storeData, setStoreData] = useState(null);
+
+  useEffect(() => {
+    async function fetchStoreData() {
+      if (!lojaId) return;
+      const lojaRef = doc(db, "lojas", lojaId);
+      const lojaSnap = await getDoc(lojaRef);
+      if (lojaSnap.exists()) {
+        setStoreData(lojaSnap.data());
+      }
+    }
+    fetchStoreData();
+  }, [lojaId]);
 
   useEffect(() => {
     if (!lojaId) return;
@@ -55,26 +71,45 @@ const Lojinha = ({
 
   useEffect(() => {
     if (!lojaId) return;
+    
+    const lojaRef = doc(db, "lojas", lojaId);
     const q = query(collection(db, `lojas/${lojaId}/produtos`));
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // Agrupa produtos por category (string)
+      
+      // Agrupa produtos por categoria
       const agrupados = {};
+      const categoriasUnicas = new Set(); // Usar Set para garantir valores únicos
+      
       produtos.forEach(prod => {
-        const cat = prod.category || "sem-categoria";
-        if (!agrupados[cat]) agrupados[cat] = [];
+        const cat = prod.category || "outros";
+        if (!agrupados[cat]) {
+          agrupados[cat] = [];
+          if (cat !== "outros") {
+            categoriasUnicas.add(cat);
+          }
+        }
         agrupados[cat].push(prod);
       });
-      setProdutosPorCategoria(agrupados);
 
-      // Gera categorias dinamicamente a partir dos produtos
-      const categoriasDinamicas = Object.keys(agrupados)
-        .filter(cat => cat && cat !== "sem-categoria")
-        .map(cat => ({ id: cat, nome: cat }));
-      setCategorias(categoriasDinamicas);
+      setProdutosPorCategoria(agrupados);
+      
+      // Converte Set para array de objetos únicos
+      const categoriasArray = Array.from(categoriasUnicas).map(cat => ({
+        id: cat,
+        nome: cat.charAt(0).toUpperCase() + cat.slice(1) // Capitaliza primeira letra
+      }));
+      
+      setCategorias(categoriasArray);
     });
+
     return () => unsubscribe();
   }, [lojaId]);
+
+  useEffect(() => {
+    localStorage.setItem("lojinha_cart", JSON.stringify(cart));
+  }, [cart]);
 
   const scrollToCategoria = (catId) => {
     if (categoriasRefs.current[catId]) {
@@ -145,12 +180,32 @@ const Lojinha = ({
     });
   };
   
+  const handleIncrement = (productId) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === productId ? { ...item, qtd: (item.qtd || 1) + 1 } : item
+      )
+    );
+  };
+
+  const handleDecrement = (productId) => {
+    setCart(prevCart =>
+      prevCart
+        .map(item =>
+          item.id === productId ? { ...item, qtd: item.qtd - 1 } : item
+        )
+        .filter(item => item.qtd > 0)
+    );
+  };
+
   const handleCheckout = () => {
     console.log("Prosseguindo para checkout com os itens:", cart);
     // Implementar lógica de checkout
     alert("Redirecionando para checkout!");
     setCartOpen(false);
   };
+
+  const cartTotal = cart.reduce((sum, item) => sum + (item.price * (item.qtd || 1)), 0);
 
   console.log("Categorias:", categorias);
   console.log("Produtos agrupados:", produtosPorCategoria);
@@ -177,9 +232,20 @@ const Lojinha = ({
         <Cart
           items={cart}
           onRemove={handleRemoveFromCart}
+          onIncrement={handleIncrement}
+          onDecrement={handleDecrement}
           onCheckout={handleCheckout}
           open={cartOpen}
-          onClose={handleCartToggle} // Troque para handleCartToggle
+          onClose={handleCartToggle}
+          userPlan={storeData?.plano || "free"}
+          whatsappNumber={storeData?.whatsappNumber || ""}
+          onCheckoutTransparent={() => {
+            // Redirecione para página de checkout transparente
+            navigate(`/checkout-transparente?loja=${lojaId}`);
+          }}
+          enableWhatsappCheckout={storeData?.enableWhatsappCheckout ?? true}
+          enableMpCheckout={storeData?.enableMpCheckout ?? false}
+          cartTotal={cartTotal}
         />
       )}
 
@@ -201,11 +267,11 @@ const Lojinha = ({
       <main className="lojinha-main">
         {categorias.map(cat => (
           <section key={cat.id} ref={el => categoriasRefs.current[cat.id] = el} className="lojinha-categoria-section">
-            <h2>{cat.nome}</h2>
             <ProductSection
               title={cat.nome}
               products={produtosPorCategoria[cat.id] || []}
               onAddToCart={handleAddToCart}
+              categoriaId={cat.id}
             />
           </section>
         ))}
@@ -216,6 +282,7 @@ const Lojinha = ({
               title="Outros Produtos"
               products={produtosPorCategoria["sem-categoria"]}
               onAddToCart={handleAddToCart}
+              categoriaId="sem-categoria"
             />
           </section>
         )}
