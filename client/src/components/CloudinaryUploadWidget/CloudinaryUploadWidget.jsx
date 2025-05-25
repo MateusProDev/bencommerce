@@ -2,11 +2,10 @@ import React from "react";
 
 // Função utilitária para validar imagem (exemplo simples)
 const validateImage = async (file) => {
-  // Exemplo: apenas verifica se é imagem
   if (!file.type.startsWith("image/")) {
     throw new Error("O arquivo precisa ser uma imagem.");
   }
-  // Você pode adicionar outras validações aqui (ex: tamanho, dimensões)
+  // Outras validações podem ser adicionadas aqui
 };
 
 // Função para upload no Cloudinary
@@ -34,7 +33,8 @@ const uploadImageToCloudinary = async (file) => {
   return data.secure_url; // URL da imagem hospedada
 };
 
-const CloudinaryUploadWidget = ({ onUpload }) => {
+// Agora aceita children para customização do botão
+const CloudinaryUploadWidget = ({ onUpload, children, disabled }) => {
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -47,9 +47,15 @@ const CloudinaryUploadWidget = ({ onUpload }) => {
   };
 
   return (
-    <label style={{ cursor: "pointer" }}>
-      <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleUpload} />
-      <span style={{ color: "#4a6bff", textDecoration: "underline" }}>Enviar imagem</span>
+    <label style={{ cursor: disabled ? "not-allowed" : "pointer", display: "flex", alignItems: "center" }}>
+      <input
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleUpload}
+        disabled={disabled}
+      />
+      {children ? children : <span style={{ color: "#4a6bff", textDecoration: "underline" }}>Enviar imagem</span>}
     </label>
   );
 };

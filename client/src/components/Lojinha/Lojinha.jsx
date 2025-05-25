@@ -8,7 +8,7 @@ import ProductSection from "./ProductSection/ProductSection";
 import Footer from "./Footer/Footer";
 import Banner from "./Banner/Banner";
 import "./Lojinha.css";
-import { Route, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Lojinha = ({
   lojaId,
@@ -28,51 +28,64 @@ const Lojinha = ({
   const categoriasRefs = useRef({});
   const [nomeLoja, setNomeLoja] = useState("");
   const [bannerImages, setBannerImages] = useState([]);
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [exibirLogo, setExibirLogo] = useState(true);
+  const [logoUrlState, setLogoUrlState] = useState(logoUrl || "");
   const navigate = useNavigate();
   const { slug } = useParams();
   const [storeData, setStoreData] = useState(null);
 
   useEffect(() => {
-    async function fetchStoreData() {
-      if (!lojaId) return;
-      const lojaRef = doc(db, "lojas", lojaId);
-      const lojaSnap = await getDoc(lojaRef);
-      if (lojaSnap.exists()) {
-        setStoreData(lojaSnap.data());
-      }
-    }
-    fetchStoreData();
-  }, [lojaId]);
-
-  useEffect(() => {
+  async function fetchStoreData() {
     if (!lojaId) return;
     const lojaRef = doc(db, "lojas", lojaId);
+    const lojaSnap = await getDoc(lojaRef);
+    if (lojaSnap.exists()) {
+      const lojaData = lojaSnap.data();
+      setStoreData(lojaData);
+      setNomeLoja(lojaData.nome || "Minha Loja");
+      setLogoUrlState(lojaData.logoUrl || "");
+      setExibirLogo(lojaData.exibirLogo !== false);
+    }
+  }
+  fetchStoreData();
+}, [lojaId]);
 
-    // Listener para atualizar as categorias em tempo real
-    const unsubscribeCategorias = onSnapshot(lojaRef, (doc) => {
-      if (doc.exists()) {
-        const lojaData = doc.data();
-        setNomeLoja(lojaData.nome || "");
-        // Ajuste para pegar banners do Firestore
-        if (lojaData.bannerImages) {
-          setBannerImages(Array.isArray(lojaData.bannerImages)
-            ? lojaData.bannerImages.map(b => b.url || b)
-            : Object.values(lojaData.bannerImages).map(b => b.url));
-        } else {
-          setBannerImages([]);
-        }
-        setCategorias(lojaData.categorias || []); // Atualiza as categorias
+  useEffect(() => {
+  if (!lojaId) return;
+  const lojaRef = doc(db, "lojas", lojaId);
+
+  // Listener para atualizar as categorias em tempo real
+  const unsubscribeCategorias = onSnapshot(lojaRef, (doc) => {
+    if (doc.exists()) {
+      const lojaData = doc.data();
+      setNomeLoja(lojaData.nome || "");
+      
+      // CORREÇÃO: Atualizar também o estado exibirLogo
+      setExibirLogo(lojaData.exibirLogo !== false);
+      setLogoUrlState(lojaData.logoUrl || "");
+      
+      // Ajuste para pegar banners do Firestore
+      if (lojaData.bannerImages) {
+        setBannerImages(Array.isArray(lojaData.bannerImages)
+          ? lojaData.bannerImages.map(b => b.url || b)
+          : Object.values(lojaData.bannerImages).map(b => b.url));
+      } else {
+        setBannerImages([]);
       }
-    });
+      setCategorias(lojaData.categorias || []); // Atualiza as categorias
+    }
+  });
 
-    // Limpa o listener ao desmontar o componente
-    return () => unsubscribeCategorias();
-  }, [lojaId]);
+  // Limpa o listener ao desmontar o componente
+  return () => unsubscribeCategorias();
+}, [lojaId]);
 
   useEffect(() => {
     if (!lojaId) return;
     
-    const lojaRef = doc(db, "lojas", lojaId);
     const q = query(collection(db, `lojas/${lojaId}/produtos`));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -82,7 +95,17 @@ const Lojinha = ({
       const agrupados = {};
       const categoriasUnicas = new Set(); // Usar Set para garantir valores únicos
       
-      produtos.forEach(prod => {
+      // Supondo que 'produtos' é o array de todos os produtos da loja
+      const produtosAtivos = produtos.filter(p => p.ativo !== false); // Mostra só ativos
+
+      // Para priorizar, ordene antes de agrupar:
+      const produtosOrdenados = [...produtosAtivos].sort((a, b) => {
+        if (b.prioridade === true && !a.prioridade) return 1;
+        if (a.prioridade === true && !b.prioridade) return -1;
+        return 0;
+      });
+      
+      produtosOrdenados.forEach(prod => {
         const cat = prod.category || "outros";
         if (!agrupados[cat]) {
           agrupados[cat] = [];
@@ -110,12 +133,6 @@ const Lojinha = ({
   useEffect(() => {
     localStorage.setItem("lojinha_cart", JSON.stringify(cart));
   }, [cart]);
-
-  const scrollToCategoria = (catId) => {
-    if (categoriasRefs.current[catId]) {
-      categoriasRefs.current[catId].scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   // Handlers para o menu lateral
   const handleMenuToggle = () => {
@@ -207,13 +224,51 @@ const Lojinha = ({
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * (item.qtd || 1)), 0);
 
+  const getSuggestions = (input) => {
+    if (!input) return [];
+    const inputLower = input.toLowerCase();
+
+    // Sugestões de categorias
+    const catSuggestions = categorias
+      .filter(cat => (cat.nome || cat).toLowerCase().includes(inputLower))
+      .map(cat => ({
+        type: "categoria",
+        value: cat.id || cat.nome || cat,
+        label: cat.nome || cat
+      }));
+
+    // Sugestões de produtos
+    let prodSuggestions = [];
+    Object.entries(produtosPorCategoria).forEach(([catId, prods]) => {
+      prods.forEach(prod => {
+        if (prod.name.toLowerCase().includes(inputLower)) {
+          prodSuggestions.push({
+            type: "produto",
+            value: prod.id,
+            label: prod.name,
+            categoria: catId
+          });
+        }
+      });
+    });
+
+    // Remove duplicados de produto
+    prodSuggestions = prodSuggestions.filter(
+      (v, i, a) => a.findIndex(t => t.value === v.value) === i
+    );
+
+    return [...catSuggestions, ...prodSuggestions];
+  };
+
   console.log("Categorias:", categorias);
   console.log("Produtos agrupados:", produtosPorCategoria);
 
   return (
     <div className="lojinha-container">
       <NavBar
-        logoUrl={logoUrl}
+        logoUrl={logoUrlState}
+        nomeLoja={nomeLoja}
+        exibirLogo={exibirLogo} // Este já está correto
         onMenuClick={handleMenuToggle}
         onCartClick={handleCartToggle}
         cartCount={cart.reduce((sum, item) => sum + (item.qtd || 1), 0)}
@@ -249,43 +304,151 @@ const Lojinha = ({
         />
       )}
 
-      {/* Banner logo abaixo do NavBar */}
+      {/* Banner logo após seus outros handlers */}
       {bannerImages?.length > 0 && <Banner banners={bannerImages} />}
 
       <div className="lojinha-categorias-scroll">
-        {categorias.map(cat => (
-          <button
-            key={cat.id}
-            className="lojinha-categoria-btn"
-            onClick={() => navigate(`/${slug}/categoria/${encodeURIComponent(cat.id)}`)}
-          >
-            {cat.nome}
-          </button>
-        ))}
+        {categorias.map(cat => {
+          const nome = typeof cat === "string" ? cat : cat.nome;
+          const imgCat = (storeData?.imgcategorias || []).find(c => c.nome === nome);
+          return (
+            <button
+              key={cat.id || nome}
+              className="lojinha-categoria-btn"
+              onClick={() => navigate(`/${slug}/categoria/${encodeURIComponent(cat.id || nome)}`)}
+            >
+              <img
+                src={imgCat?.imagem || "/placeholder-categoria.jpg"}
+                alt={nome}
+                className="lojinha-categoria-icone"
+              />
+              <span className="lojinha-categoria-nome">{nome}</span>
+            </button>
+          );
+        })}
       </div>
 
+      {/* Campo de pesquisa */}
+      <div style={{
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  maxWidth: 370,
+  margin: "0 auto 24px auto",
+  position: "relative"
+}}>
+  <input
+    type="text"
+    className="lojinha-pesquisa-input"
+    placeholder="Pesquisar produto ou categoria..."
+    value={search}
+    onChange={e => {
+      const val = e.target.value;
+      setSearch(val);
+      if (val.length > 0) {
+        setSuggestions(getSuggestions(val));
+        setShowSuggestions(true);
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }}
+    onFocus={() => {
+      if (search.length > 0) setShowSuggestions(true);
+    }}
+    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+    style={{ paddingRight: 38 }}
+  />
+  <span style={{
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: "translateY(-50%)",
+    color: "#1976d2",
+    pointerEvents: "none"
+  }}>
+    <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="10" cy="10" r="7"/>
+      <line x1="15.5" y1="15.5" x2="20" y2="20"/>
+    </svg>
+  </span>
+  {showSuggestions && suggestions.length > 0 && (
+    <ul className="lojinha-suggestions-list" style={{ left: 0, right: 0 }}>
+      {suggestions.map((s, idx) => (
+        <li
+          key={s.type + s.value + idx}
+          className="lojinha-suggestion-item"
+          onMouseDown={() => {
+            setSearch(s.label);
+            setShowSuggestions(false);
+          }}
+        >
+          <span className="lojinha-suggestion-type">
+            {s.type === "categoria" ? "Categoria" : "Produto"}:
+          </span>
+          {s.label}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
       <main className="lojinha-main">
-        {categorias.map(cat => (
-          <section key={cat.id} ref={el => categoriasRefs.current[cat.id] = el} className="lojinha-categoria-section">
-            <ProductSection
-              title={cat.nome}
-              products={produtosPorCategoria[cat.id] || []}
-              onAddToCart={handleAddToCart}
-              categoriaId={cat.id}
-            />
-          </section>
-        ))}
-        {produtosPorCategoria["sem-categoria"] && (
-          <section>
-            <h2>Outros Produtos</h2>
-            <ProductSection
-              title="Outros Produtos"
-              products={produtosPorCategoria["sem-categoria"]}
-              onAddToCart={handleAddToCart}
-              categoriaId="sem-categoria"
-            />
-          </section>
-        )}
+        {(() => {
+  // Se search vazio, mostra tudo
+  if (!search.trim()) {
+    return categorias.map(cat => (
+      <section key={cat.id} ref={el => categoriasRefs.current[cat.id] = el} className="lojinha-categoria-section">
+        <ProductSection
+          title={cat.nome}
+          products={produtosPorCategoria[cat.id] || []}
+          onAddToCart={handleAddToCart}
+          categoriaId={cat.id}
+        />
+      </section>
+    ));
+  }
+
+  // Se search bate com categoria
+  const catMatch = categorias.find(cat =>
+    (cat.nome || cat).toLowerCase() === search.trim().toLowerCase()
+  );
+  if (catMatch) {
+    return (
+      <section key={catMatch.id} ref={el => categoriasRefs.current[catMatch.id] = el} className="lojinha-categoria-section">
+        <ProductSection
+          title={catMatch.nome}
+          products={produtosPorCategoria[catMatch.id] || []}
+          onAddToCart={handleAddToCart}
+          categoriaId={catMatch.id}
+        />
+      </section>
+    );
+  }
+
+  // Se search bate com produto(s)
+  let found = false;
+  return categorias.map(cat => {
+    const filtered = (produtosPorCategoria[cat.id] || []).filter(prod =>
+      prod.name.toLowerCase().includes(search.toLowerCase())
+    );
+    if (filtered.length > 0) found = true;
+    return filtered.length > 0 ? (
+      <section key={cat.id} ref={el => categoriasRefs.current[cat.id] = el} className="lojinha-categoria-section">
+        <ProductSection
+          title={cat.nome}
+          products={filtered}
+          onAddToCart={handleAddToCart}
+          categoriaId={cat.id}
+        />
+      </section>
+    ) : null;
+  }).concat(!found ? (
+    <div style={{ textAlign: "center", margin: "2rem 0", color: "#888" }}>
+      Nenhum produto ou categoria encontrada.
+    </div>
+  ) : null);
+})()}
       </main>
 
       <Footer info={footerInfo} />

@@ -16,7 +16,7 @@ import {
   Grid,
   Card,
   TextField,
-  CardMedia, // Adicione esta importação
+  CardMedia,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -33,14 +33,12 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
-import { doc, getDoc, collection, getDocs, updateDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, updateDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
-import { verificarPlanoUsuario } from "../../utils/verificarPlanoUsuario";
 import "./Dashboard.css";
 import EditHeader from "../Admin/EditHeader/EditHeader";
 import EditBanner from "../Admin/EditBanner/EditBanner";
-// Removido ManageProducts import, pois o ManageStock já gerencia os produtos
 import ManageStock from "../ManageStock/ManageStock";
 import SalesReports from "../SalesReports/SalesReports";
 import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
@@ -60,61 +58,66 @@ const Dashboard = ({ user }) => {
   const [bannerImages, setBannerImages] = useState([]);
   const [newBannerImage, setNewBannerImage] = useState("");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
+  const [exibirLogo, setExibirLogo] = useState(true); // Novo estado
   const navigate = useNavigate();
-  const auth = getAuth(); 
+  const auth = getAuth();
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const currentAuthUser = user || auth.currentUser;
-        if (currentAuthUser) {
-          setCurrentUser(currentAuthUser);
-          setLoading(true);
-          // Verifica plano do usuário
-          await verificarPlanoUsuario(currentAuthUser.uid);
-          // Verifica se o usuário tem uma loja
-          const [userSnap, storeSnap] = await Promise.all([
-            getDoc(doc(db, "usuarios", currentAuthUser.uid)),
-            getDoc(doc(db, "lojas", currentAuthUser.uid)),
-          ]);
-          const userData = userSnap.exists() ? userSnap.data() : {};
-          const storeDataExists = storeSnap.exists();
-          setUserPlan(userData.planoAtual || userData.plano || "free");
-          if (storeDataExists) {
-            const storeData = storeSnap.data();
-            setStoreData(storeData);
-            setHeaderTitle(storeData.headerTitle || "Minha Loja");
-            setWhatsappNumber(storeData.whatsappNumber || "");
-            setLogoUrl(storeData.logoUrl || "");
-            setBannerImages(storeData.bannerImages || []);
-            setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
-            // Carrega produtos
-            const productsCollection = collection(
-              db,
-              `lojas/${currentAuthUser.uid}/produtos`
-            );
-            const productsSnapshot = await getDocs(productsCollection);
-            const productsList = productsSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setProducts(productsList);
-          } else {
-            navigate("/criar-loja");
-          }
-        } else {
+        if (!currentAuthUser) {
           navigate("/login");
+          return;
         }
+
+        // Monitora mudanças no documento do usuário em tempo real
+        const unsubscribe = onSnapshot(doc(db, "usuarios", currentAuthUser.uid), (userDoc) => {
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUserPlan(userData.plano || "free"); // Atualiza o plano do usuário
+            setCurrentUser(currentAuthUser);
+
+            // Verifica se o usuário tem uma loja
+            getDoc(doc(db, "lojas", currentAuthUser.uid)).then((storeSnap) => {
+              if (storeSnap.exists()) {
+                const storeData = storeSnap.data();
+                setStoreData(storeData);
+                setHeaderTitle(storeData.headerTitle || storeData.nome || "Minha Loja");
+                setWhatsappNumber(storeData.whatsappNumber || "");
+                setLogoUrl(storeData.logoUrl || "");
+                setBannerImages(storeData.bannerImages || []);
+                setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
+                setExibirLogo(storeData.exibirLogo !== false); // Carrega o estado do banco
+
+                // Carrega produtos
+                getDocs(collection(db, `lojas/${currentAuthUser.uid}/produtos`)).then((productsSnapshot) => {
+                  const productsList = productsSnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                  }));
+                  setProducts(productsList);
+                });
+              } else {
+                navigate("/criar-loja");
+              }
+            });
+          }
+        });
+
+        return () => unsubscribe(); // Remove o listener quando o componente é desmontado
       } catch (err) {
         console.error("Erro ao carregar dados:", err);
       } finally {
         setLoading(false);
       }
     };
+
     loadUserData();
-  }, [user, navigate, auth, selectedSection]);
+  }, [user, navigate, auth]);
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -123,6 +126,7 @@ const Dashboard = ({ user }) => {
       console.error("Erro ao fazer logout:", error);
     }
   };
+
   const saveHeaderChanges = async () => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
@@ -134,6 +138,7 @@ const Dashboard = ({ user }) => {
       alert("Erro ao salvar cabeçalho");
     }
   };
+
   const saveWhatsappChanges = async () => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
@@ -145,6 +150,7 @@ const Dashboard = ({ user }) => {
       alert("Erro ao salvar WhatsApp");
     }
   };
+
   const addBannerImage = async () => {
     if (!newBannerImage) return;
     try {
@@ -160,6 +166,7 @@ const Dashboard = ({ user }) => {
       alert("Erro ao adicionar imagem");
     }
   };
+
   const removeBannerImage = async (index) => {
     try {
       const updatedBannerImages = bannerImages.filter((_, i) => i !== index);
@@ -174,21 +181,31 @@ const Dashboard = ({ user }) => {
     }
   };
 
-  // Atualize os itens do menu, removendo a opção "Gerenciar Produtos"
+  const handleHeaderUpdate = (newHeaderTitle, newLogoUrl, newExibirLogo) => {
+    setHeaderTitle(newHeaderTitle);
+    setLogoUrl(newLogoUrl);
+    setExibirLogo(newExibirLogo);
+    setStoreData((prev) => ({
+      ...prev,
+      nome: newHeaderTitle,
+      logoUrl: newLogoUrl,
+      exibirLogo: newExibirLogo,
+    }));
+  };
+
   const menuItems = [
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["plus", "premium"] },
+    { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
+    { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Produtos", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Pagamentos", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium", "free"] },
   ];
-  
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -197,6 +214,24 @@ const Dashboard = ({ user }) => {
         </Box>
       );
     }
+
+    // Verifica se a seção selecionada é permitida para o plano atual
+    const isSectionAllowed = menuItems.some(
+      (item) => item.text === selectedSection && item.allowedPlans.includes(userPlan)
+    );
+
+    if (!isSectionAllowed) {
+      setSelectedSection("Home");
+      return (
+        <DashboardHome
+          storeData={storeData}
+          userPlan={userPlan}
+          navigate={navigate}
+          setSelectedSection={setSelectedSection}
+        />
+      );
+    }
+
     switch (selectedSection) {
       case "Home":
         return (
@@ -214,8 +249,11 @@ const Dashboard = ({ user }) => {
             setHeaderTitle={setHeaderTitle}
             logoUrl={logoUrl}
             setLogoUrl={setLogoUrl}
+            exibirLogo={exibirLogo}
+            setExibirLogo={setExibirLogo}
             onSave={saveHeaderChanges}
             currentUser={currentUser}
+            onUpdate={handleHeaderUpdate}
           />
         );
       case "Editar Banner":
@@ -228,7 +266,7 @@ const Dashboard = ({ user }) => {
             onAddBanner={addBannerImage}
             onRemoveBanner={removeBannerImage}
             currentUser={currentUser}
-            userPlan={userPlan} // "free", "plus", or "premium"
+            userPlan={userPlan}
           />
         );
       case "Gerenciar Estoque":
@@ -263,9 +301,7 @@ const Dashboard = ({ user }) => {
           </div>
         );
       case "Visualizar Loja":
-        return (
-          <LojinhaPreview user={storeData} />
-        );
+        return <LojinhaPreview user={storeData} />;
       case "Upgrade de Plano":
         return currentUser ? <PlanoUpgrade user={currentUser} /> : null;
       case "Preview Estático":
@@ -281,7 +317,9 @@ const Dashboard = ({ user }) => {
               }}
             >
               <h1>{headerTitle}</h1>
-              <img src={logoUrl} alt="Logo da Loja" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+              {exibirLogo && logoUrl && (
+                <img src={logoUrl} alt="Logo da Loja" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+              )}
               <div>
                 {bannerImages.length === 0 ? (
                   <p>Nenhuma imagem adicionada ainda.</p>
@@ -321,14 +359,14 @@ const Dashboard = ({ user }) => {
               label="Chave Pública Mercado Pago"
               fullWidth
               value={storeData?.mpPublicKey || ""}
-              onChange={e => setStoreData({ ...storeData, mpPublicKey: e.target.value })}
+              onChange={(e) => setStoreData({ ...storeData, mpPublicKey: e.target.value })}
               sx={{ mb: 2 }}
             />
             <TextField
               label="Chave Secreta Mercado Pago"
               fullWidth
               value={storeData?.mpAccessToken || ""}
-              onChange={e => setStoreData({ ...storeData, mpAccessToken: e.target.value })}
+              onChange={(e) => setStoreData({ ...storeData, mpAccessToken: e.target.value })}
               sx={{ mb: 2 }}
             />
             <Box sx={{ mb: 2 }}>
@@ -336,7 +374,9 @@ const Dashboard = ({ user }) => {
                 <input
                   type="checkbox"
                   checked={storeData?.enableWhatsappCheckout ?? true}
-                  onChange={e => setStoreData({ ...storeData, enableWhatsappCheckout: e.target.checked })}
+                  onChange={(e) =>
+                    setStoreData({ ...storeData, enableWhatsappCheckout: e.target.checked })
+                  }
                 />
                 Permitir finalizar pelo WhatsApp
               </label>
@@ -344,7 +384,9 @@ const Dashboard = ({ user }) => {
                 <input
                   type="checkbox"
                   checked={storeData?.enableMpCheckout ?? false}
-                  onChange={e => setStoreData({ ...storeData, enableMpCheckout: e.target.checked })}
+                  onChange={(e) =>
+                    setStoreData({ ...storeData, enableMpCheckout: e.target.checked })
+                  }
                   disabled={userPlan === "free"}
                 />
                 Permitir finalizar pelo Cartão (Mercado Pago)
@@ -375,15 +417,14 @@ const Dashboard = ({ user }) => {
         );
     }
   };
-  
-  const filteredMenuItems = menuItems.filter((item) =>
-    item.allowedPlans.includes(userPlan)
-  );
+
+  const filteredMenuItems = menuItems.filter((item) => item.allowedPlans.includes(userPlan));
+
   const drawerContent = (
     <div className="admin-loja-drawer-container">
       <Toolbar className="admin-loja-drawer-header">
         <Typography variant="h6" noWrap>
-          {storeData?.storeName || "Minha Loja"}
+          {storeData?.storeName || headerTitle || "Minha Loja"}
         </Typography>
       </Toolbar>
       <List className="admin-loja-menu-list">
@@ -408,7 +449,7 @@ const Dashboard = ({ user }) => {
       </div>
     </div>
   );
-  
+
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
@@ -431,7 +472,7 @@ const Dashboard = ({ user }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            {storeData?.storeName || "Minha Loja"}
+            {storeData?.storeName || headerTitle || "Minha Loja"}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -440,10 +481,10 @@ const Dashboard = ({ user }) => {
         sx={{
           width: 260,
           flexShrink: 0,
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': {
+          display: { xs: "none", sm: "block" },
+          "& .MuiDrawer-paper": {
             width: 260,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
         open
@@ -456,8 +497,8 @@ const Dashboard = ({ user }) => {
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { width: 260 },
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": { width: 260 },
         }}
       >
         {drawerContent}
@@ -468,8 +509,8 @@ const Dashboard = ({ user }) => {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - 260px)` },
-          ml: { sm: '260px' },
-          mt: { xs: '56px', sm: 0 }
+          ml: { sm: "260px" },
+          mt: { xs: "56px", sm: 0 },
         }}
       >
         {renderContent()}

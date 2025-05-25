@@ -18,6 +18,7 @@ const CategoriaPage = () => {
   const [lojaId, setLojaId] = useState(null);
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState(""); // Estado para a pesquisa
 
   // Carrossel drag
   const carouselRef = useRef(null);
@@ -39,7 +40,17 @@ const CategoriaPage = () => {
           where("category", "==", categoria.toLowerCase())
         ));
 
-        setProdutos(produtosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        // Adicione este filtro e ordenação:
+        const produtosFiltrados = produtosSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(prod => prod.ativo !== false) // Só ativos
+          .sort((a, b) => {
+            if (b.prioridade === true && !a.prioridade) return 1;
+            if (a.prioridade === true && !b.prioridade) return -1;
+            return 0;
+          });
+
+        setProdutos(produtosFiltrados);
       }
       setLoading(false);
     }
@@ -85,6 +96,13 @@ const CategoriaPage = () => {
   return (
     <div className="categoria-page-container">
       <h1 className="categoria-titulo">Categoria: {categoria}</h1>
+      <input
+        type="text"
+        className="categoria-pesquisa-input"
+        placeholder="Pesquisar produto nesta categoria..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
       <div
         className="categoria-produtos-carousel"
         ref={carouselRef}
@@ -98,7 +116,9 @@ const CategoriaPage = () => {
       >
         {loading
           ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
-          : produtos.map(produto => {
+          : produtos
+              .filter(produto => produto.name.toLowerCase().includes(search.toLowerCase())) // Filtro de pesquisa
+              .map(produto => {
               const desconto = getDiscount(produto.price, produto.anchorPrice);
               return (
                 <div className="categoria-produto-card" key={produto.id}>

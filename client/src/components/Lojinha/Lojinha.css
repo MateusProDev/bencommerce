@@ -86,14 +86,72 @@
   }
 }
 
+/* Carrossel centralizado, responsivo e sem bordas */
 .lojinha-categorias-scroll {
-  position: sticky;
-  top: 60px;
-  z-index: 10;
-  background: #fff;
-  padding: 1rem;
-  margin: 0 -1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  overflow-x: auto;
+  gap: 1.2rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  background: transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: auto;
+  max-width: 1100px;
+  margin-left: 0;
+  margin-right: auto;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.lojinha-categorias-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.lojinha-categoria-btn {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform 0.18s;
+  gap: 0.4rem;
+  min-width: 80px;
+}
+.lojinha-categoria-btn:active,
+.lojinha-categoria-btn:hover {
+  transform: scale(1.07);
+  background: none;
+}
+
+.lojinha-categoria-icone {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.3rem;
+  background: #f3f3f3;
+  box-shadow: 0 2px 8px #0001;
+  border: none;
+  display: block;
+}
+
+.lojinha-categoria-nome {
+  font-size: 1rem;
+  color: #222;
+  font-weight: 600;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lojinha-categorias-container {
@@ -112,11 +170,7 @@
 }
 
 .lojinha-categoria-btn {
-  background: #fff;
-  color: #27ae60;
-  border: 2px solid #27ae60;
-  padding: 0.6rem 1.2rem;
-  border-radius: 24px;
+  border-radius: 30px;
   font-weight: 600;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -127,25 +181,25 @@
 
 .lojinha-categoria-btn:hover,
 .lojinha-categoria-btn.active {
-  background: #27ae60;
   color: #fff;
 }
 
 .lojinha-categoria-btn:hover,
 .lojinha-categoria-btn:focus {
-  background: #27ae60;
   color: #fff;
-  border-color: #219150;
 }
 
 .lojinha-categoria-icone {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .lojinha-categoria-section {
-  margin-bottom: 36px;
+  margin-bottom: 0;
 }
 
 .lojinha-categoria-titulo {
@@ -154,4 +208,93 @@
   font-weight: 700;
   margin-bottom: 12px;
   margin-top: 0;
+}
+
+.lojinha-pesquisa-input {
+  width: 100%;
+  max-width: 350px;
+  padding: 0.7rem 2.2rem 0.7rem 1.1rem; /* espaço para a lupa */
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1.05rem;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #0001;
+  display: block;
+}
+.lojinha-pesquisa-input:focus {
+  border: 1.5px solid #1976d2;
+  box-shadow: 0 4px 16px #1976d220;
+}
+
+/* Estilo para as seções de categorias dentro do <main> */
+.lojinha-categoria-section {
+  margin-bottom: 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.lojinha-categoria-section:nth-child(even) {
+  animation-name: slideInRight;
+}
+
+.lojinha-categoria-section:nth-child(odd) {
+  animation-name: slideIn;
+}
+
+/* Mensagem de nenhuma categoria ou produto encontrado */
+.lojinha-no-result {
+  text-align: center;
+  margin: 2rem 0;
+  color: #888;
+  font-size: 1.1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Sugestões de autocomplete da barra de pesquisa */
+.lojinha-suggestions-list {
+  position: absolute;
+  z-index: 20;
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px #0001;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  left: 0; right: 0;
+  list-style: none;
+  padding: 0;
+  margin-top: 2px;
+  top: 60px; /* ajuste conforme o layout */
+}
+
+.lojinha-suggestion-item {
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #222;
+  border-bottom: 1px solid #f3f3f3;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.lojinha-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.lojinha-suggestion-item:hover,
+.lojinha-suggestion-item:focus {
+  background: #f5faff;
+}
+
+.lojinha-suggestion-type {
+  font-size: 0.92em;
+  color: #1976d2;
+  font-weight: 600;
+  margin-right: 0.5em;
+  text-transform: capitalize;
 }
