@@ -1,36 +1,67 @@
 import React from "react";
+import { ShoppingBag, Menu } from '@mui/icons-material';
 import "./NavBar.css";
 
-const NavBar = ({ logoUrl, onMenuClick, onCartClick, cartCount }) => {
+const NavBar = ({
+  logoUrl,
+  nomeLoja,
+  exibirLogo = true,
+  onMenuClick,
+  onCartClick,
+  cartCount
+}) => {
+  console.log("NavBar - exibirLogo:", exibirLogo, "logoUrl:", logoUrl, "nomeLoja:", nomeLoja);
+  
   return (
-    <nav className="navbar-container">
-      <div className="navbar-left">
-        {logoUrl ? (
-          <img src={logoUrl} alt="Logo da Loja" className="navbar-logo" />
+    <div className="lojinha-navbar">
+      <div className="lojinha-navbar-left">
+        {exibirLogo ? (
+          logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo da Loja"
+              className="lojinha-navbar-logo"
+              style={{
+                maxHeight: '60px',
+                maxWidth: '200px',
+                objectFit: 'contain'
+              }}
+            />
+          ) : (
+            <div className="lojinha-navbar-no-logo">
+              Sem logo
+            </div>
+          )
         ) : (
-          <span className="placeholder-logo">Minha Loja</span>
+          <div className="lojinha-navbar-title">
+            {nomeLoja || "Minha Loja"}
+          </div>
         )}
       </div>
       
-      <div className="navbar-right">
+      <div className="lojinha-navbar-right">
         <button 
-          className="cart-icon" 
-          onClick={onCartClick} 
-          aria-label="Abrir carrinho"
+          className="lojinha-navbar-cart-btn"
+          onClick={onCartClick}
+          aria-label="Carrinho de compras"
         >
-          🛒 
-          {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+          <ShoppingBag sx={{ fontSize: 32 }} />
+          {cartCount > 0 && (
+            <span className="lojinha-navbar-cart-count">
+              {cartCount}
+            </span>
+          )}
         </button>
         
         <button 
-          className="menu-toggle" 
-          onClick={onMenuClick} 
-          aria-label="Abrir menu"
+          className="lojinha-navbar-menu-btn"
+          onClick={onMenuClick}
+          aria-label="Menu"
         >
-          ☰
+          <Menu sx={{ fontSize: 32 }} />
         </button>
       </div>
-    </nav>
+    </div>
   );
 };
 

@@ -158,6 +158,28 @@
   100% { background-color: #e0e0e0; }
 }
 
+/* Pesquisa */
+.categoria-pesquisa-input {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto 24px auto;
+  display: block;
+  padding: 0.7rem 1.1rem;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1.05rem;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #0001;
+}
+
+.categoria-pesquisa-input:focus {
+  border: 1.5px solid #1976d2;
+  box-shadow: 0 4px 16px #1976d220;
+}
+
 /* Responsivo */
 @media (max-width: 900px) {
   .categoria-produto-card {

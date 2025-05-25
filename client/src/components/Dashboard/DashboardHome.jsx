@@ -12,7 +12,7 @@ const DashboardHome = ({ storeData, userPlan, navigate, setSelectedSection }) =>
           <CardContent>
             <Typography variant="h6">Resumo da Loja</Typography>
             <Typography variant="body2">
-              <strong>Nome:</strong> {storeData?.storeName || "Não definido"}<br />
+              <strong>Nome:</strong> {storeData?.nome || "Não definido"}<br />
               <strong>Segmento:</strong> {storeData?.segmento || "Não definido"}<br />
               <strong>Plano:</strong> {userPlan}
             </Typography>

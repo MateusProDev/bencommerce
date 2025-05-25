@@ -1,3 +1,4 @@
+/* Banner principal */
 .lojinha-banner {
   width: 100vw;
   max-width: 100%;
@@ -26,6 +27,7 @@
   display: block;
 }
 
+/* Banner slider */
 .lojinha-banner.slider {
   position: relative;
   overflow: hidden;
@@ -129,25 +131,16 @@
     margin-bottom: 1rem;
     gap: 0.5rem;
   }
-  .lojinha-banner img {
+  .lojinha-banner img,
+  .slider-img {
     width: 100vw;
     min-width: 100vw;
     max-width: 100vw;
-    height: 45vh !important;
-    min-height: 220px !important;
-    max-height: 340px !important;
+    height: 30vh !important;
+    min-height: 160px !important;
+    max-height: 280px !important;
     border-radius: 0;
     box-shadow: 0 2px 16px rgba(0,0,0,0.10);
-  }
-  .slider-img,
-  .lojinha-banner img {
-    width: 100vw;
-    min-width: 100vw;
-    max-width: 100vw;
-    height: 45vh !important;
-    min-height: 220px !important;
-    max-height: 340px !important;
-    border-radius: 0;
   }
   .slider-arrow { width: 32px; height: 32px; font-size: 1.3rem; }
   .slider-dot, .slider-dot.active { width: 22px; height: 7px; }
@@ -155,12 +148,9 @@
     width: 100vw;
     min-width: 100vw;
     max-width: 100vw;
-    height: 45vh !important;
-    min-height: 220px !important;
-    max-height: 340px !important;
-    border-radius: 0;
-  }
-  .slider-img, .slider-img.active {
+    height: 30vh !important;
+    min-height: 160px !important;
+    max-height: 280px !important;
     border-radius: 0;
   }
 }
