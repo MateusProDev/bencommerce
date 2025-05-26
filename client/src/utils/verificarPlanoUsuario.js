@@ -20,11 +20,15 @@ export const verificarPlanoUsuario = async (uid) => {
     let atualizacoes = null;
     const agora = new Date();
     
+    // Validar campos opcionais
+    const expiracaoPlano = userData?.expiracaoPlano;
+    const emTeste = userData?.emTeste;
+    const planoAtivo = userData?.planoAtivo;
+    const plano = userData?.plano;
+
     // Verificar se o usuário está em período de teste
-    if (userData.emTeste && userData.expiracaoPlano) {
-      const expiracao = new Date(userData.expiracaoPlano);
-      
-      // Se o período de teste expirou, rebaixar para free
+    if (emTeste && expiracaoPlano) {
+      const expiracao = new Date(expiracaoPlano);
       if (agora > expiracao) {
         atualizacoes = {
           plano: 'free',
@@ -32,7 +36,7 @@ export const verificarPlanoUsuario = async (uid) => {
           expiracaoPlano: null,
           dataInicioPlano: null,
           emTeste: false,
-          testeGratuito: true, // Marca que o usuário já usou o teste
+          testeGratuito: true,
           planoAtivo: false,
           pagamentoConfirmado: false,
           atualizadoEm: serverTimestamp()
@@ -41,10 +45,8 @@ export const verificarPlanoUsuario = async (uid) => {
     }
     
     // Verificar planos pagos ativos (não em teste)
-    else if (!userData.emTeste && userData.planoAtivo && userData.expiracaoPlano) {
-      const expiracao = new Date(userData.expiracaoPlano);
-      
-      // Se o plano pago expirou
+    else if (!emTeste && planoAtivo && expiracaoPlano) {
+      const expiracao = new Date(expiracaoPlano);
       if (agora > expiracao) {
         atualizacoes = {
           plano: 'free',
@@ -57,19 +59,19 @@ export const verificarPlanoUsuario = async (uid) => {
         };
       }
     }
-    
-    // Atualizar o documento se necessário
+
+    // Atualizações de segurança para campos opcionais
     if (atualizacoes) {
       await updateDoc(userRef, atualizacoes);
-      console.log(`Usuário ${uid} teve seu plano atualizado para ${atualizacoes.plano}.`);
+      console.log(`Usuário ${uid} atualizado para plano ${atualizacoes.plano}`);
       return { ...userData, ...atualizacoes };
     }
     
-    return null; // Nenhuma atualização foi necessária
-    
+    return null;
+
   } catch (err) {
-    console.error('Erro ao verificar plano do usuário:', err);
-    throw err;
+    console.error('Erro ao verificar plano:', err);
+    throw new Error(`Falha ao verificar plano do usuário ${uid}: ${err.message}`);
   }
 };
 
@@ -79,17 +81,14 @@ export const verificarPlanoUsuario = async (uid) => {
  * @returns {boolean} - Retorna true se o usuário pode iniciar um teste
  */
 export const podeIniciarTeste = (userData) => {
-  // Se já usou o teste gratuito, não pode iniciar outro
-  if (userData.testeGratuito) {
-    return false;
-  }
-  
-  // Se já está em algum plano pago ativo, não precisa de teste
-  if (userData.planoAtivo && userData.plano !== 'free') {
-    return false;
-  }
-  
-  return true;
+  // Verifica campos opcionais com operador optional chaining
+  return (
+    !(userData?.testeGratuito) &&
+    !(
+      userData?.planoAtivo &&
+      userData?.plano !== 'free'
+    )
+  );
 };
 
 /**
@@ -100,34 +99,35 @@ export const podeIniciarTeste = (userData) => {
  */
 export const iniciarTeste = async (uid, plano) => {
   if (!['plus', 'premium'].includes(plano)) {
-    throw new Error('Plano inválido para teste gratuito');
+    throw new Error(`Plano '${plano}' inválido para teste gratuito`);
   }
   
   const userRef = doc(db, 'usuarios', uid);
   const userSnap = await getDoc(userRef);
   
   if (!userSnap.exists()) {
-    throw new Error('Usuário não encontrado');
+    throw new Error(`Usuário ${uid} não encontrado`);
   }
   
   const userData = userSnap.data();
   
   if (!podeIniciarTeste(userData)) {
-    throw new Error('Usuário não pode iniciar teste gratuito');
+    throw new Error(`Usuário ${uid} não pode iniciar teste`);
   }
   
-  const agora = new Date();
+  // Usar serverTimestamp para datas críticas
+  const inicioTeste = serverTimestamp();
   const expiracaoDate = new Date();
-  expiracaoDate.setDate(expiracaoDate.getDate() + 7); // 7 dias de teste
-  
+  expiracaoDate.setDate(expiracaoDate.getDate() + 7);
+
   const atualizacoes = {
     plano: plano,
     planoAtual: plano,
-    dataInicioPlano: agora.toISOString(),
+    dataInicioPlano: inicioTeste,
     expiracaoPlano: expiracaoDate.toISOString(),
     emTeste: true,
     testeGratuito: true,
-    inicioTeste: agora.toISOString(),
+    inicioTeste: inicioTeste,
     fimTeste: expiracaoDate.toISOString(),
     planoAtivo: false,
     pagamentoConfirmado: false,
