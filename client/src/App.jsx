@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+// App.js
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { useState, useEffect } from "react";
 import { db } from './firebaseConfig';
 import { Spinner } from 'react-bootstrap';
 
@@ -23,6 +25,7 @@ import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
 
 // Context
 import { CategoriasProvider } from "./context/CategoriasContext";
+import { UserPlanProvider } from "./context/UserPlanContext"; // Import the UserPlanProvider
 
 // Componente de rota protegida
 const ProtectedRoute = ({ user, children }) => {
@@ -108,120 +111,121 @@ const AppContent = () => {
   }
 
   return (
-    <Routes location={location}>
-      {/* Rotas públicas */}
-      <Route path="/" element={<HomePage />} />
+    <UserPlanProvider>
+      <Routes location={location}>
+        {/* Rotas públicas */}
+        <Route path="/" element={<HomePage />} />
 
-      {/* Rotas de autenticação */}
-      <Route
-        path="/login"
-        element={
-          !user ? (
-            <AuthForm
-              initialMode="login"
-              onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
-            />
-          ) : (
-            <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
-          )
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          !user ? (
-            <AuthForm
-              initialMode="signup"
-              onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
-            />
-          ) : (
-            <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
-          )
-        }
-      />
-      {/* Mantém /auth para compatibilidade com versões anteriores */}
-      <Route
-        path="/auth"
-        element={
-          !user ? (
-            <AuthForm
-              initialMode={location.state?.authMode || 'login'}
-              onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
-            />
-          ) : (
-            <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
-          )
-        }
-      />
+        {/* Rotas de autenticação */}
+        <Route
+          path="/login"
+          element={
+            !user ? (
+              <AuthForm
+                initialMode="login"
+                onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
+              />
+            ) : (
+              <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
+            )
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            !user ? (
+              <AuthForm
+                initialMode="signup"
+                onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
+              />
+            ) : (
+              <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
+            )
+          }
+        />
+        {/* Mantém /auth para compatibilidade com versões anteriores */}
+        <Route
+          path="/auth"
+          element={
+            !user ? (
+              <AuthForm
+                initialMode={location.state?.authMode || 'login'}
+                onLoginSuccess={() => navigate(hasStore ? '/dashboard' : '/criar-loja', { replace: true })}
+              />
+            ) : (
+              <Navigate to={hasStore ? '/dashboard' : '/criar-loja'} replace />
+            )
+          }
+        />
 
-      {/* Loja do usuário */}
-      <Route
-        path="/:slug"
-        element={
-          <LojinhaPage />
-        }
-      />
-      <Route path="/:slug/categoria/:categoria" element={<CategoriaPage />} />
-      {/* <Route path="/:slug/produto/:produtoId" element={<ProdutoPage />} /> */}
-      <Route path="/:slug/produto/:produtoSlug" element={<ProdutoPage />} />
+        {/* Loja do usuário */}
+        <Route
+          path="/:slug"
+          element={
+            <LojinhaPage />
+          }
+        />
+        <Route path="/:slug/categoria/:categoria" element={<CategoriaPage />} />
+        <Route path="/:slug/produto/:produtoSlug" element={<ProdutoPage />} />
 
-      {/* Rotas protegidas que requerem apenas autenticação */}
-      <Route
-        path="/criar-loja"
-        element={
-          <ProtectedRoute user={user}>
-            <CreateStore onStoreCreated={() => setHasStore(true)} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/checkout"
-        element={
-          <ProtectedRoute user={user}>
-            <CheckoutRedirect currentUser={user} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/upgrade"
-        element={
-          <ProtectedRoute user={user}>
-            <CheckoutTransparent currentUser={user} />
-          </ProtectedRoute>
-        }
-      />
+        {/* Rotas protegidas que requerem apenas autenticação */}
+        <Route
+          path="/criar-loja"
+          element={
+            <ProtectedRoute user={user}>
+              <CreateStore onStoreCreated={() => setHasStore(true)} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute user={user}>
+              <CheckoutRedirect currentUser={user} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/upgrade"
+          element={
+            <ProtectedRoute user={user}>
+              <CheckoutTransparent currentUser={user} />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Rotas protegidas que requerem autenticação e uma loja */}
-      <Route
-        path="/dashboard"
-        element={
-          <StoreRequiredRoute user={user} hasStore={hasStore}>
-            <CategoriasProvider lojaId={user?.uid}>
-              <Dashboard user={user} />
-            </CategoriasProvider>
-          </StoreRequiredRoute>
-        }
-      />
-      <Route
-        path="/minha-loja"
-        element={
-          <StoreRequiredRoute user={user} hasStore={hasStore}>
-            <LojinhaPreview user={user} />
-          </StoreRequiredRoute>
-        }
-      />
-      <Route
-        path="/dashboard/produtos"
-        element={
-          <StoreRequiredRoute user={user} hasStore={hasStore}>
-            <ProdutosPage lojaId={user?.uid} />
-          </StoreRequiredRoute>
-        }
-      />
+        {/* Rotas protegidas que requerem autenticação e uma loja */}
+        <Route
+          path="/dashboard"
+          element={
+            <StoreRequiredRoute user={user} hasStore={hasStore}>
+              <CategoriasProvider lojaId={user?.uid}>
+                <Dashboard user={user} />
+              </CategoriasProvider>
+            </StoreRequiredRoute>
+          }
+        />
+        <Route
+          path="/minha-loja"
+          element={
+            <StoreRequiredRoute user={user} hasStore={hasStore}>
+              <LojinhaPreview user={user} />
+            </StoreRequiredRoute>
+          }
+        />
+        <Route
+          path="/dashboard/produtos"
+          element={
+            <StoreRequiredRoute user={user} hasStore={hasStore}>
+              <ProdutosPage lojaId={user?.uid} />
+            </StoreRequiredRoute>
+          }
+        />
 
-      {/* Rota para todos os outros casos */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Rota para todos os outros casos */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </UserPlanProvider>
   );
 };
 

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// ProductEditModal.js
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -32,16 +33,14 @@ const ProductEditModal = ({
   onSave,
   initialProduct = {},
   categories = [],
-  userPlan: initialUserPlan,
   onCreateCategory,
   lojaId,
   currentProductCount = 0,
 }) => {
   const auth = getAuth();
   const resolvedLojaId = lojaId || auth.currentUser?.uid;
-  const { userPlan } = useUserPlan(resolvedLojaId) || { userPlan: initialUserPlan };
+  const { userPlan, loading: planLoading } = useUserPlan(resolvedLojaId);
   const [saveLoading, setSaveLoading] = useState(false);
-
   const safeProduct = initialProduct || {};
   const [product, setProduct] = useState({
     name: safeProduct.name || "",
@@ -55,21 +54,61 @@ const ProductEditModal = ({
     ativo: safeProduct.ativo !== false,
     prioridade: safeProduct.prioridade || false,
   });
-
   const [variantInput, setVariantInput] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCategoryImage, setNewCategoryImage] = useState("");
 
-  const maxImages = MAX_IMAGES[userPlan] || 1;
-  const maxProducts = PRODUCT_LIMITS[userPlan] || 30;
-  
+  const maxImages = MAX_IMAGES[userPlan] || MAX_IMAGES['free'] || 1;
+  const maxProducts = PRODUCT_LIMITS[userPlan] || PRODUCT_LIMITS['free'] || 30;
+
+  // Log para debug - remover em produção
+  console.log('ProductEditModal - currentUserPlan:', userPlan);
+  console.log('ProductEditModal - maxImages:', maxImages);
+  console.log('ProductEditModal - maxProducts:', maxProducts);
+
+  // Efeito para monitorar mudanças no plano e ajustar imagens se necessário
+  useEffect(() => {
+    if (product.images.length > maxImages) {
+      setProduct((prev) => ({
+        ...prev,
+        images: prev.images.slice(0, maxImages)
+      }));
+      alert(`Seu plano foi alterado. O número de imagens foi reduzido para ${maxImages} conforme o limite do plano ${userPlan.toUpperCase()}.`);
+    }
+  }, [maxImages, userPlan]);
+
+  // Efeito para resetar o produto quando o modal abrir/fechar ou o plano mudar
+  useEffect(() => {
+    if (open) {
+      const safeProduct = initialProduct || {};
+      const productImages = safeProduct.images || [];
+      const limitedImages = productImages.slice(0, maxImages);
+      setProduct({
+        name: safeProduct.name || "",
+        price: safeProduct.price || "",
+        anchorPrice: safeProduct.anchorPrice || "",
+        stock: safeProduct.stock || "",
+        description: safeProduct.description || "",
+        images: limitedImages,
+        category: safeProduct.category || "",
+        variants: safeProduct.variants || [],
+        ativo: safeProduct.ativo !== false,
+        prioridade: safeProduct.prioridade || false,
+      });
+      if (productImages.length > maxImages && productImages.length > 0) {
+        setTimeout(() => {
+          alert(`Algumas imagens foram removidas para adequar ao limite do plano ${userPlan.toUpperCase()} (${maxImages} imagens por produto).`);
+        }, 500);
+      }
+    }
+  }, [open, initialProduct, maxImages, userPlan]);
 
   const handleImageUpload = (url) => {
     if (product.images.length < maxImages) {
       setProduct((prev) => ({ ...prev, images: [...prev.images, url] }));
     } else {
-      alert(`Você atingiu o limite máximo de ${maxImages} imagens para o seu plano ${userPlan}.`);
+      alert(`Você atingiu o limite máximo de ${maxImages} imagens para o seu plano ${userPlan.toUpperCase()}.`);
     }
   };
 
@@ -108,29 +147,30 @@ const ProductEditModal = ({
   const handleSave = async () => {
     try {
       setSaveLoading(true);
-
       if (!product.name || !product.price) {
         alert("Nome e preço são obrigatórios!");
         return;
       }
-
       if (product.images.length === 0) {
         alert("Adicione pelo menos uma imagem do produto.");
         return;
       }
-
+      // Verificar limite de produtos apenas para novos produtos
       if (!initialProduct.id && currentProductCount >= maxProducts) {
-        alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan}.`);
+        alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`);
         return;
       }
-
+      // Verificar limite de imagens
+      if (product.images.length > maxImages) {
+        alert(`Você pode ter no máximo ${maxImages} imagens por produto no plano ${userPlan.toUpperCase()}.`);
+        return;
+      }
       const productSlug = generateSlug(product.name);
       const productData = { 
         ...product,
         slug: productSlug,
         updatedAt: new Date().toISOString(),
       };
-
       if (initialProduct && initialProduct.id) {
         await updateDoc(
           doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
@@ -143,7 +183,6 @@ const ProductEditModal = ({
           productData
         );
       }
-
       onSave(productData);
     } catch (err) {
       console.error("Erro ao salvar produto:", err);
@@ -156,19 +195,16 @@ const ProductEditModal = ({
   const handleCreateCategory = async () => {
     const trimmed = newCategory.trim();
     if (!trimmed) return;
-
     setCreatingCategory(true);
     try {
       await updateDoc(doc(db, "lojas", resolvedLojaId), {
         categorias: arrayUnion(trimmed),
       });
-
       if (newCategoryImage) {
         await updateDoc(doc(db, "lojas", resolvedLojaId), {
           imgcategorias: arrayUnion({ nome: trimmed, imagem: newCategoryImage }),
         });
       }
-
       setProduct((prev) => ({ ...prev, category: trimmed }));
       setNewCategory("");
       setNewCategoryImage("");
@@ -179,15 +215,28 @@ const ProductEditModal = ({
     setCreatingCategory(false);
   };
 
+  // Função para obter a descrição do plano
+  const getPlanDescription = (plan) => {
+    switch(plan) {
+      case 'free':
+        return '30 produtos, 1 imagem por produto';
+      case 'plus':
+        return '300 produtos, 3 imagens por produto';
+      case 'premium':
+        return 'Produtos ilimitados, 5 imagens por produto';
+      default:
+        return '30 produtos, 1 imagem por produto';
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {initialProduct && initialProduct.id ? "Editar Produto" : "Adicionar Produto"}
-        {userPlan && (
-          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-            (Plano {userPlan.toUpperCase()})
-          </Typography>
-        )}
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 1, display: 'block' }}>
+          Plano {userPlan.toUpperCase()} - {getPlanDescription(userPlan)}
+          {planLoading && <CircularProgress size={12} sx={{ ml: 1 }} />}
+        </Typography>
       </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
@@ -198,7 +247,6 @@ const ProductEditModal = ({
             fullWidth
             required
           />
-
           <TextField
             label="Preço"
             type="number"
@@ -208,7 +256,6 @@ const ProductEditModal = ({
             required
             inputProps={{ step: "0.01", min: "0" }}
           />
-
           <TextField
             label="Preço de Ancoragem (opcional)"
             type="number"
@@ -217,7 +264,6 @@ const ProductEditModal = ({
             fullWidth
             inputProps={{ step: "0.01", min: "0" }}
           />
-
           <TextField
             label="Estoque"
             type="number"
@@ -226,7 +272,6 @@ const ProductEditModal = ({
             fullWidth
             inputProps={{ min: "0" }}
           />
-
           <TextField
             label="Descrição"
             value={product.description}
@@ -235,7 +280,6 @@ const ProductEditModal = ({
             multiline
             minRows={2}
           />
-
           <Box>
             <TextField
               select
@@ -254,7 +298,6 @@ const ProductEditModal = ({
                 </MenuItem>
               ))}
             </TextField>
-            
             <Box display="flex" gap={1} mt={1}>
               <TextField
                 label="Nova categoria"
@@ -293,7 +336,6 @@ const ProductEditModal = ({
               </Button>
             </Box>
           </Box>
-
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
               Variantes (ex: cor, tamanho)
@@ -321,7 +363,6 @@ const ProductEditModal = ({
               ))}
             </Box>
           </Box>
-
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
               Imagens do produto ({product.images.length}/{maxImages})
@@ -363,12 +404,14 @@ const ProductEditModal = ({
               ))}
             </Grid>
             <Typography variant="caption" color="text.secondary">
-              {userPlan === "free" && "Plano Free: 1 imagem por produto"}
-              {userPlan === "plus" && "Plano Plus: até 3 imagens por produto"}
-              {userPlan === "premium" && "Plano Premium: até 5 imagens por produto"}
+              Plano {userPlan.toUpperCase()}: {
+                userPlan === "free" ? "1 imagem por produto" :
+                userPlan === "plus" ? "até 3 imagens por produto" :
+                userPlan === "premium" ? "até 5 imagens por produto" :
+                "1 imagem por produto"
+              }
             </Typography>
           </Box>
-
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box>
               <Typography variant="subtitle2">Status</Typography>
