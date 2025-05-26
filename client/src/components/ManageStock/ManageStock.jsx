@@ -32,30 +32,34 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ProductEditModal from "../Admin/ProductEditModal/ProductEditModal";
 import CategoriasManager from "../CategoriasManager/CategoriasManager";
 import { useCategorias } from "../../context/CategoriasContext";
+import { useUserPlan } from "../../context/UserPlanContext"; // Mudança aqui - usando Context
 import { db } from "../../firebaseConfig";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import useUserPlan from "../../hooks/useUserPlan"; // Fixed import - default import
 import { MAX_IMAGES, PRODUCT_LIMITS } from '../../utils/planLimits';
 import "./ManageStock.css";
+
 const PAGE_SIZE = 8;
 
 const ManageStock = ({ products, setProducts, lojaId }) => {
   const { categorias } = useCategorias();
-  const { userPlan } = useUserPlan(lojaId) || { userPlan: 'free' }; // Using default import
+  const { userPlan, loading: planLoading } = useUserPlan(); // Usando o Context em vez do hook
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [categoriasModalOpen, setCategoriasModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [removingId, setRemovingId] = useState(null);
   const [error, setError] = useState(null);
+  
   // Filtros avançados
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
   const [estoqueFiltro, setEstoqueFiltro] = useState("");
   const [ativoFiltro, setAtivoFiltro] = useState("");
   const [prioridadeFiltro, setPrioridadeFiltro] = useState("");
+  
   // Paginação
   const [page, setPage] = useState(1);
-  const maxProducts = PRODUCT_LIMITS[userPlan] || 30;
+  
+  const maxProducts = PRODUCT_LIMITS[userPlan] || PRODUCT_LIMITS['free'] || 30;
 
   const handleRemove = async (product) => {
     if (!window.confirm(`Tem certeza que deseja remover "${product.name}"?`)) return;
@@ -136,7 +140,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
   const handleAdd = () => {
     if (products.length >= maxProducts) {
       alert(
-        `Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan}.`
+        `Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`
       );
       return;
     }
@@ -153,19 +157,27 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
     setPage(1);
   }, [search, categoriaFiltro, estoqueFiltro, ativoFiltro, prioridadeFiltro]);
 
+  // Mostrar loading se o plano ainda está carregando
+  if (planLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Carregando informações do plano...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box className="manage-stock-container">
       <Box className="manage-stock-header">
         <Typography variant="h4" className="manage-stock-title">
           Gerenciar Estoque
-          {userPlan && (
-            <Chip 
-              label={`Plano ${userPlan.toUpperCase()}`} 
-              size="small" 
-              sx={{ ml: 1, mb: 0.5 }} 
-              color="primary"
-            />
-          )}
+          <Chip 
+            label={`Plano ${userPlan.toUpperCase()}`} 
+            size="small" 
+            sx={{ ml: 1, mb: 0.5 }} 
+            color="primary"
+          />
         </Typography>
         <Button
           variant="contained"
@@ -176,11 +188,13 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
           + Adicionar Produto
         </Button>
       </Box>
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
+
       <Box className="manage-stock-searchbar">
         <input
           type="text"
@@ -197,6 +211,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
           Gerenciar Categorias
         </Button>
       </Box>
+
       <Box sx={{ display: "flex", gap: 2, mb: 2, flexWrap: "wrap" }}>
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Categoria</InputLabel>
@@ -213,6 +228,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
             ))}
           </Select>
         </FormControl>
+
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Estoque</InputLabel>
           <Select
@@ -225,6 +241,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
             <MenuItem value="esgotado">Esgotado</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Status</InputLabel>
           <Select
@@ -237,6 +254,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
             <MenuItem value="inativo">Inativo</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Prioridade</InputLabel>
           <Select
@@ -249,9 +267,11 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
           </Select>
         </FormControl>
       </Box>
+
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {products.length}/{maxProducts} produtos ({filteredProducts.length} filtrados)
       </Typography>
+
       <Grid container spacing={3} className="manage-stock-grid">
         {paginatedProducts.length === 0 ? (
           <Grid item xs={12}>
@@ -398,6 +418,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
           })
         )}
       </Grid>
+
       {pageCount > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <Pagination
@@ -410,6 +431,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
           />
         </Box>
       )}
+
       <ProductEditModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -425,10 +447,10 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
         }}
         initialProduct={editingProduct}
         categories={categorias}
-        userPlan={userPlan}
         lojaId={lojaId}
         currentProductCount={products.length}
       />
+
       <Dialog 
         open={categoriasModalOpen} 
         onClose={() => setCategoriasModalOpen(false)} 

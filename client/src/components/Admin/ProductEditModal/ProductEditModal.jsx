@@ -1,4 +1,4 @@
-// ProductEditModal.js
+// ProductEditModal.js - Seção modificada para usar o Context
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -24,7 +24,7 @@ import { collection, addDoc, updateDoc, doc, arrayUnion } from "firebase/firesto
 import { db } from "../../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import "./ProductEditModal.css";
-import useUserPlan from "../../../hooks/useUserPlan";
+import { useUserPlan } from "../../../context/UserPlanContext"; // Mudança aqui
 import { MAX_IMAGES, PRODUCT_LIMITS } from '../../../utils/planLimits';
 
 const ProductEditModal = ({
@@ -39,7 +39,10 @@ const ProductEditModal = ({
 }) => {
   const auth = getAuth();
   const resolvedLojaId = lojaId || auth.currentUser?.uid;
-  const { userPlan, loading: planLoading } = useUserPlan(resolvedLojaId);
+  
+  // Usa o Context em vez do hook local
+  const { userPlan, loading: planLoading } = useUserPlan();
+  
   const [saveLoading, setSaveLoading] = useState(false);
   const safeProduct = initialProduct || {};
   const [product, setProduct] = useState({
