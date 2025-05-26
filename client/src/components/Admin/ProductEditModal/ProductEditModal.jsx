@@ -304,43 +304,6 @@ const ProductEditModal = ({
                 </MenuItem>
               ))}
             </TextField>
-            <Box display="flex" gap={1} mt={1}>
-              <TextField
-                label="Nova categoria"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                size="small"
-                disabled={creatingCategory}
-                fullWidth
-              />
-              <CloudinaryUploadWidget
-                onUpload={setNewCategoryImage}
-                buttonText={
-                  newCategoryImage ? (
-                    <img
-                      src={newCategoryImage}
-                      alt="Prévia"
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <AddAPhotoIcon style={{ fontSize: 28, color: "#1976d2" }} />
-                  )
-                }
-                disabled={creatingCategory}
-              />
-              <Button
-                variant="outlined"
-                onClick={handleCreateCategory}
-                disabled={!newCategory.trim() || creatingCategory}
-              >
-                {creatingCategory ? <CircularProgress size={24} /> : "Criar"}
-              </Button>
-            </Box>
           </Box>
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
