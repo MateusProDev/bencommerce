@@ -148,52 +148,55 @@ const ProductEditModal = ({
       .replace(/\s+/g, "-");
 
   const handleSave = async () => {
-    try {
-      setSaveLoading(true);
-      if (!product.name || !product.price) {
-        alert("Nome e preço são obrigatórios!");
-        return;
-      }
-      if (product.images.length === 0) {
-        alert("Adicione pelo menos uma imagem do produto.");
-        return;
-      }
-      // Verificar limite de produtos apenas para novos produtos
-      if (!initialProduct.id && currentProductCount >= maxProducts) {
-        alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`);
-        return;
-      }
-      // Verificar limite de imagens
-      if (product.images.length > maxImages) {
-        alert(`Você pode ter no máximo ${maxImages} imagens por produto no plano ${userPlan.toUpperCase()}.`);
-        return;
-      }
-      const productSlug = generateSlug(product.name);
-      const productData = { 
-        ...product,
-        slug: productSlug,
-        updatedAt: new Date().toISOString(),
-      };
-      if (initialProduct && initialProduct.id) {
-        await updateDoc(
-          doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
-          productData
-        );
-      } else {
-        productData.createdAt = new Date().toISOString();
-        await addDoc(
-          collection(db, `lojas/${resolvedLojaId}/produtos`),
-          productData
-        );
-      }
-      onSave(productData);
-    } catch (err) {
-      console.error("Erro ao salvar produto:", err);
-      alert("Erro ao salvar produto: " + err.message);
-    } finally {
-      setSaveLoading(false);
+  try {
+    setSaveLoading(true);
+    if (!product.name || !product.price) {
+      alert("Nome e preço são obrigatórios!");
+      return;
     }
-  };
+    if (product.images.length === 0) {
+      alert("Adicione pelo menos uma imagem do produto.");
+      return;
+    }
+    // Verificar limite de produtos apenas para novos produtos
+    if (!initialProduct?.id && currentProductCount >= maxProducts) {
+      alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`);
+      return;
+    }
+    // Verificar limite de imagens
+    if (product.images.length > maxImages) {
+      alert(`Você pode ter no máximo ${maxImages} imagens por produto no plano ${userPlan.toUpperCase()}.`);
+      return;
+    }
+    const productSlug = generateSlug(product.name);
+    const productData = { 
+      ...product,
+      slug: productSlug,
+      updatedAt: new Date().toISOString(),
+    };
+    if (initialProduct?.id) {
+      // Atualizar produto existente
+      await updateDoc(
+        doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
+        productData
+      );
+    } else {
+      // Criar novo produto
+      productData.createdAt = new Date().toISOString();
+      const docRef = await addDoc(
+        collection(db, `lojas/${resolvedLojaId}/produtos`),
+        productData
+      );
+      productData.id = docRef.id; // Adicionar o ID gerado ao productData
+    }
+    onSave(productData);
+  } catch (err) {
+    console.error("Erro ao salvar produto:", err);
+    alert("Erro ao salvar produto: " + err.message);
+  } finally {
+    setSaveLoading(false);
+  }
+};
 
   const handleCreateCategory = async () => {
     const trimmed = newCategory.trim();
