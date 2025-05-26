@@ -394,7 +394,11 @@ const PlanoUpgrade = () => {
     }
 
     const trialIsCurrentlyActive = isTrialActive();
-    const desconto = trialIsCurrentlyActive && !userData?.descontoAplicado ? 0.95 : 1;
+    
+    // Aplicar 5% de desconto para mensal ou 10% para anual durante o teste
+    const desconto = trialIsCurrentlyActive && !userData?.descontoAplicado 
+      ? (duration === "annual" ? 0.9 : 0.95) 
+      : 1;
 
     let precoFinal = duration === "annual"
       ? planos.annual.find((p) => p.nome === plano.nome)?.preco
@@ -718,7 +722,7 @@ const PlanoUpgrade = () => {
                               </Button>
                             </Tooltip>
                           ) : showDiscountButton ? (
-                            <Tooltip title="Aproveite 5% de desconto ao assinar durante o teste!">
+                            <Tooltip title={`Aproveite ${planType === 'annual' ? '10%' : '5%'} de desconto ao assinar durante o teste!`}>
                               <Button
                                 variant="contained"
                                 fullWidth
@@ -727,7 +731,7 @@ const PlanoUpgrade = () => {
                                 disabled={updatingPlan}
                                 endIcon={updatingPlan ? <CircularProgress size={20} className={styles.buttonSpinner} /> : <ArrowRightIcon className={styles.buttonIcon} />}
                               >
-                                {updatingPlan ? "Processando..." : `Pagar com 5% OFF (${planType === 'monthly' ? 'Mensal' : 'Anual'})`}
+                                {updatingPlan ? "Processando..." : `Pagar com ${planType === 'annual' ? '10%' : '5%'} OFF (${planType === 'monthly' ? 'Mensal' : 'Anual'})`}
                               </Button>
                             </Tooltip>
                           ) : (
@@ -747,8 +751,8 @@ const PlanoUpgrade = () => {
                                 endIcon={updatingPlan ? <CircularProgress size={20} className={styles.buttonSpinner} /> : <ArrowRightIcon className={styles.buttonIcon} />}
                               >
                                 {updatingPlan ? "Processando..." : 
-                                 plano.preco === 0 ? "Mudar para Gratuito" : 
-                                 `Assinar ${planType === 'monthly' ? 'Mensal' : 'Anual'}`}
+                                plano.preco === 0 ? "Mudar para Gratuito" : 
+                                `Assinar ${planType === 'monthly' ? 'Mensal' : 'Anual'}`}
                               </Button>
                             </Tooltip>
                           )}
