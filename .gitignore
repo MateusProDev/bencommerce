@@ -1,0 +1,11 @@
+# .gitignore
+
+# Ignorar credenciais do Firebase
+server/serviceAccountKey.json
+
+# Ignorar variáveis de ambiente locais
+.env
+server/.env
+
+# Ignorar pasta node_modules (se estiver versionando o backend separadamente)
+server/node_modules/
