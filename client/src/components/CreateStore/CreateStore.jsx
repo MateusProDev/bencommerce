@@ -199,6 +199,19 @@ const CreateStore = ({ onStoreCreated }) => {
         .replace(/--+/g, '-') // Replace multiple hyphens
         .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
 
+      // --- Footer Data Structure --- 
+      const footerData = {
+        descricao: "",
+        endereco: "",
+        social: {
+          instagram: "",
+          facebook: "",
+          twitter: "",
+          youtube: ""
+        },
+        extras: []
+      };
+
       // --- Loja Data --- 
       const lojaData = {
         nome: nomeLoja,
@@ -211,6 +224,7 @@ const CreateStore = ({ onStoreCreated }) => {
         criadaEm: inicioTimestamp,
         atualizadaEm: inicioTimestamp,
         categorias: [],
+        footer: footerData, // Campo footer adicionado aqui
         configs: {
           corPrimaria: '#4a6bff',
           corSecundaria: '#2541b2',
