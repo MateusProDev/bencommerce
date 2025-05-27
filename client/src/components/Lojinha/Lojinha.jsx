@@ -9,6 +9,11 @@ import Footer from "./Footer/Footer"; // Importa o Footer
 import Banner from "./Banner/Banner";
 import "./Lojinha.css";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from 'axios'; // <-- ADICIONADO
+import { CircularProgress, Box, Typography, Button } from '@mui/material'; // <-- ADICIONADO
+
+// <-- ADICIONADO: URL DO SEU BACKEND (MUITO IMPORTANTE!)
+const API_BASE_URL = 'https://storesync.onrender.com'; // **ATENÇÃO: Use a URL correta do seu backend na Render!**
 
 // Função Debounce (pode ser movida para um arquivo utilitário se preferir)
 function debounce(func, delay) {
@@ -30,8 +35,8 @@ const Lojinha = ({
   // footerInfo não é mais necessário se buscamos tudo
 }) => {
   const [cart, setCart] = useState(() => {
-    // Tenta carregar o carrinho do localStorage ao iniciar
-    const saved = localStorage.getItem("lojinha_cart");
+    // Tenta carregar o carrinho do localStorage ao iniciar (Corrigido para usar lojaId)
+    const saved = localStorage.getItem(`lojinha_cart_${lojaId}`);
     return saved ? JSON.parse(saved) : [];
   });
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
@@ -49,14 +54,25 @@ const Lojinha = ({
   const navigate = useNavigate();
   const { slug } = useParams(); // Pega o 'slug' da URL (se estiver usando)
   const [storeData, setStoreData] = useState(null); // Armazena todos os dados da loja
+  const [loading, setLoading] = useState(true); // <-- ADICIONADO: Estado de Carregamento
+  const [error, setError] = useState(null); // <-- ADICIONADO: Estado de Erro
+
+  // <-- ADICIONADO: Estados para o checkout -->
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
+  // <-- FIM ADIÇÃO -->
 
   // Efeito para buscar dados iniciais da loja
   useEffect(() => {
     async function fetchStoreData() {
       if (!lojaId) {
         console.warn("lojaId não foi fornecido ao componente Lojinha.");
+        setError("ID da loja não fornecido."); // Define erro
+        setLoading(false); // Para carregamento
         return;
       }
+      setLoading(true); // Inicia carregamento
+      setError(null); // Limpa erro anterior
       try {
         const lojaRef = doc(db, "lojas", lojaId);
         const lojaSnap = await getDoc(lojaRef);
@@ -85,10 +101,13 @@ const Lojinha = ({
 
         } else {
           console.warn(`Loja com ID ${lojaId} não encontrada.`);
-          // Aqui você pode navegar para 404 ou mostrar uma mensagem
+          setError(`Loja não encontrada.`); // Define erro
         }
       } catch (error) {
         console.error("Erro ao buscar dados da loja:", error);
+        setError("Erro ao carregar dados da loja."); // Define erro
+      } finally {
+        setLoading(false); // Finaliza carregamento
       }
     }
     fetchStoreData();
@@ -131,8 +150,8 @@ const Lojinha = ({
 
   // Efeito para persistir o carrinho no localStorage
   useEffect(() => {
-    localStorage.setItem("lojinha_cart", JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem(`lojinha_cart_${lojaId}`, JSON.stringify(cart)); // Corrigido para usar lojaId
+  }, [cart, lojaId]); // Adicionado lojaId
 
   // Funções de toggle para menu e carrinho
   const handleMenuToggle = () => {
@@ -156,7 +175,7 @@ const Lojinha = ({
       }
       return [...prevCart, { ...product, qtd: 1 }];
     });
-    // setCartOpen(true);
+    // setCartOpen(true); // Descomente se quiser abrir o carrinho ao adicionar
   };
   const handleRemoveItemFromCartCompletely = (productId) => {
     setCart(prevCart => prevCart.filter(item => item.id !== productId));
@@ -177,10 +196,49 @@ const Lojinha = ({
         .filter(item => item.qtd > 0) // Remove se a quantidade for 0
     );
   };
+
+  // <-- ADICIONADO: Função para chamar o backend e iniciar checkout MP -->
+  const handleCheckoutMercadoPago = async () => {
+    if (!storeData?.enableMpCheckout) {
+      alert("Desculpe, esta loja não está aceitando pagamentos via Mercado Pago no momento.");
+      return;
+    }
+    setLoadingCheckout(true);
+    setCheckoutError(null);
+    setCartOpen(false); // Fecha o carrinho
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/create-store-preference`, {
+        storeId: lojaId,
+        items: cart.map(item => ({
+          id: item.id,
+          title: item.name, // Use 'name' ou 'nome', dependendo do seu DB
+          quantity: item.qtd,
+          unit_price: item.price,
+          currency_id: 'BRL',
+        })),
+      });
+
+      const { init_point } = response.data;
+      if (init_point) {
+        window.location.href = init_point; // Redireciona!
+      } else {
+        setCheckoutError("Não foi possível iniciar o checkout. Tente novamente.");
+        setLoadingCheckout(false); // Só para aqui se der erro mas não redirecionar
+      }
+    } catch (err) {
+      console.error("Erro ao criar preferência MP:", err);
+      setCheckoutError(`Erro ao iniciar pagamento: ${err.response?.data?.error || err.message}`);
+      setLoadingCheckout(false);
+    }
+  };
+  // <-- FIM ADIÇÃO -->
+
+  // Função de checkout antiga (mantida para referência ou WPP)
   const handleCheckout = () => {
-    console.log("Prosseguindo para checkout com os itens:", cart);
-    setCartOpen(false);
-    // Navegue para a página de checkout ou abra o modal
+      console.log("Prosseguindo para checkout (WPP ou outro):", cart);
+      setCartOpen(false);
+      // Aqui você abriria seu modal do WhatsApp, por exemplo.
   };
 
   // Cálculos do carrinho
@@ -191,8 +249,6 @@ const Lojinha = ({
   const getSuggestions = (input) => {
     if (!input || input.trim() === "") return [];
     const inputLower = input.toLowerCase().trim();
-
-    // Sugestões de categorias
     const catSuggestions = categorias
       .filter(cat => (cat.nome || cat).toLowerCase().includes(inputLower))
       .map(cat => ({
@@ -200,12 +256,9 @@ const Lojinha = ({
         value: cat.id || cat.nome || cat,
         label: cat.nome || cat
       }));
-
-    // Sugestões de produtos (assume que o campo é 'name')
     let prodSuggestions = [];
     Object.entries(produtosPorCategoria).forEach(([catId, prods]) => {
       prods.forEach(prod => {
-        // !!! VERIFIQUE SE O CAMPO É 'name' OU 'nome' NO SEU FIREBASE !!!
         if (prod.name && prod.name.toLowerCase().includes(inputLower)) {
           prodSuggestions.push({
             type: "produto",
@@ -216,7 +269,6 @@ const Lojinha = ({
         }
       });
     });
-
     const uniqueProdSuggestions = Array.from(new Map(prodSuggestions.map(item => [item.value, item])).values());
     return [...catSuggestions, ...uniqueProdSuggestions].slice(0, 10);
   };
@@ -240,25 +292,19 @@ const Lojinha = ({
   // Função para lidar com clique na sugestão
   const handleSuggestionClick = (suggestion) => {
     setShowSuggestions(false);
-    setSearch(suggestion.label); // Preenche a busca
-
-    // Navega ou filtra - Adicione sua lógica aqui
+    setSearch(suggestion.label);
+    // Lógica de navegação ou filtro
     if (suggestion.type === 'categoria') {
-        // Se o slug for necessário na URL, use-o
-        // navigate(`/${slug}/categoria/${encodeURIComponent(suggestion.label)}`);
-        // Ou, se a busca já filtra, apenas preencher pode ser suficiente
+        const element = document.getElementById(`category-title-${suggestion.value}`);
+        if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (suggestion.type === 'produto') {
-        // Talvez rolar para o produto ou ir para a página do produto?
-        // const element = document.getElementById(`product-${suggestion.value}`);
-        // if (element) element.scrollIntoView({ behavior: 'smooth' });
+       // Poderia rolar para o produto ou abrir um modal
     }
   };
 
   // Função para renderizar os produtos (normal ou busca)
   const renderProducts = () => {
     const searchTermLower = search.trim().toLowerCase();
-
-    // Se não houver busca, mostra tudo
     if (!searchTermLower) {
       return categorias.map(cat => {
         const nome = typeof cat === "string" ? cat : cat.nome;
@@ -277,38 +323,30 @@ const Lojinha = ({
       });
     }
 
-    // Se houver busca, filtra
     let foundSomething = false;
     const searchResults = categorias.map(cat => {
       const nome = typeof cat === "string" ? cat : cat.nome;
       const key = (typeof cat === 'object' && cat.id) ? cat.id : nome;
-
-      // Filtra produtos pelo nome (Verifique se é 'name' ou 'nome')
       const produtosFiltrados = (produtosPorCategoria[nome] || [])
         .filter(prod => prod.name && prod.name.toLowerCase().includes(searchTermLower));
-
-      // Verifica se a categoria bate com a busca
       const categoryMatches = nome.toLowerCase().includes(searchTermLower);
 
       if (produtosFiltrados.length > 0 || categoryMatches) {
         foundSomething = true;
-        // Se a categoria bate, mostra todos os produtos dela
-        // Se não, mostra apenas os filtrados
         const productsToShow = categoryMatches ? (produtosPorCategoria[nome] || []) : produtosFiltrados;
-
         return productsToShow.length > 0 ? (
-            <ProductSection
-                key={key}
-                id={`category-title-${key}`}
-                title={nome}
-                products={productsToShow}
-                onAddToCart={handleAddToCart}
-                navigate={navigate}
-            />
+          <ProductSection
+            key={key}
+            id={`category-title-${key}`}
+            title={nome}
+            products={productsToShow}
+            onAddToCart={handleAddToCart}
+            navigate={navigate}
+          />
         ) : null;
       }
       return null;
-    }).filter(Boolean); // Remove nulos
+    }).filter(Boolean);
 
     return foundSomething ? searchResults : (
       <div className="lojinha-no-results">
@@ -316,6 +354,14 @@ const Lojinha = ({
       </div>
     );
   };
+
+  // Exibe loading ou erro se necessário
+  if (loading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
+  }
+  if (error) {
+    return <Box sx={{ textAlign: 'center', mt: 5 }}><Typography color="error">{error}</Typography></Box>;
+  }
 
 
   return (
@@ -350,12 +396,14 @@ const Lojinha = ({
             onRemoveItemCompletely={handleRemoveItemFromCartCompletely}
             onIncrement={handleIncrement}
             onDecrement={handleDecrement}
-            onCheckout={handleCheckout}
+            onCheckout={handleCheckout} // Mantido para WPP ou outro
             open={cartOpen}
             onClose={handleCartToggle}
-            userPlan={storeData?.plano || "free"}
+            // userPlan={storeData?.plano || "free"} // Removido se não usado no Cart
             whatsappNumber={storeData?.whatsappNumber || ""}
-            onCheckoutTransparent={() => navigate(`/checkout-transparente?loja=${lojaId}`)}
+            // **** AQUI ESTÁ A MUDANÇA ****
+            onCheckoutTransparent={handleCheckoutMercadoPago} // <-- USA A NOVA FUNÇÃO!
+            // **** FIM DA MUDANÇA ****
             enableWhatsappCheckout={storeData?.enableWhatsappCheckout ?? true}
             enableMpCheckout={storeData?.enableMpCheckout ?? false}
             cartTotal={cartTotal}
@@ -382,15 +430,11 @@ const Lojinha = ({
                 <button
                   key={key}
                   className="lojinha-categoria-btn"
-                  // Ação ao clicar: rolar para a seção ou navegar
                   onClick={() => {
-                     const element = document.getElementById(`category-title-${key}`);
-                     if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                     } else {
-                        // Opcional: navegar se a seção não estiver visível (ex: outra página)
-                        // navigate(`/${slug}/categoria/${encodeURIComponent(nome)}`);
-                     }
+                    const element = document.getElementById(`category-title-${key}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                   }}
                   title={`Ver categoria ${nome}`}
                 >
@@ -421,7 +465,6 @@ const Lojinha = ({
           value={search}
           onChange={handleSearchChange}
           onFocus={() => search.length > 0 && setShowSuggestions(true)}
-          // Aumenta o tempo para permitir o clique na sugestão
           onBlur={() => setTimeout(() => setShowSuggestions(false), 250)}
           aria-label="Pesquisar produtos ou categorias"
         />
@@ -439,7 +482,6 @@ const Lojinha = ({
                 className="lojinha-suggestion-item"
                 role="option"
                 aria-selected={false}
-                // Usa onMouseDown para executar antes do onBlur
                 onMouseDown={() => handleSuggestionClick(s)}
               >
                 <span className="lojinha-suggestion-type">
@@ -457,19 +499,35 @@ const Lojinha = ({
           {renderProducts()}
       </main>
 
+      {/* <-- ADICIONADO: Feedback visual para o checkout --> */}
+      {loadingCheckout && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
+              <Box sx={{ p: 3, background: 'white', borderRadius: 2, textAlign: 'center' }}>
+                  <CircularProgress />
+                  <Typography sx={{ mt: 2 }}>Aguarde, redirecionando para o pagamento seguro...</Typography>
+              </Box>
+          </div>
+      )}
+      {checkoutError && (
+           <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '10px 20px', borderRadius: '5px', zIndex: 9998, textAlign: 'center' }}>
+               Erro: {checkoutError}
+               <Button onClick={() => setCheckoutError(null)} sx={{ ml: 2, color: 'white', minWidth: 'auto', p: '2px' }}>X</Button>
+           </div>
+      )}
+      {/* <-- FIM ADIÇÃO --> */}
+
       {/* Footer */}
       <Footer
         nomeLoja={nomeLoja}
-        // Passa os dados ACESSANDO DENTRO DE 'storeData.footer'
         footerData={{
-          descricao: storeData?.footer?.descricao || "", // <--- CORRIGIDO
+          descricao: storeData?.footer?.descricao || "",
           social: {
-            instagram: storeData?.footer?.instagram || "", // <--- CORRIGIDO
-            facebook: storeData?.footer?.facebook || "",  // <--- CORRIGIDO
-            twitter: storeData?.footer?.twitter || "",    // <--- CORRIGIDO
-            youtube: storeData?.footer?.youtube || ""     // <--- CORRIGIDO
+            instagram: storeData?.footer?.instagram || "",
+            facebook: storeData?.footer?.facebook || "",
+            twitter: storeData?.footer?.twitter || "",
+            youtube: storeData?.footer?.youtube || ""
           },
-          extras: storeData?.footer?.extras || [] // <--- CORRIGIDO (caminho e nome)
+          extras: storeData?.footer?.extras || []
         }}
         showSocial={true}
         showExtras={true}
