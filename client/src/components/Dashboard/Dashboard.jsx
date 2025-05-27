@@ -15,7 +15,7 @@ import {
   Button,
   Grid,
   Card,
-  TextField,
+  TextField, // Removido daqui se não usado mais diretamente
   CardMedia,
 } from "@mui/material";
 import {
@@ -44,6 +44,7 @@ import ManageStock from "../ManageStock/ManageStock";
 import SalesReports from "../SalesReports/SalesReports";
 import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
 import DashboardHome from "./DashboardHome";
+import PaymentsSettings from "../PaymentsSettings/PaymentsSettings"; // <-- 1. Importe o novo componente
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -60,7 +61,6 @@ const Dashboard = ({ user }) => {
   const [newBannerImage, setNewBannerImage] = useState("");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
   const [exibirLogo, setExibirLogo] = useState(true);
-  // Novos estados para o footer
   const [footerData, setFooterData] = useState({});
   const navigate = useNavigate();
   const auth = getAuth();
@@ -74,28 +74,24 @@ const Dashboard = ({ user }) => {
           return;
         }
 
-        // Monitora mudanças no documento do usuário em tempo real
         const unsubscribe = onSnapshot(doc(db, "usuarios", currentAuthUser.uid), (userDoc) => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUserPlan(userData.plano || "free");
             setCurrentUser(currentAuthUser);
 
-            // Verifica se o usuário tem uma loja
             getDoc(doc(db, "lojas", currentAuthUser.uid)).then((storeSnap) => {
               if (storeSnap.exists()) {
                 const storeData = storeSnap.data();
-                setStoreData(storeData);
+                setStoreData({ ...storeData, id: storeSnap.id }); // <-- Garanta que storeData é setado
                 setHeaderTitle(storeData.headerTitle || storeData.nome || "Minha Loja");
                 setWhatsappNumber(storeData.whatsappNumber || "");
                 setLogoUrl(storeData.logoUrl || "");
                 setBannerImages(storeData.bannerImages || []);
                 setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
                 setExibirLogo(storeData.exibirLogo !== false);
-                // Carrega dados do footer
                 setFooterData(storeData.footer || {});
 
-                // Carrega produtos
                 getDocs(collection(db, `lojas/${currentAuthUser.uid}/produtos`)).then((productsSnapshot) => {
                   const productsList = productsSnapshot.docs.map((doc) => ({
                     id: doc.id,
@@ -136,6 +132,8 @@ const Dashboard = ({ user }) => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
         headerTitle,
+        logoUrl, // Adicione se necessário
+        exibirLogo, // Adicione se necessário
       });
       alert("Cabeçalho atualizado com sucesso!");
     } catch (error) {
@@ -156,7 +154,6 @@ const Dashboard = ({ user }) => {
     }
   };
 
-  // Nova função para salvar dados do footer
   const saveFooterChanges = async (newFooterData) => {
     try {
       await updateDoc(doc(db, "lojas", currentUser.uid), {
@@ -204,34 +201,35 @@ const Dashboard = ({ user }) => {
     }
   };
 
-  const handleHeaderUpdate = (newHeaderTitle, newLogoUrl, newExibirLogo) => {
-    setHeaderTitle(newHeaderTitle);
-    setLogoUrl(newLogoUrl);
-    setExibirLogo(newExibirLogo);
-    setStoreData((prev) => ({
-      ...prev,
-      nome: newHeaderTitle,
-      logoUrl: newLogoUrl,
-      exibirLogo: newExibirLogo,
-    }));
-  };
+    const handleHeaderUpdate = (newHeaderTitle, newLogoUrl, newExibirLogo) => {
+        setHeaderTitle(newHeaderTitle);
+        setLogoUrl(newLogoUrl);
+        setExibirLogo(newExibirLogo);
+        setStoreData((prev) => ({
+            ...prev,
+            nome: newHeaderTitle, // ou headerTitle
+            logoUrl: newLogoUrl,
+            exibirLogo: newExibirLogo,
+        }));
+    };
+
 
   const menuItems = [
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Editar Rodapé", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Rodapé", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] }, // Usando EditIcon
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
-    { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Pagamentos", icon: <PointOfSaleIcon />, allowedPlans: ["free", "plus", "premium"] }, // Adicionado ícone
     { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["plus", "premium"] },
-    { text: "Pagamentos", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium", "free"] },
+    { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
   ];
 
   const renderContent = () => {
-    if (loading) {
+    if (loading || !storeData) { // <-- Adicionado !storeData
       return (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
@@ -239,22 +237,15 @@ const Dashboard = ({ user }) => {
       );
     }
 
-    // Verifica se a seção selecionada é permitida para o plano atual
     const isSectionAllowed = menuItems.some(
       (item) => item.text === selectedSection && item.allowedPlans.includes(userPlan)
     );
 
-    if (!isSectionAllowed) {
+    if (!isSectionAllowed && selectedSection !== "Home") { // <-- Permite ir para Home
       setSelectedSection("Home");
-      return (
-        <DashboardHome
-          storeData={storeData}
-          userPlan={userPlan}
-          navigate={navigate}
-          setSelectedSection={setSelectedSection}
-        />
-      );
+      // Não precisa renderizar Home aqui, o switch fará isso.
     }
+
 
     switch (selectedSection) {
       case "Home":
@@ -307,8 +298,8 @@ const Dashboard = ({ user }) => {
           <ManageStock
             products={products}
             setProducts={setProducts}
-            userPlan={storeData?.plano || "free"}
-            lojaId={storeData?.id || currentUser?.uid}
+            userPlan={userPlan} // <-- Passando userPlan
+            lojaId={currentUser?.uid} // <-- Passando lojaId
           />
         );
       case "Relatórios de Vendas":
@@ -317,7 +308,7 @@ const Dashboard = ({ user }) => {
         return (
           <div>
             <h2>Configurar WhatsApp para Vendas</h2>
-            <TextField
+            <TextField // <-- Precisa importar TextField se ainda não estiver
               label="Número do WhatsApp (com DDD)"
               fullWidth
               value={whatsappNumber}
@@ -337,109 +328,15 @@ const Dashboard = ({ user }) => {
         return <LojinhaPreview user={storeData} />;
       case "Upgrade de Plano":
         return currentUser ? <PlanoUpgrade user={currentUser} /> : null;
-      case "Preview Estático":
+      // Remova o case "Preview Estático" se não for mais necessário
+      case "Pagamentos": // <-- 2. Renderize o novo componente
         return (
-          <div>
-            <h2>Preview Estático da Loja</h2>
-            <div
-              style={{
-                backgroundColor: corPrimaria,
-                color: "white",
-                padding: "20px",
-                borderRadius: "8px",
-              }}
-            >
-              <h1>{headerTitle}</h1>
-              {exibirLogo && logoUrl && (
-                <img src={logoUrl} alt="Logo da Loja" style={{ maxWidth: "100%", maxHeight: "200px" }} />
-              )}
-              <div>
-                {bannerImages.length === 0 ? (
-                  <p>Nenhuma imagem adicionada ainda.</p>
-                ) : (
-                  <Grid container spacing={2}>
-                    {bannerImages.map((image, index) => (
-                      <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Card>
-                          <CardMedia
-                            component="img"
-                            height="140"
-                            image={image}
-                            alt={`Banner ${index + 1}`}
-                          />
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                )}
-              </div>
-            </div>
-            <Button
-              variant="contained"
-              onClick={() => navigate(`/loja/${currentUser.uid}`)}
-              startIcon={<PreviewIcon />}
-              sx={{ mt: 3 }}
-            >
-              Publicar Loja
-            </Button>
-          </div>
-        );
-      case "Pagamentos":
-        return (
-          <div>
-            <h2>Configurações de Pagamento</h2>
-            <TextField
-              label="Chave Pública Mercado Pago"
-              fullWidth
-              value={storeData?.mpPublicKey || ""}
-              onChange={(e) => setStoreData({ ...storeData, mpPublicKey: e.target.value })}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Chave Secreta Mercado Pago"
-              fullWidth
-              value={storeData?.mpAccessToken || ""}
-              onChange={(e) => setStoreData({ ...storeData, mpAccessToken: e.target.value })}
-              sx={{ mb: 2 }}
-            />
-            <Box sx={{ mb: 2 }}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={storeData?.enableWhatsappCheckout ?? true}
-                  onChange={(e) =>
-                    setStoreData({ ...storeData, enableWhatsappCheckout: e.target.checked })
-                  }
-                />
-                Permitir finalizar pelo WhatsApp
-              </label>
-              <label style={{ marginLeft: 24 }}>
-                <input
-                  type="checkbox"
-                  checked={storeData?.enableMpCheckout ?? false}
-                  onChange={(e) =>
-                    setStoreData({ ...storeData, enableMpCheckout: e.target.checked })
-                  }
-                  disabled={userPlan === "free"}
-                />
-                Permitir finalizar pelo Cartão (Mercado Pago)
-              </label>
-            </Box>
-            <Button
-              variant="contained"
-              onClick={async () => {
-                await updateDoc(doc(db, "lojas", currentUser.uid), {
-                  mpPublicKey: storeData.mpPublicKey,
-                  mpAccessToken: storeData.mpAccessToken,
-                  enableWhatsappCheckout: storeData.enableWhatsappCheckout,
-                  enableMpCheckout: storeData.enableMpCheckout,
-                });
-                alert("Configurações de pagamento salvas!");
-              }}
-            >
-              Salvar Configurações
-            </Button>
-          </div>
+          <PaymentsSettings
+            storeData={storeData}
+            setStoreData={setStoreData} // <-- Passe a função setStoreData
+            currentUser={currentUser}
+            userPlan={userPlan}
+          />
         );
       default:
         return (
@@ -457,7 +354,7 @@ const Dashboard = ({ user }) => {
     <div className="admin-loja-drawer-container">
       <Toolbar className="admin-loja-drawer-header">
         <Typography variant="h6" noWrap>
-          {storeData?.storeName || headerTitle || "Minha Loja"}
+          {storeData?.nome || headerTitle || "Minha Loja"}
         </Typography>
       </Toolbar>
       <List className="admin-loja-menu-list">
@@ -505,7 +402,7 @@ const Dashboard = ({ user }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            {storeData?.storeName || headerTitle || "Minha Loja"}
+            {storeData?.nome || headerTitle || "Minha Loja"}
           </Typography>
         </Toolbar>
       </AppBar>
