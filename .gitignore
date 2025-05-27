@@ -1,11 +1,30 @@
-# .gitignore
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Ignorar credenciais do Firebase
-server/serviceAccountKey.json
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
 
-# Ignorar variáveis de ambiente locais
+# Dependências do Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Variáveis de Ambiente
 .env
-server/.env
+.env*.local
+.env.*.local
+server/.env  # Ignora o .env dentro da pasta server
 
-# Ignorar pasta node_modules (se estiver versionando o backend separadamente)
-server/node_modules/
+# Credenciais do Firebase
+server/serviceAccountKey.json # Ignora a chave dentro da pasta server
+A   
