@@ -220,13 +220,13 @@ const Dashboard = ({ user }) => {
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Editar Footer", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Rodapé", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Upgrade de Plano", icon: <UpgradeIcon />, allowedPlans: ["free", "plus"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
-    { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Visualizar Loja", icon: <PreviewIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Pagamentos", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium", "free"] },
   ];
 
@@ -293,7 +293,7 @@ const Dashboard = ({ user }) => {
             userPlan={userPlan}
           />
         );
-      case "Editar Footer":
+      case "Editar Rodapé":
         return (
           <EditFooter
             nomeLoja={headerTitle || storeData?.nome || "Minha Loja"}

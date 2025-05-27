@@ -156,7 +156,7 @@ const Lojinha = ({
       }
       return [...prevCart, { ...product, qtd: 1 }];
     });
-    setCartOpen(true);
+    // setCartOpen(true);
   };
   const handleRemoveItemFromCartCompletely = (productId) => {
     setCart(prevCart => prevCart.filter(item => item.id !== productId));

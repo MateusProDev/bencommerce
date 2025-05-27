@@ -1,53 +1,298 @@
-/* Cart */
-.lojinha-cart-modal {
-  position: absolute; /* era fixed */
-  right: -350px;
+/* Cart.css - Minimalista, Clean & Corrigido */
+
+:root {
+  --cart-text-primary: #111827; /* Preto um pouco mais suave */
+  --cart-text-secondary: #6b7280; /* Cinza médio */
+  --cart-border-color: #e5e7eb; /* Cinza bem claro */
+  --cart-bg: #ffffff;
+  --cart-bg-alt: #f9fafb; /* Fundo alternativo suave */
+  --cart-accent: #4f46e5; /* Roxo/Azul moderno (ajuste p/ sua cor) */
+  --cart-whatsapp: #25D366;
+  --cart-mp: #009EE3;
+  --cart-danger: #ef4444; /* Vermelho */
+  --cart-radius: 6px; /* Raio de borda padrão */
+  --cart-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Transição padrão */
+}
+
+/* Overlay */
+.cart-overlay-min {
+  position: fixed;
+  inset: 0; /* Cobre tudo (top/left/right/bottom = 0) */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.cart-overlay-min.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal */
+.cart-modal-min {
+  position: fixed;
   top: 0;
-  width: 80%;
+  right: -100%;
+  width: 100%;
+  max-width: 350px; /* Um pouco mais estreito */
   height: 100%;
-  background: #fff;
-  box-shadow: -2px 0 8px rgba(0,0,0,0.08);
-  transition: right 0.3s;
-  z-index: 30;
-  padding: 1rem;
+  background-color: var(--cart-bg);
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 1050;
   display: flex;
   flex-direction: column;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Fontes de sistema */
 }
-.lojinha-cart-modal.open {
+.cart-modal-min.open {
   right: 0;
 }
-.lojinha-cart-modal .close-btn {
+
+/* Cabeçalho */
+.cart-header-min {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cart-border-color);
+  flex-shrink: 0;
+}
+.cart-header-min h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cart-text-primary);
+}
+.cart-close-btn-min {
   background: none;
   border: none;
-  font-size: 2rem;
-  position: absolute;
-  left: 10px;
-  top: 10px;
+  color: var(--cart-text-secondary);
   cursor: pointer;
+  padding: 4px;
+  display: flex;
+  border-radius: 50%;
+  transition: var(--cart-transition);
 }
-.lojinha-cart-modal h3 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+.cart-close-btn-min:hover {
+  background-color: var(--cart-bg-alt);
+  color: var(--cart-text-primary);
+  transform: rotate(90deg);
 }
-.lojinha-cart-modal ul {
+
+/* Corpo */
+.cart-body-min {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+.cart-empty-min {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 80px 40px;
+  color: var(--cart-text-secondary);
+  height: 100%;
+  justify-content: center;
+}
+.cart-empty-min p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--cart-text-primary);
+}
+.cart-empty-min span {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Botão Voltar a Comprar */
+.btn-back-min {
+    background-color: var(--cart-accent);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: var(--cart-radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 30px;
+    transition: var(--cart-transition);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+}
+.btn-back-min:hover {
+    opacity: 0.9;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+}
+
+/* Lista de Itens */
+.cart-items-list-min {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-.lojinha-cart-modal li {
+.cart-item-min {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cart-border-color);
+  gap: 12px;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+.cart-item-min:hover {
+    background-color: var(--cart-bg-alt);
+}
+.cart-item-min:last-child {
+  border-bottom: none;
+}
+
+.cart-item-info-min {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Garante que ele não seja empurrado pelo botão de remover */
+  padding-right: 35px; /* Deixa espaço para o botão absoluto */
+}
+.cart-item-name-min {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--cart-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.cart-item-price-min {
+  font-size: 0.85rem;
+  color: var(--cart-text-secondary);
+}
+
+.cart-item-controls-min {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    text-align: right;
+    /* Margem para não colar no botão de remover */
+    margin-right: 15px;
+}
+
+.cart-item-qty-min {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--cart-border-color);
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 5px;
+  background-color: var(--cart-bg);
+}
+.cart-item-qty-min button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 7px;
+  color: var(--cart-text-secondary);
+  display: flex;
+  transition: var(--cart-transition);
+}
+.cart-item-qty-min button:hover {
+  background: var(--cart-bg-alt);
+  color: var(--cart-accent);
+}
+.cart-item-qty-min span {
+  padding: 0px 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 30px;
+  text-align: center;
+  border-left: 1px solid var(--cart-border-color);
+  border-right: 1px solid var(--cart-border-color);
+  color: var(--cart-text-primary);
+}
+
+.cart-item-subtotal-min {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--cart-text-primary);
+}
+
+/* **** AQUI: A LIXEIRA CORRIGIDA **** */
+.cart-item-remove-min {
+  position: absolute;
+  top: 50%;
+  right: 15px; /* Distância da borda direita do 'li' */
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--cart-text-secondary); /* Cor padrão cinza */
+  cursor: pointer;
+  opacity: 0.6;
+  transition: var(--cart-transition);
+  padding: 6px; /* Aumenta a área de clique */
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+}
+.cart-item-min:hover .cart-item-remove-min {
+  opacity: 1;
+}
+.cart-item-remove-min:hover {
+  color: var(--cart-danger); /* Cor vermelha no hover */
+  background-color: #fee2e2;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Rodapé */
+.cart-footer-min {
+  padding: 20px;
+  border-top: 1px solid var(--cart-border-color);
+  background-color: var(--cart-bg);
+  box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+.cart-total-min {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--cart-text-primary);
 }
-.lojinha-cart-modal button {
-  background: #ff3d00;
-  color: #fff;
+.btn-checkout-min {
+  width: 100%;
+  padding: 13px 15px;
   border: none;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  border-radius: var(--cart-radius);
   cursor: pointer;
-  font-size: 0.9rem;
-  margin-left: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: var(--cart-transition);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+.btn-checkout-min:last-child {
+  margin-bottom: 0;
+}
+.btn-checkout-min:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+}
+.btn-whatsapp-min {
+  background-color: var(--cart-whatsapp);
+  color: white;
+}
+.btn-mp-min {
+  background-color: var(--cart-mp);
+  color: white;
 }
