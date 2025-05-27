@@ -19,7 +19,7 @@
 }
 
 .lojinha-navbar-logo {
-  height: 50px;
+  height: 50px !important;
   max-width: 220px;
   object-fit: contain;
 }
