@@ -39,6 +39,7 @@ import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
 import "./Dashboard.css";
 import EditHeader from "../Admin/EditHeader/EditHeader";
 import EditBanner from "../Admin/EditBanner/EditBanner";
+import EditFooter from "../Admin/EditFooter/EditFooter";
 import ManageStock from "../ManageStock/ManageStock";
 import SalesReports from "../SalesReports/SalesReports";
 import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
@@ -58,7 +59,9 @@ const Dashboard = ({ user }) => {
   const [bannerImages, setBannerImages] = useState([]);
   const [newBannerImage, setNewBannerImage] = useState("");
   const [corPrimaria, setCorPrimaria] = useState("#4a6bff");
-  const [exibirLogo, setExibirLogo] = useState(true); // Novo estado
+  const [exibirLogo, setExibirLogo] = useState(true);
+  // Novos estados para o footer
+  const [footerData, setFooterData] = useState({});
   const navigate = useNavigate();
   const auth = getAuth();
 
@@ -75,7 +78,7 @@ const Dashboard = ({ user }) => {
         const unsubscribe = onSnapshot(doc(db, "usuarios", currentAuthUser.uid), (userDoc) => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            setUserPlan(userData.plano || "free"); // Atualiza o plano do usuário
+            setUserPlan(userData.plano || "free");
             setCurrentUser(currentAuthUser);
 
             // Verifica se o usuário tem uma loja
@@ -88,7 +91,9 @@ const Dashboard = ({ user }) => {
                 setLogoUrl(storeData.logoUrl || "");
                 setBannerImages(storeData.bannerImages || []);
                 setCorPrimaria(storeData.configs?.corPrimaria || "#4a6bff");
-                setExibirLogo(storeData.exibirLogo !== false); // Carrega o estado do banco
+                setExibirLogo(storeData.exibirLogo !== false);
+                // Carrega dados do footer
+                setFooterData(storeData.footer || {});
 
                 // Carrega produtos
                 getDocs(collection(db, `lojas/${currentAuthUser.uid}/produtos`)).then((productsSnapshot) => {
@@ -105,7 +110,7 @@ const Dashboard = ({ user }) => {
           }
         });
 
-        return () => unsubscribe(); // Remove o listener quando o componente é desmontado
+        return () => unsubscribe();
       } catch (err) {
         console.error("Erro ao carregar dados:", err);
       } finally {
@@ -148,6 +153,24 @@ const Dashboard = ({ user }) => {
     } catch (error) {
       console.error("Erro ao salvar WhatsApp:", error);
       alert("Erro ao salvar WhatsApp");
+    }
+  };
+
+  // Nova função para salvar dados do footer
+  const saveFooterChanges = async (newFooterData) => {
+    try {
+      await updateDoc(doc(db, "lojas", currentUser.uid), {
+        footer: newFooterData,
+      });
+      setFooterData(newFooterData);
+      setStoreData(prev => ({
+        ...prev,
+        footer: newFooterData
+      }));
+      alert("Footer atualizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar footer:", error);
+      alert("Erro ao salvar footer");
     }
   };
 
@@ -197,6 +220,7 @@ const Dashboard = ({ user }) => {
     { text: "Home", icon: <HomeIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Cabeçalho", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Editar Footer", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
@@ -267,6 +291,15 @@ const Dashboard = ({ user }) => {
             onRemoveBanner={removeBannerImage}
             currentUser={currentUser}
             userPlan={userPlan}
+          />
+        );
+      case "Editar Footer":
+        return (
+          <EditFooter
+            nomeLoja={headerTitle || storeData?.nome || "Minha Loja"}
+            footerData={footerData}
+            onSave={saveFooterChanges}
+            onCancel={() => setSelectedSection("Home")}
           />
         );
       case "Gerenciar Estoque":
