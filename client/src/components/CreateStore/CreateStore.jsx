@@ -9,33 +9,13 @@ import './CreateStore.css'; // Certifique-se que o CSS está correto
 
 const CreateStore = ({ onStoreCreated }) => {
   const steps = [
-    { 
-      title: 'Nome da Loja', 
-      description: 'Como sua loja será chamada?',
-      icon: <FiShoppingBag size={24} />
-    },
-    { 
-      title: 'Segmento', 
-      description: 'Qual o segmento do seu negócio?',
-      icon: <FiTag size={24} />
-    },
-    { 
-      title: 'Logo', 
-      description: 'Adicione uma imagem para sua loja',
-      icon: <FiImage size={24} />
-    },
-    { 
-      title: 'Plano', 
-      description: 'Escolha o plano ideal para você',
-      icon: <FiDollarSign size={24} />
-    },
-    { 
-      title: 'Confirmação', 
-      description: 'Revise os dados e finalize',
-      icon: <FiCheck size={24} />
-    }
+    { title: 'Nome da Loja', description: 'Como sua loja será chamada?', icon: <FiShoppingBag size={24} /> },
+    { title: 'Segmento', description: 'Qual o segmento do seu negócio?', icon: <FiTag size={24} /> },
+    { title: 'Logo', description: 'Adicione uma imagem para sua loja', icon: <FiImage size={24} /> },
+    { title: 'Plano', description: 'Escolha o plano ideal para você', icon: <FiDollarSign size={24} /> },
+    { title: 'Confirmação', description: 'Revise os dados e finalize', icon: <FiCheck size={24} /> }
   ];
-  
+
   const [currentStep, setCurrentStep] = useState(0);
   const [nomeLoja, setNomeLoja] = useState('');
   const [segmento, setSegmento] = useState('');
@@ -74,10 +54,8 @@ const CreateStore = ({ onStoreCreated }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Use environment variables for Cloudinary credentials
     const uploadPreset = process.env.REACT_APP_UPLOAD_PRESET;
     const cloudName = process.env.REACT_APP_CLOUD_NAME;
-
     if (!uploadPreset || !cloudName) {
       setErrorMsg('Configuração de upload de imagem ausente.');
       console.error('Cloudinary upload preset or cloud name is missing.');
@@ -90,13 +68,12 @@ const CreateStore = ({ onStoreCreated }) => {
 
     setLoading(true);
     setUploadProgress(0);
-    setErrorMsg(''); // Clear previous errors
+    setErrorMsg('');
 
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,  {
         method: 'POST',
         body: formData,
-        // Add progress event listener if needed (more complex)
       });
 
       if (response.ok) {
@@ -105,7 +82,6 @@ const CreateStore = ({ onStoreCreated }) => {
         setUploadProgress(100);
       } else {
         const errorData = await response.json();
-        console.error('Cloudinary upload error:', errorData);
         throw new Error(`Erro no upload: ${errorData.error?.message || response.statusText}`);
       }
     } catch (err) {
@@ -117,8 +93,8 @@ const CreateStore = ({ onStoreCreated }) => {
   };
 
   const validateStep = () => {
-    setErrorMsg(''); // Clear previous errors before validation
-    switch(currentStep) {
+    setErrorMsg('');
+    switch (currentStep) {
       case 0:
         if (!nomeLoja.trim()) {
           setErrorMsg('Por favor, insira um nome para sua loja');
@@ -136,11 +112,7 @@ const CreateStore = ({ onStoreCreated }) => {
         }
         break;
       case 2:
-        // Logo is optional now, based on previous discussions, remove required check
-        // if (!logoUrl) {
-        //   setErrorMsg('Por favor, faça upload de uma imagem para sua loja');
-        //   return false;
-        // }
+        // Logo is optional
         break;
       case 3:
         if (!plano) {
@@ -166,11 +138,10 @@ const CreateStore = ({ onStoreCreated }) => {
   };
 
   const handleCreateStore = async () => {
-    // Validate the final step before submitting
-    if (!validateStep()) return; 
-    
+    if (!validateStep()) return;
+
     setLoading(true);
-    setErrorMsg(''); // Clear previous errors
+    setErrorMsg('');
 
     try {
       const user = auth.currentUser;
@@ -179,27 +150,23 @@ const CreateStore = ({ onStoreCreated }) => {
       }
 
       const agora = new Date();
-      const inicioTimestamp = serverTimestamp(); // Use server timestamp for consistency
-
-      // --- Corrected Trial End Date Calculation --- 
+      const inicioTimestamp = serverTimestamp();
       let fimTesteDate = null;
+
       if (plano !== 'free') {
         fimTesteDate = new Date(agora.getTime() + 7 * 24 * 60 * 60 * 1000);
-        // Optional: Set time to end of day for clarity
-        // fimTesteDate.setHours(23, 59, 59, 999);
       }
+
       const fimTesteISO = fimTesteDate ? fimTesteDate.toISOString() : null;
 
-      // Create a URL-friendly slug
       const slug = nomeLoja.toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^\w\s-]/g, '') // Keep hyphens
+        .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-')
-        .replace(/--+/g, '-') // Replace multiple hyphens
-        .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
+        .replace(/--+/g, '-')
+        .replace(/^-+|-+$/g, '');
 
-      // --- Footer Data Structure --- 
       const footerData = {
         descricao: "",
         endereco: "",
@@ -212,103 +179,104 @@ const CreateStore = ({ onStoreCreated }) => {
         extras: []
       };
 
-      // --- Loja Data --- 
       const lojaData = {
         nome: nomeLoja,
         segmento,
-        logoUrl: logoUrl || null, // Store null if no logo
-        plano, // Store the selected plan ('free', 'plus', 'premium')
+        logoUrl: logoUrl || null,
+        plano,
         donoUid: user.uid,
         status: 'ativa',
         slug,
         criadaEm: inicioTimestamp,
         atualizadaEm: inicioTimestamp,
         categorias: [],
-        footer: footerData, // Campo footer adicionado aqui
+        footer: footerData,
         configs: {
           corPrimaria: '#4a6bff',
           corSecundaria: '#2541b2',
           tema: 'claro'
         },
-        // Add other necessary loja fields here
       };
 
-      // --- User Data (Corrected Logic) --- 
       let usuarioDataUpdate = {};
       if (plano === 'free') {
         usuarioDataUpdate = {
           plano: 'free',
           planoAtual: 'free',
-          planoAtivo: true, // Free plan is considered active
+          planoAtivo: true,
           emTeste: false,
           testeGratuito: false,
           inicioTeste: null,
           fimTeste: null,
           expiracaoPlano: null,
           dataInicioPlano: inicioTimestamp,
-          hasUsedTrial: false, // Reset trial usage if moving to Free explicitly here?
-                              // Or maybe keep hasUsedTrial if they previously had one?
-                              // Let's assume creating a FREE store doesn't grant a new trial.
-                              // We should ideally read the existing hasUsedTrial state first, 
-                              // but for simplicity in creation, let's set it based on *this* action.
+          hasUsedTrial: false,
           pagamentoConfirmado: false,
           descontoAplicado: false,
           storeCreated: true,
           ultimoLogin: inicioTimestamp,
-          updatedAt: inicioTimestamp, // Use server timestamp
+          updatedAt: inicioTimestamp,
         };
-      } else { // Plus or Premium
+      } else {
         usuarioDataUpdate = {
-          plano: plano, // 'plus' or 'premium'
+          plano: plano,
           planoAtual: plano,
-          planoAtivo: false, // Paid plan is not active until paid (after trial)
+          planoAtivo: false,
           emTeste: true,
           testeGratuito: true,
           inicioTeste: inicioTimestamp,
           fimTeste: fimTesteISO,
-          expiracaoPlano: fimTesteISO, // Align expiration with trial end
-          dataInicioPlano: null, // Plan starts after trial/payment
-          hasUsedTrial: true, // Mark trial as used upon starting it
+          expiracaoPlano: fimTesteISO,
+          dataInicioPlano: null,
+          hasUsedTrial: true,
           pagamentoConfirmado: false,
           descontoAplicado: false,
           storeCreated: true,
           ultimoLogin: inicioTimestamp,
-          updatedAt: inicioTimestamp, // Use server timestamp
+          updatedAt: inicioTimestamp,
         };
       }
 
-      // Use a batch write for atomicity
       const batch = writeBatch(db);
       const lojaRef = doc(db, 'lojas', user.uid);
       const userRef = doc(db, 'usuarios', user.uid);
 
-      batch.set(lojaRef, lojaData); // Create/overwrite loja data
-      // IMPORTANT: Use merge: true for user data to update existing fields 
-      // and add new ones without overwriting unrelated data (like email, name etc.)
-      batch.set(userRef, usuarioDataUpdate, { merge: true }); 
-      
+      batch.set(lojaRef, lojaData);
+      batch.set(userRef, usuarioDataUpdate, { merge: true });
+
+      // Criação de produto com priceConditions
+      const produtoRef = doc(collection(db, "lojas", user.uid, "produtos"));
+      await setDoc(produtoRef, {
+        name: "Produto de exemplo",
+        price: "49.99",
+        anchorPrice: "59.99",
+        stock: "55",
+        images: [
+          "https://res.cloudinary.com/doeiv6m4h/image/upload/v1748384587/ojfxb53zx1dv65r9hxj0.webp" 
+        ],
+        category: "Camisa",
+        description: "Tsywyey",
+        variants: ["Preta"],
+        createdAt: inicioTimestamp,
+        updatedAt: inicioTimestamp,
+        slug: "camisa-lisa",
+        ativo: true,
+        prioridade: false,
+        priceConditions: [
+          {
+            quantity: "10",
+            pricePerUnit: "45.99"
+          },
+          {
+            quantity: "20",
+            pricePerUnit: "40.99"
+          }
+        ],
+        isPlaceholder: true
+      });
+
       await batch.commit();
 
-      // Create placeholder product (optional, keep if needed)
-      try {
-        const produtoRef = doc(collection(db, "lojas", user.uid, "produtos"));
-        await setDoc(produtoRef, {
-          name: "Produto de exemplo",
-          price: "0.00",
-          stock: "0",
-          images: [],
-          category: "",
-          description: "",
-          variants: [],
-          createdAt: inicioTimestamp,
-          isPlaceholder: true
-        });
-      } catch (prodError) {
-        console.warn("Aviso: Não foi possível criar o produto de exemplo.", prodError);
-        // Don't fail the whole process for this
-      }
-
-      // Confetti effect
       if (jsConfetti) {
         jsConfetti.addConfetti({
           emojis: ['🛍️', '💰', '🛒', '💳', '✨', '🎉'],
@@ -318,8 +286,7 @@ const CreateStore = ({ onStoreCreated }) => {
       }
 
       setShowSuccess(true);
-      if (onStoreCreated) onStoreCreated(); // Callback if provided
-
+      if (onStoreCreated) onStoreCreated();
     } catch (err) {
       console.error('Erro ao criar loja:', err);
       setErrorMsg(`Erro ao criar loja: ${err.message}. Tente novamente.`);
@@ -328,10 +295,8 @@ const CreateStore = ({ onStoreCreated }) => {
     }
   };
 
-  // --- Render Logic (Keep as is, focus was on handleCreateStore) ---
   const renderStepContent = () => {
-    // ... (render logic for each step remains the same as provided previously)
-    switch(currentStep) {
+    switch (currentStep) {
       case 0:
         return (
           <div className="step-content-inner">
@@ -384,7 +349,7 @@ const CreateStore = ({ onStoreCreated }) => {
                     onChange={handleFileUpload} 
                     className="file-upload-input" 
                     accept="image/*"
-                    disabled={loading} // Disable during upload
+                    disabled={loading}
                   />
                 </label>
               </div>
@@ -414,7 +379,6 @@ const CreateStore = ({ onStoreCreated }) => {
             <div className="form-group mb-4">
               <label className="form-label-custom">Plano*</label>
               <div className="plan-options">
-                {/* Free Plan Option */}
                 <div 
                   className={`plan-option ${plano === 'free' ? 'selected' : ''}`}
                   onClick={() => setPlano('free')}
@@ -424,11 +388,9 @@ const CreateStore = ({ onStoreCreated }) => {
                   <ul className="plan-features">
                     <li>Até 30 produtos</li>
                     <li>1 imagem por produto</li>
-                    {/* Add other free features */}
                   </ul>
                   <div className="plan-badge">Básico</div>
                 </div>
-                {/* Plus Plan Option */}
                 <div 
                   className={`plan-option ${plano === 'plus' ? 'selected' : ''}`}
                   onClick={() => setPlano('plus')}
@@ -438,12 +400,10 @@ const CreateStore = ({ onStoreCreated }) => {
                   <ul className="plan-features">
                     <li>Até 300 produtos</li>
                     <li>3 imagens por produto</li>
-                    <li>7 dias grátis</li> 
-                    {/* Add other plus features */}
+                    <li>7 dias grátis</li>
                   </ul>
                   <div className="plan-badge popular">Popular</div>
                 </div>
-                {/* Premium Plan Option */}
                 <div 
                   className={`plan-option ${plano === 'premium' ? 'selected' : ''}`}
                   onClick={() => setPlano('premium')}
@@ -454,7 +414,6 @@ const CreateStore = ({ onStoreCreated }) => {
                     <li>Produtos ilimitados</li>
                     <li>5 imagens por produto</li>
                     <li>7 dias grátis</li>
-                    {/* Add other premium features */}
                   </ul>
                   <div className="plan-badge">Premium</div>
                 </div>
@@ -486,7 +445,7 @@ const CreateStore = ({ onStoreCreated }) => {
                       <span className="confirmation-value">
                         {plano === 'free' ? 'Free' : 
                          plano === 'plus' ? 'Plus' : 'Premium'}
-                         {plano !== 'free' && ' (+ 7 dias grátis)'} 
+                         {plano !== 'free' && ' (+ 7 dias grátis)'}
                       </span>
                     </div>
                   </div>
@@ -519,7 +478,7 @@ const CreateStore = ({ onStoreCreated }) => {
   return (
     <div className="create-store-wrapper">
       <div className="create-store-container">
-        {/* Progress Steps */} 
+        {/* Progress Steps */}
         <div className="progress-steps-wrapper">
           <div className="progress-steps">
             {steps.map((step, index) => (
@@ -546,14 +505,12 @@ const CreateStore = ({ onStoreCreated }) => {
             />
           </div>
         </div>
-
-        {/* Step Content */} 
+        {/* Step Content */}
         <div className="step-content-wrapper">
           {errorMsg && <div className="alert alert-danger error-message">{errorMsg}</div>}
           {renderStepContent()}
         </div>
-
-        {/* Navigation Buttons */} 
+        {/* Navigation Buttons */}
         <div className="navigation-buttons">
           <button 
             onClick={prevStep} 
@@ -582,8 +539,7 @@ const CreateStore = ({ onStoreCreated }) => {
           )}
         </div>
       </div>
-
-      {/* Success Overlay */} 
+      {/* Success Overlay */}
       {showSuccess && (
         <div className="success-overlay">
           <div className="success-content">

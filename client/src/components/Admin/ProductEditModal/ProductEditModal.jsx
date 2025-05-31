@@ -1,4 +1,4 @@
-// ProductEditModal.js - Seção modificada para usar o Context
+// ProductEditModal.js
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -15,6 +15,8 @@ import {
   Grid,
   CircularProgress,
   Switch,
+  FormControlLabel,
+  Divider,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,7 +26,7 @@ import { collection, addDoc, updateDoc, doc, arrayUnion } from "firebase/firesto
 import { db } from "../../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import "./ProductEditModal.css";
-import { useUserPlan } from "../../../context/UserPlanContext"; // Mudança aqui
+import { useUserPlan } from "../../../context/UserPlanContext";
 import { MAX_IMAGES, PRODUCT_LIMITS } from '../../../utils/planLimits';
 
 const ProductEditModal = ({
@@ -39,12 +41,33 @@ const ProductEditModal = ({
 }) => {
   const auth = getAuth();
   const resolvedLojaId = lojaId || auth.currentUser?.uid;
-  
-  // Usa o Context em vez do hook local
+
   const { userPlan, loading: planLoading } = useUserPlan();
-  
+
   const [saveLoading, setSaveLoading] = useState(false);
   const safeProduct = initialProduct || {};
+
+  // Função para converter a estrutura legada de variantes
+  const convertLegacyVariants = (legacyVariants) => {
+    if (!legacyVariants) return [];
+    
+    // Se for a estrutura antiga (mapa com options)
+    if (legacyVariants.options && Array.isArray(legacyVariants.options)) {
+      return [{
+        name: legacyVariants.name || "Tamanho",
+        options: legacyVariants.options,
+        required: legacyVariants.required !== false
+      }];
+    }
+    
+    // Se for um array já no formato novo
+    if (Array.isArray(legacyVariants) && legacyVariants.every(v => v.name && v.options)) {
+      return legacyVariants;
+    }
+    
+    return [];
+  };
+
   const [product, setProduct] = useState({
     name: safeProduct.name || "",
     price: safeProduct.price || "",
@@ -53,11 +76,15 @@ const ProductEditModal = ({
     description: safeProduct.description || "",
     images: safeProduct.images || [],
     category: safeProduct.category || "",
-    variants: safeProduct.variants || [],
+    variants: convertLegacyVariants(safeProduct.variants),
     ativo: safeProduct.ativo !== false,
     prioridade: safeProduct.prioridade || false,
+    priceConditions: safeProduct.priceConditions || [],
   });
+
   const [variantInput, setVariantInput] = useState("");
+  const [variantOptions, setVariantOptions] = useState("");
+  const [editingVariantIndex, setEditingVariantIndex] = useState(null);
   const [newCategory, setNewCategory] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCategoryImage, setNewCategoryImage] = useState("");
@@ -65,17 +92,12 @@ const ProductEditModal = ({
   const maxImages = MAX_IMAGES[userPlan] || MAX_IMAGES['free'] || 1;
   const maxProducts = PRODUCT_LIMITS[userPlan] || PRODUCT_LIMITS['free'] || 30;
 
-  // Log para debug - remover em produção
-  console.log('ProductEditModal - currentUserPlan:', userPlan);
-  console.log('ProductEditModal - maxImages:', maxImages);
-  console.log('ProductEditModal - maxProducts:', maxProducts);
-
   // Efeito para monitorar mudanças no plano e ajustar imagens se necessário
   useEffect(() => {
     if (product.images.length > maxImages) {
       setProduct((prev) => ({
         ...prev,
-        images: prev.images.slice(0, maxImages)
+        images: prev.images.slice(0, maxImages),
       }));
       alert(`Seu plano foi alterado. O número de imagens foi reduzido para ${maxImages} conforme o limite do plano ${userPlan.toUpperCase()}.`);
     }
@@ -87,6 +109,7 @@ const ProductEditModal = ({
       const safeProduct = initialProduct || {};
       const productImages = safeProduct.images || [];
       const limitedImages = productImages.slice(0, maxImages);
+      
       setProduct({
         name: safeProduct.name || "",
         price: safeProduct.price || "",
@@ -95,10 +118,12 @@ const ProductEditModal = ({
         description: safeProduct.description || "",
         images: limitedImages,
         category: safeProduct.category || "",
-        variants: safeProduct.variants || [],
+        variants: convertLegacyVariants(safeProduct.variants),
         ativo: safeProduct.ativo !== false,
         prioridade: safeProduct.prioridade || false,
+        priceConditions: safeProduct.priceConditions || [],
       });
+      
       if (productImages.length > maxImages && productImages.length > 0) {
         setTimeout(() => {
           alert(`Algumas imagens foram removidas para adequar ao limite do plano ${userPlan.toUpperCase()} (${maxImages} imagens por produto).`);
@@ -123,19 +148,80 @@ const ProductEditModal = ({
   };
 
   const handleAddVariant = () => {
-    if (variantInput.trim()) {
-      setProduct((prev) => ({
+    if (variantInput.trim() && variantOptions.trim()) {
+      const optionsArray = variantOptions.split(',').map(opt => opt.trim()).filter(opt => opt);
+      
+      if (optionsArray.length === 0) {
+        alert("Adicione pelo menos uma opção para a variante");
+        return;
+      }
+
+      const newVariant = {
+        name: variantInput.trim(),
+        options: optionsArray,
+        required: true
+      };
+
+      setProduct(prev => ({
         ...prev,
-        variants: [...prev.variants, variantInput.trim()],
+        variants: editingVariantIndex !== null
+          ? prev.variants.map((v, i) => i === editingVariantIndex ? newVariant : v)
+          : [...prev.variants, newVariant]
       }));
+
       setVariantInput("");
+      setVariantOptions("");
+      setEditingVariantIndex(null);
     }
   };
 
-  const handleRemoveVariant = (idx) => {
+  const handleEditVariant = (index) => {
+    const variant = product.variants[index];
+    setVariantInput(variant.name);
+    setVariantOptions(variant.options.join(', '));
+    setEditingVariantIndex(index);
+  };
+
+  const handleRemoveVariant = (index) => {
+    setProduct(prev => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleVariantRequiredChange = (index, checked) => {
+    setProduct(prev => ({
+      ...prev,
+      variants: prev.variants.map((v, i) => 
+        i === index ? { ...v, required: checked } : v
+      )
+    }));
+  };
+
+  // Gerenciamento de Condições de Preço
+  const handleAddPriceCondition = () => {
     setProduct((prev) => ({
       ...prev,
-      variants: prev.variants.filter((_, i) => i !== idx),
+      priceConditions: [
+        ...prev.priceConditions,
+        { quantity: "", pricePerUnit: "" },
+      ],
+    }));
+  };
+
+  const handleRemovePriceCondition = (index) => {
+    setProduct((prev) => ({
+      ...prev,
+      priceConditions: prev.priceConditions.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handlePriceConditionChange = (index, field, value) => {
+    setProduct((prev) => ({
+      ...prev,
+      priceConditions: prev.priceConditions.map((condition, i) =>
+        i === index ? { ...condition, [field]: value } : condition
+      ),
     }));
   };
 
@@ -148,55 +234,54 @@ const ProductEditModal = ({
       .replace(/\s+/g, "-");
 
   const handleSave = async () => {
-  try {
-    setSaveLoading(true);
-    if (!product.name || !product.price) {
-      alert("Nome e preço são obrigatórios!");
-      return;
+    try {
+      setSaveLoading(true);
+      if (!product.name || !product.price) {
+        alert("Nome e preço são obrigatórios!");
+        return;
+      }
+      if (product.images.length === 0) {
+        alert("Adicione pelo menos uma imagem do produto.");
+        return;
+      }
+
+      // Verificar limite de produtos apenas para novos produtos
+      if (!initialProduct?.id && currentProductCount >= maxProducts) {
+        alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`);
+        return;
+      }
+
+      // Verificar limite de imagens
+      if (product.images.length > maxImages) {
+        alert(`Você pode ter no máximo ${maxImages} imagens por produto no plano ${userPlan.toUpperCase()}.`);
+        return;
+      }
+
+      const productSlug = generateSlug(product.name);
+      const productData = {
+        ...product,
+        slug: productSlug,
+        updatedAt: new Date().toISOString(),
+      };
+
+      if (initialProduct?.id) {
+        // Atualizar produto existente
+        await updateDoc(doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`), productData);
+      } else {
+        // Criar novo produto
+        productData.createdAt = new Date().toISOString();
+        const docRef = await addDoc(collection(db, `lojas/${resolvedLojaId}/produtos`), productData);
+        productData.id = docRef.id;
+      }
+
+      onSave(productData);
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+      alert("Erro ao salvar produto: " + err.message);
+    } finally {
+      setSaveLoading(false);
     }
-    if (product.images.length === 0) {
-      alert("Adicione pelo menos uma imagem do produto.");
-      return;
-    }
-    // Verificar limite de produtos apenas para novos produtos
-    if (!initialProduct?.id && currentProductCount >= maxProducts) {
-      alert(`Você atingiu o limite máximo de ${maxProducts} produtos para o plano ${userPlan.toUpperCase()}.`);
-      return;
-    }
-    // Verificar limite de imagens
-    if (product.images.length > maxImages) {
-      alert(`Você pode ter no máximo ${maxImages} imagens por produto no plano ${userPlan.toUpperCase()}.`);
-      return;
-    }
-    const productSlug = generateSlug(product.name);
-    const productData = { 
-      ...product,
-      slug: productSlug,
-      updatedAt: new Date().toISOString(),
-    };
-    if (initialProduct?.id) {
-      // Atualizar produto existente
-      await updateDoc(
-        doc(db, `lojas/${resolvedLojaId}/produtos/${initialProduct.id}`),
-        productData
-      );
-    } else {
-      // Criar novo produto
-      productData.createdAt = new Date().toISOString();
-      const docRef = await addDoc(
-        collection(db, `lojas/${resolvedLojaId}/produtos`),
-        productData
-      );
-      productData.id = docRef.id; // Adicionar o ID gerado ao productData
-    }
-    onSave(productData);
-  } catch (err) {
-    console.error("Erro ao salvar produto:", err);
-    alert("Erro ao salvar produto: " + err.message);
-  } finally {
-    setSaveLoading(false);
-  }
-};
+  };
 
   const handleCreateCategory = async () => {
     const trimmed = newCategory.trim();
@@ -221,9 +306,8 @@ const ProductEditModal = ({
     setCreatingCategory(false);
   };
 
-  // Função para obter a descrição do plano
   const getPlanDescription = (plan) => {
-    switch(plan) {
+    switch (plan) {
       case 'free':
         return '30 produtos, 1 imagem por produto';
       case 'plus':
@@ -305,15 +389,67 @@ const ProductEditModal = ({
               ))}
             </TextField>
           </Box>
+
+          {/* Seção de Variantes */}
           <Box>
-            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-              Variantes (ex: cor, tamanho)
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Variantes (ex: Tamanho, Cor)
             </Typography>
-            <Box display="flex" gap={1} alignItems="center">
+            
+            {product.variants.map((variant, index) => (
+              <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #eee', borderRadius: 1 }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="subtitle2">{variant.name}</Typography>
+                  <Box>
+                    <IconButton onClick={() => handleEditVariant(index)} size="small">
+                      <AddAPhotoIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton onClick={() => handleRemoveVariant(index)} size="small" color="error">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ mt: 1 }}>
+                  {variant.options.map((option, i) => (
+                    <Chip key={i} label={option} sx={{ mr: 1, mb: 1 }} />
+                  ))}
+                </Box>
+                
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={variant.required}
+                      onChange={(e) => handleVariantRequiredChange(index, e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Obrigatório"
+                />
+              </Box>
+            ))}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {editingVariantIndex !== null ? "Editar Variante" : "Adicionar Nova Variante"}
+            </Typography>
+            
+            <Box display="flex" gap={1} alignItems="center" sx={{ mb: 1 }}>
               <TextField
-                label="Adicionar variante"
+                label="Nome da Variante (ex: Tamanho)"
                 value={variantInput}
                 onChange={(e) => setVariantInput(e.target.value)}
+                size="small"
+                fullWidth
+              />
+            </Box>
+            
+            <Box display="flex" gap={1} alignItems="center">
+              <TextField
+                label="Opções (separadas por vírgula)"
+                value={variantOptions}
+                onChange={(e) => setVariantOptions(e.target.value)}
                 size="small"
                 fullWidth
               />
@@ -321,17 +457,9 @@ const ProductEditModal = ({
                 <AddIcon />
               </IconButton>
             </Box>
-            <Box sx={{ mt: 1 }}>
-              {product.variants.map((variant, idx) => (
-                <Chip
-                  key={idx}
-                  label={variant}
-                  onDelete={() => handleRemoveVariant(idx)}
-                  sx={{ mr: 1, mb: 1 }}
-                />
-              ))}
-            </Box>
           </Box>
+
+          {/* Seção de Imagens */}
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
               Imagens do produto ({product.images.length}/{maxImages})
@@ -381,6 +509,39 @@ const ProductEditModal = ({
               }
             </Typography>
           </Box>
+
+          {/* Seção de Condições de Preço */}
+          <Box>
+            <Typography variant="subtitle2">Condições de Preço</Typography>
+            {product.priceConditions.map((condition, index) => (
+              <Box key={index} display="flex" gap={1} alignItems="center" sx={{ mb: 1 }}>
+                <TextField
+                  label="Quantidade Mínima"
+                  type="number"
+                  value={condition.quantity}
+                  onChange={(e) => handlePriceConditionChange(index, "quantity", e.target.value)}
+                  size="small"
+                  fullWidth
+                />
+                <TextField
+                  label="Preço por Unidade"
+                  type="number"
+                  value={condition.pricePerUnit}
+                  onChange={(e) => handlePriceConditionChange(index, "pricePerUnit", e.target.value)}
+                  size="small"
+                  fullWidth
+                />
+                <IconButton onClick={() => handleRemovePriceCondition(index)} color="error">
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))}
+            <Button startIcon={<AddIcon />} onClick={handleAddPriceCondition} variant="outlined" size="small">
+              Adicionar Condição
+            </Button>
+          </Box>
+
+          {/* Seção de Status */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box>
               <Typography variant="subtitle2">Status</Typography>
@@ -411,8 +572,8 @@ const ProductEditModal = ({
         <Button onClick={onClose} disabled={saveLoading}>
           Cancelar
         </Button>
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           variant="contained"
           disabled={saveLoading}
         >
