@@ -244,7 +244,7 @@ const CreateStore = ({ onStoreCreated }) => {
       batch.set(lojaRef, lojaData);
       batch.set(userRef, usuarioDataUpdate, { merge: true });
 
-      // Criação de produto com priceConditions
+      // Criação de produto com variantes vazias
       const produtoRef = doc(collection(db, "lojas", user.uid, "produtos"));
       await setDoc(produtoRef, {
         name: "Produto de exemplo",
@@ -255,11 +255,15 @@ const CreateStore = ({ onStoreCreated }) => {
           "https://res.cloudinary.com/doeiv6m4h/image/upload/v1748384587/ojfxb53zx1dv65r9hxj0.webp" 
         ],
         category: "Camisa",
-        description: "Tsywyey",
-        variants: ["Preta"],
+        description: "Este é um produto de exemplo que você pode editar ou deletar",
+        variants: {
+          default: "", // Valor padrão vazio
+          name: "",   // Nome da variante vazio
+          options: []  // Opções vazias
+        },
         createdAt: inicioTimestamp,
         updatedAt: inicioTimestamp,
-        slug: "camisa-lisa",
+        slug: "produto-exemplo",
         ativo: true,
         prioridade: false,
         priceConditions: [

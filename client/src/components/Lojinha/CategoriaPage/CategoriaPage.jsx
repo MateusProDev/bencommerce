@@ -18,42 +18,75 @@ const CategoriaPage = () => {
   const [lojaId, setLojaId] = useState(null);
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(""); // Estado para a pesquisa
+  const [search, setSearch] = useState("");
 
-  // Carrossel drag
   const carouselRef = useRef(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
+  // Função para calcular o desconto
+  const getDiscount = (price, anchorPrice) => {
+    if (!anchorPrice || !price) return 0;
+    return Math.round(((anchorPrice - price) / anchorPrice) * 100);
+  };
+
   useEffect(() => {
     async function fetchLojaIdAndProdutos() {
       setLoading(true);
-      const lojaSnap = await getDocs(query(collection(db, "lojas"), where("slug", "==", slug)));
-      if (!lojaSnap.empty) {
-        const lojaId = lojaSnap.docs[0].id;
-        setLojaId(lojaId);
+      try {
+        // Busca a loja pelo slug
+        const lojaQuery = query(collection(db, "lojas"), where("slug", "==", slug));
+        const lojaSnap = await getDocs(lojaQuery);
+        
+        if (!lojaSnap.empty) {
+          const lojaId = lojaSnap.docs[0].id;
+          setLojaId(lojaId);
 
-        // Busca produtos da categoria (case insensitive)
-        const produtosSnap = await getDocs(query(
-          collection(db, `lojas/${lojaId}/produtos`),
-          where("category", "==", categoria.toLowerCase())
-        ));
+          // Busca produtos da categoria (case insensitive)
+          const produtosRef = collection(db, `lojas/${lojaId}/produtos`);
+          const produtosQuery = query(
+            produtosRef,
+            where("category", "==", "Camisas"), // Teste com valor fixo primeiro
+            where("ativo", "==", true)
+          );
 
-        // Adicione este filtro e ordenação:
-        const produtosFiltrados = produtosSnap.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(prod => prod.ativo !== false) // Só ativos
-          .sort((a, b) => {
-            if (b.prioridade === true && !a.prioridade) return 1;
-            if (a.prioridade === true && !b.prioridade) return -1;
+          console.log("Executando query:", produtosQuery); // Debug
+
+          const produtosSnap = await getDocs(produtosQuery);
+          console.log("Produtos encontrados:", produtosSnap.docs.length); // Debug
+
+          const produtosData = produtosSnap.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              // Converte strings numéricas para números
+              price: parseFloat(data.price) || 0,
+              anchorPrice: data.anchorPrice ? parseFloat(data.anchorPrice) : null
+            };
+          });
+
+          console.log("Produtos processados:", produtosData); // Debug
+
+          // Ordenação
+          const produtosOrdenados = produtosData.sort((a, b) => {
+            if (a.prioridade && !b.prioridade) return -1;
+            if (!a.prioridade && b.prioridade) return 1;
             return 0;
           });
 
-        setProdutos(produtosFiltrados);
+          setProdutos(produtosOrdenados);
+        } else {
+          console.error("Loja não encontrada");
+        }
+      } catch (error) {
+        console.error("Erro completo:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
+
     fetchLojaIdAndProdutos();
   }, [slug, categoria]);
 
@@ -63,8 +96,15 @@ const CategoriaPage = () => {
     startX.current = e.pageX - carouselRef.current.offsetLeft;
     scrollLeft.current = carouselRef.current.scrollLeft;
   };
-  const handleMouseLeave = () => { isDragging.current = false; };
-  const handleMouseUp = () => { isDragging.current = false; };
+
+  const handleMouseLeave = () => { 
+    isDragging.current = false; 
+  };
+
+  const handleMouseUp = () => { 
+    isDragging.current = false; 
+  };
+
   const handleMouseMove = (e) => {
     if (!isDragging.current) return;
     e.preventDefault();
@@ -79,18 +119,16 @@ const CategoriaPage = () => {
     startX.current = e.touches[0].pageX - carouselRef.current.offsetLeft;
     scrollLeft.current = carouselRef.current.scrollLeft;
   };
-  const handleTouchEnd = () => { isDragging.current = false; };
+
+  const handleTouchEnd = () => { 
+    isDragging.current = false; 
+  };
+
   const handleTouchMove = (e) => {
     if (!isDragging.current) return;
     const x = e.touches[0].pageX - carouselRef.current.offsetLeft;
     const walk = (x - startX.current) * 1.2;
     carouselRef.current.scrollLeft = scrollLeft.current - walk;
-  };
-
-  // Badge de desconto
-  const getDiscount = (price, anchorPrice) => {
-    if (!anchorPrice || !price) return 0;
-    return Math.round(((anchorPrice - price) / anchorPrice) * 100);
   };
 
   return (
@@ -103,22 +141,32 @@ const CategoriaPage = () => {
         value={search}
         onChange={e => setSearch(e.target.value)}
       />
-      <div
-        className="categoria-produtos-carousel"
-        ref={carouselRef}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
-      >
-        {loading
-          ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
-          : produtos
-              .filter(produto => produto.name.toLowerCase().includes(search.toLowerCase())) // Filtro de pesquisa
-              .map(produto => {
+      
+      {loading ? (
+        <div className="categoria-produtos-carousel">
+          {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      ) : produtos.length === 0 ? (
+        <div className="categoria-sem-produtos">
+          Nenhum produto encontrado nesta categoria.
+        </div>
+      ) : (
+        <div
+          className="categoria-produtos-carousel"
+          ref={carouselRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchMove={handleTouchMove}
+        >
+          {produtos
+            .filter(produto => 
+              produto.name.toLowerCase().includes(search.toLowerCase())
+            )
+            .map(produto => {
               const desconto = getDiscount(produto.price, produto.anchorPrice);
               return (
                 <div className="categoria-produto-card" key={produto.id}>
@@ -143,7 +191,8 @@ const CategoriaPage = () => {
                 </div>
               );
             })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
