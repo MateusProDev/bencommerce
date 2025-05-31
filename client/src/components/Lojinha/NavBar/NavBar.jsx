@@ -8,12 +8,13 @@ const NavBar = ({
   exibirLogo = true,
   onMenuClick,
   onCartClick,
-  cartCount
+  cartCount,
 }) => {
   console.log("NavBar - exibirLogo:", exibirLogo, "logoUrl:", logoUrl, "nomeLoja:", nomeLoja);
-  
+
   return (
     <div className="lojinha-navbar">
+      {/* Parte Esquerda: Logo ou Nome da Loja */}
       <div className="lojinha-navbar-left">
         {exibirLogo ? (
           logoUrl ? (
@@ -24,36 +25,33 @@ const NavBar = ({
               style={{
                 maxHeight: '60px',
                 maxWidth: '200px',
-                objectFit: 'contain'
+                objectFit: 'contain',
               }}
             />
           ) : (
-            <div className="lojinha-navbar-no-logo">
-              Sem logo
-            </div>
+            <div className="lojinha-navbar-no-logo">Sem logo</div>
           )
         ) : (
-          <div className="lojinha-navbar-title">
-            {nomeLoja || "Minha Loja"}
-          </div>
+          <div className="lojinha-navbar-title">{nomeLoja || "Minha Loja"}</div>
         )}
       </div>
-      
+
+      {/* Parte Direita: Botões de Carrinho e Menu */}
       <div className="lojinha-navbar-right">
-        <button 
+        {/* Botão do Carrinho */}
+        <button
           className="lojinha-navbar-cart-btn"
           onClick={onCartClick}
           aria-label="Carrinho de compras"
         >
           <ShoppingBag sx={{ fontSize: 32 }} />
           {cartCount > 0 && (
-            <span className="lojinha-navbar-cart-count">
-              {cartCount}
-            </span>
+            <span className="lojinha-navbar-cart-count">{cartCount}</span>
           )}
         </button>
-        
-        <button 
+
+        {/* Botão do Menu */}
+        <button
           className="lojinha-navbar-menu-btn"
           onClick={onMenuClick}
           aria-label="Menu"
