@@ -405,13 +405,13 @@ const ProdutoPage = () => {
   if (!produto || !loja) {
     return (
       <>
-        <NavBar
+        {/* <NavBar
           nomeLoja="Informação Indisponível"
           logoUrlState=""
           exibirLogo={false}
           cartCount={0}
           onCartClick={() => navigate('/')}
-        />
+        /> */}
         <Container sx={{ textAlign: 'center', mt: 10, p: 2 }}>
           <Typography variant="h6">Produto não encontrado</Typography>
           <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
@@ -425,13 +425,13 @@ const ProdutoPage = () => {
 
   return (
     <>
-      <NavBar
+      {/* <NavBar
         nomeLoja={loja.nome}
         logoUrlState={loja.logoUrl || ""}
         exibirLogo={loja.exibirLogo !== false}
         cartCount={cartItemCount}
         onCartClick={() => navigate(`/carrinho/${loja.id}`)}
-      />
+      /> */}
       <Container maxWidth="lg" className="produto-page-container">
         <Button
           variant="text"

@@ -431,10 +431,8 @@ const Lojinha = ({
                   key={key}
                   className="lojinha-categoria-btn"
                   onClick={() => {
-                    const element = document.getElementById(`category-title-${key}`);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                    // Alterado para usar navigate e ir para a rota da categoria
+                    navigate(`/${slug}/categoria/${encodeURIComponent(nome.toLowerCase())}`);
                   }}
                   title={`Ver categoria ${nome}`}
                 >
