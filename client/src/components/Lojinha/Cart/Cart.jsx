@@ -160,12 +160,16 @@ const Cart = ({
                       
                       {item.variants && Object.keys(item.variants).length > 0 && (
                         <div className="cart-item-variants-container">
-                          {Object.entries(item.variants).map(([name, value]) => (
-                            <div key={name} className="cart-item-variant">
-                              <span className="variant-name">{name}:</span>
-                              <span className="variant-value">{value}</span>
-                            </div>
-                          ))}
+                          {Object.entries(item.variants).map(([name, value]) => {
+                            // Converte o valor em string, se for um objeto
+                            const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                            return (
+                              <div key={name} className="cart-item-variant">
+                                <span className="variant-name">{name}:</span>
+                                <span className="variant-value">{displayValue}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

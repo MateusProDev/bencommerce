@@ -148,8 +148,8 @@ const ProdutoPage = () => {
       localStorage.setItem(`lojinha_cart_${loja.id}`, JSON.stringify(cartItemsInternal));
       const count = cartItemsInternal.reduce((sum, item) => sum + (item.qtd || 0), 0);
       setCartItemCount(count);
-      window.dispatchEvent(new CustomEvent('cartUpdatedGlobal', { 
-        detail: { lojaId: loja.id, itemCount: count } 
+      window.dispatchEvent(new CustomEvent('cartUpdatedGlobal', {
+        detail: { lojaId: loja.id, itemCount: count }
       }));
     }
   }, [cartItemsInternal, loja?.id]);
@@ -158,11 +158,10 @@ const ProdutoPage = () => {
     if (produto) {
       // Inicializa variantes selecionadas de forma robusta
       let variantsArray = [];
-      
       // Caso 1: Variantes como array (estrutura correta)
       if (Array.isArray(produto.variants)) {
         variantsArray = produto.variants;
-      } 
+      }
       // Caso 2: Variantes como objeto (estrutura antiga - compatibilidade)
       else if (produto.variants && typeof produto.variants === 'object') {
         // Converte o objeto de variantes para array
@@ -173,7 +172,6 @@ const ProdutoPage = () => {
           required: produto.variants.required !== false
         }];
       }
-
       const initialVariants = {};
       variantsArray.forEach(variant => {
         if (variant && variant.options && variant.options.length > 0) {
@@ -182,7 +180,6 @@ const ProdutoPage = () => {
         }
       });
       setSelectedVariants(initialVariants);
-      
       // Reset imagem selecionada e quantidade
       setSelectedImage(0);
       setQuantity(1);
@@ -223,7 +220,6 @@ const ProdutoPage = () => {
       showSnackbar("Erro ao adicionar ao carrinho. Tente novamente.");
       return;
     }
-
     // Verifica se todas as variantes obrigatórias foram selecionadas
     let variantsToCheck = [];
     if (Array.isArray(produto.variants)) {
@@ -235,7 +231,6 @@ const ProdutoPage = () => {
         required: produto.variants.required !== false
       }];
     }
-
     for (const variant of variantsToCheck) {
       if (typeof variant === 'object' && variant.required) {
         const variantName = variant.name || "Tamanho";
@@ -245,7 +240,6 @@ const ProdutoPage = () => {
         }
       }
     }
-
     const currentStock = Number(produto.stock) || 0;
     if (currentStock <= 0) {
       showSnackbar("Produto fora de estoque.");
@@ -255,13 +249,11 @@ const ProdutoPage = () => {
       showSnackbar(`Quantidade solicitada excede o estoque disponível (${currentStock}).`);
       return;
     }
-
     // Calcula preço com base nas condições de preço
     let pricePerUnit = Number(produto.price);
     if (produto.priceConditions && Array.isArray(produto.priceConditions)) {
       // Ordena as condições por quantidade (maior primeiro)
       const sortedConditions = [...produto.priceConditions].sort((a, b) => b.quantity - a.quantity);
-      
       for (const condition of sortedConditions) {
         if (quantity >= condition.quantity) {
           pricePerUnit = Number(condition.pricePerUnit);
@@ -269,7 +261,6 @@ const ProdutoPage = () => {
         }
       }
     }
-
     // Cria objeto do item com as variantes selecionadas
     const itemToAdd = {
       id: produto.id,
@@ -285,23 +276,19 @@ const ProdutoPage = () => {
       // Adiciona uma chave única considerando as variantes
       uniqueKey: `${produto.id}_${JSON.stringify(selectedVariants)}`
     };
-
     setCartItemsInternal(prevCart => {
       // Verifica se já existe um item igual no carrinho (mesmo ID e mesmas variantes)
       const existingIndex = prevCart.findIndex(
         item => item.uniqueKey === itemToAdd.uniqueKey
       );
-
       if (existingIndex > -1) {
         // Atualiza quantidade se o item já existe
         const updatedCart = [...prevCart];
         const newQtd = updatedCart[existingIndex].qtd + quantity;
-        
         if (newQtd > currentStock) {
           showSnackbar(`Você já tem ${updatedCart[existingIndex].qtd} no carrinho. Limite de estoque: ${currentStock}`);
           return prevCart;
         }
-        
         updatedCart[existingIndex] = {
           ...updatedCart[existingIndex],
           qtd: newQtd
@@ -312,7 +299,6 @@ const ProdutoPage = () => {
         return [...prevCart, itemToAdd];
       }
     });
-
     showSnackbar(`${quantity} ${produto.name} adicionado ao carrinho!`);
     setQuantity(1);
   };
@@ -352,7 +338,6 @@ const ProdutoPage = () => {
     if (produto?.priceConditions && Array.isArray(produto.priceConditions)) {
       // Ordena as condições por quantidade (maior primeiro)
       const sortedConditions = [...produto.priceConditions].sort((a, b) => b.quantity - a.quantity);
-      
       for (const condition of sortedConditions) {
         if (quantity >= condition.quantity) {
           pricePerUnit = Number(condition.pricePerUnit);
@@ -405,13 +390,6 @@ const ProdutoPage = () => {
   if (!produto || !loja) {
     return (
       <>
-        {/* <NavBar
-          nomeLoja="Informação Indisponível"
-          logoUrlState=""
-          exibirLogo={false}
-          cartCount={0}
-          onCartClick={() => navigate('/')}
-        /> */}
         <Container sx={{ textAlign: 'center', mt: 10, p: 2 }}>
           <Typography variant="h6">Produto não encontrado</Typography>
           <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
@@ -425,18 +403,11 @@ const ProdutoPage = () => {
 
   return (
     <>
-      {/* <NavBar
-        nomeLoja={loja.nome}
-        logoUrlState={loja.logoUrl || ""}
-        exibirLogo={loja.exibirLogo !== false}
-        cartCount={cartItemCount}
-        onCartClick={() => navigate(`/carrinho/${loja.id}`)}
-      /> */}
       <Container maxWidth="lg" className="produto-page-container">
         <Button
           variant="text"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(`/${slug}`)} 
+          onClick={() => navigate(`/${slug}`)}
           sx={{ mb: 3, textTransform: 'none' }}
         >
           Voltar para {loja.nome}
@@ -486,7 +457,6 @@ const ProdutoPage = () => {
                 <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
                   {produto.name}
                 </Typography>
-                
                 {/* Preço e Desconto */}
                 <Box mb={2.5}>
                   <Box display="flex" alignItems="flex-end" gap={1}>
@@ -510,10 +480,9 @@ const ProdutoPage = () => {
                     </Typography>
                   )}
                 </Box>
-
                 {/* Condições de Preço */}
                 {produto.priceConditions && produto.priceConditions.length > 0 && (
-                  <Box mb={3} sx={{ backgroundColor: '#f8f9fa', p: 2, borderRadius: 1 }}>
+                  <Box mb={3} sx={{ backgroundColor: '#f8f9fa', p: 2, borderRadius: 1 }}> 
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                       <LocalOfferIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                       Descontos progressivos:
@@ -536,18 +505,15 @@ const ProdutoPage = () => {
                     </List>
                   </Box>
                 )}
-
                 {/* Variantes do Produto */}
                 {(Array.isArray(produto.variants) || (produto.variants && typeof produto.variants === 'object')) && (
                   <Box mb={3}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                       Opções disponíveis:
                     </Typography>
-                    
                     {/* Converter para array se for objeto (estrutura antiga) */}
                     {(() => {
                       let variantsToRender = [];
-                      
                       if (Array.isArray(produto.variants)) {
                         variantsToRender = produto.variants;
                       } else if (produto.variants && typeof produto.variants === 'object') {
@@ -558,14 +524,15 @@ const ProdutoPage = () => {
                           required: produto.variants.required !== false
                         }];
                       }
-                      
                       return variantsToRender.map((variant, index) => {
                         // Variante simples (apenas texto)
                         if (typeof variant === 'string') {
                           return <Chip label={variant} key={index} sx={{ mr: 1, mb: 1 }} />;
                         }
-                        
                         // Variante com opções selecionáveis
+                        if (!variant.options || !Array.isArray(variant.options) || variant.options.length === 0) {
+                          return null; // Ignora variantes inválidas
+                        }
                         return (
                           <Box key={variant.name || `variant-${index}`} sx={{ mb: 2 }}>
                             <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
@@ -609,7 +576,6 @@ const ProdutoPage = () => {
                     })()}
                   </Box>
                 )}
-
                 {/* Quantidade e Estoque */}
                 <Box mb={3}>
                   <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
@@ -626,8 +592,8 @@ const ProdutoPage = () => {
                   {!isOutOfStock && (
                     <Box display="flex" alignItems="center">
                       <Tooltip title="Diminuir quantidade">
-                        <IconButton 
-                          onClick={() => handleQuantityChange(-1)} 
+                        <IconButton
+                          onClick={() => handleQuantityChange(-1)}
                           disabled={quantity <= 1}
                           size="small"
                           sx={{ border: '1px solid', borderColor: 'divider' }}
@@ -638,8 +604,8 @@ const ProdutoPage = () => {
                       <TextField
                         value={quantity}
                         onChange={handleDirectQuantityInput}
-                        inputProps={{ 
-                          min: 1, 
+                        inputProps={{
+                          min: 1,
                           max: currentStock,
                           style: { textAlign: 'center' }
                         }}
@@ -647,8 +613,8 @@ const ProdutoPage = () => {
                         size="small"
                       />
                       <Tooltip title="Aumentar quantidade">
-                        <IconButton 
-                          onClick={() => handleQuantityChange(1)} 
+                        <IconButton
+                          onClick={() => handleQuantityChange(1)}
                           disabled={quantity >= currentStock}
                           size="small"
                           sx={{ border: '1px solid', borderColor: 'divider' }}
@@ -659,7 +625,6 @@ const ProdutoPage = () => {
                     </Box>
                   )}
                 </Box>
-
                 {/* Botões de Ação */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button
@@ -674,10 +639,10 @@ const ProdutoPage = () => {
                     {isOutOfStock ? "Esgotado" : "Adicionar ao Carrinho"}
                   </Button>
                   <Tooltip title="Compartilhar">
-                    <IconButton 
+                    <IconButton
                       onClick={handleShare}
-                      sx={{ 
-                        border: '1px solid', 
+                      sx={{
+                        border: '1px solid',
                         borderColor: 'divider',
                         borderRadius: '8px'
                       }}
@@ -689,18 +654,16 @@ const ProdutoPage = () => {
               </Box>
             </Box>
           </Box>
-          
           {/* Seções de Informações */}
           <Box mt={5}>
             <Divider sx={{ mb: 3 }} />
-            
             {/* Descrição */}
-            <Accordion 
-              expanded={expandedAccordion === 'description'} 
+            <Accordion
+              expanded={expandedAccordion === 'description'}
               onChange={handleAccordionChange('description')}
               elevation={0}
-              sx={{ 
-                border: '1px solid', 
+              sx={{
+                border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: '8px !important',
                 mb: 2
@@ -721,15 +684,14 @@ const ProdutoPage = () => {
                 )}
               </AccordionDetails>
             </Accordion>
-            
             {/* Especificações */}
             {produto.specifications && Object.keys(produto.specifications).length > 0 && (
-              <Accordion 
-                expanded={expandedAccordion === 'specs'} 
+              <Accordion
+                expanded={expandedAccordion === 'specs'}
                 onChange={handleAccordionChange('specs')}
                 elevation={0}
-                sx={{ 
-                  border: '1px solid', 
+                sx={{
+                  border: '1px solid',
                   borderColor: 'divider',
                   borderRadius: '8px !important',
                   mb: 2
