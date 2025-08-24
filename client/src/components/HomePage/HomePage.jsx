@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaStore, FaShoppingCart, FaChartLine, FaLock, FaBars, FaWhatsapp, FaCheck } from 'react-icons/fa';
+import { FaGlobe, FaUsers, FaCar, FaChartLine, FaCreditCard, FaBars, FaWhatsapp, FaCheck, FaPlane, FaHotel, FaUmbrellaBeach } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
@@ -13,7 +13,7 @@ const HomePage = () => {
     navigate('/login');
   };
 
-  const handleSignupClick = (plan = 'free') => {
+  const handleSignupClick = (plan = 'basico') => {
     navigate('/signup', { 
       state: { 
         selectedPlan: plan 
@@ -39,103 +39,112 @@ const HomePage = () => {
 
   const features = [
     {
-      icon: <FaStore />,
-      title: "Loja Personalizada",
-      description: "Crie sua loja virtual em minutos com seu próprio domínio e identidade visual"
+      icon: <FaGlobe />,
+      title: "Site Personalizado",
+      description: "Desenvolvemos seu site totalmente personalizado com identidade visual única para sua agência"
     },
     {
-      icon: <FaShoppingCart />,
-      title: "Gestão de Produtos",
-      description: "Adicione, edite e organize seus produtos com facilidade"
+      icon: <FaUsers />,
+      title: "Sistema de Clientes",
+      description: "Cadastro completo de clientes com histórico de reservas e preferências de viagem"
     },
     {
-      icon: <FaLock />,
-      title: "Pagamentos Seguros",
-      description: "Diversas opções de pagamento com segurança e confiabilidade"
+      icon: <FaCar />,
+      title: "Gestão de Motoristas",
+      description: "Controle completo da frota e motoristas com agenda de serviços e acompanhamento em tempo real"
     },
     {
       icon: <FaChartLine />,
-      title: "Relatórios Avançados",
-      description: "Acompanhe suas vendas e crescimento com dados em tempo real"
+      title: "Dashboard Inteligente",
+      description: "Acompanhe o desempenho da sua agência com relatórios detalhados e métricas importantes"
+    },
+    {
+      icon: <FaCreditCard />,
+      title: "Gestão Financeira",
+      description: "Controle de pagamentos, comissões e finanças da sua agência de forma integrada"
     }
   ];
 
   const plans = [
     {
-      name: "Free",
-      price: "R$0",
+      name: "Básico",
+      price: "R$149",
       period: "/mês",
-      icon: <FaStore />,
+      icon: <FaGlobe />,
       features: [
-        "Até 30 produtos",
-        "Certificado SSL",
-        "Gerenciamento de estoque",
+        "Site personalizado",
+        "Até 100 clientes",
+        "5 motoristas",
+        "Gestão de reservas básica",
+        "Relatórios simples",
         "Suporte por email"
       ],
-      ctaText: "Começar Gratuitamente",
+      ctaText: "Contratar Agora",
       featured: false
     },
     {
-      name: "Plus",
-      price: "R$39,90",
+      name: "Completo",
+      price: "R$299",
       period: "/mês",
-      icon: <FaShoppingCart />,
+      icon: <FaUsers />,
       features: [
-        "Até 300 produtos",
-        "Certificado SSL",
-        "Gerenciamento de estoque",
-        "Registro de vendas",
-        "Relatórios completos",
+        "Site premium personalizado",
+        "Clientes ilimitados",
+        "Motoristas ilimitados",
+        "Sistema de reservas avançado",
+        "Dashboard completo",
+        "Gestão financeira integrada",
+        "Integração com pagamentos",
         "Suporte prioritário",
-        "7 dias grátis"
+        "7 dias grátis para teste"
       ],
       ctaText: "Testar Grátis",
       featured: true
     },
     {
-      name: "Premium",
-      price: "R$99,90",
-      period: "/mês",
+      name: "Enterprise",
+      price: "Sob consulta",
+      period: "",
       icon: <FaChartLine />,
       features: [
-        "Produtos ilimitados",
-        "Certificado SSL",
-        "Gerenciamento de estoque",
-        "Registro de vendas",
-        "Relatórios avançados",
-        "Suporte 24/7",
-        "7 dias grátis",
-        "Consultoria mensal"
+        "Solução personalizada",
+        "Múltiplas agências",
+        "Relatórios avançados personalizados",
+        "API completa",
+        "Integrações específicas",
+        "Suporte 24/7 dedicado",
+        "Treinamento da equipe",
+        "Consultoria especializada"
       ],
-      ctaText: "Testar Grátis",
+      ctaText: "Falar com Vendas",
       featured: false
     }
   ];
 
   const clients = [
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" },
-    { name: "BenCommerce", logo: "/Ben.png" }
+    { name: "Sunset Turismo", logo: "/client1.png" },
+    { name: "Viagem & Cia", logo: "/client2.png" },
+    { name: "Paraíso Travel", logo: "/client3.png" },
+    { name: "Horizonte Turismo", logo: "/client4.png" },
+    { name: "Mares do Sul", logo: "/client5.png" },
+    { name: "Trilhas Adventure", logo: "/client6.png" },
+    { name: "EuroTravel", logo: "/client7.png" },
+    { name: "Brasil Destinos", logo: "/client8.png" }
   ];
 
   return (
     <div className="homepage-container">
       {/* Navbar */}
       <nav className="homepage-navbar">
-        <div className="homepage-navbar-logo" onClick={() => navigate('/')}>BenCommerce</div>
+        <div className="homepage-navbar-logo" onClick={() => navigate('/')}>MabelSoft</div>
         {/* Menu Desktop */}
         <ul className="homepage-nav-links">
           <li className="homepage-nav-link" onClick={() => navigate('/')}>Início</li>
-          <li className="homepage-nav-link" onClick={() => navigate('/recursos')}>Recursos</li>
+          <li className="homepage-nav-link" onClick={() => navigate('/solucoes')}>Soluções</li>
           <li className="homepage-nav-link" onClick={() => navigate('/planos')}>Planos</li>
           <li className="homepage-nav-link" onClick={() => navigate('/contato')}>Contato</li>
           <li className="homepage-nav-link" onClick={handleLoginClick}>Login</li>
-          <li className="homepage-nav-button" onClick={() => handleSignupClick('free')}>Teste Grátis</li>
+          <li className="homepage-nav-button" onClick={() => handleSignupClick('completo')}>Demonstração</li>
         </ul>
         {/* Botão do menu mobile */}
         <button className="homepage-mobile-menu-button toggle-button" onClick={toggleMobileMenu}>
@@ -146,11 +155,11 @@ const HomePage = () => {
           <div className="homepage-mobile-menu">
             <ul className="homepage-mobile-menu-list">
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/'); setMobileMenuOpen(false); }}>Início</li>
-              <li className="homepage-mobile-menu-item" onClick={() => { navigate('/recursos'); setMobileMenuOpen(false); }}>Recursos</li>
+              <li className="homepage-mobile-menu-item" onClick={() => { navigate('/solucoes'); setMobileMenuOpen(false); }}>Soluções</li>
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/planos'); setMobileMenuOpen(false); }}>Planos</li>
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/contato'); setMobileMenuOpen(false); }}>Contato</li>
               <li className="homepage-mobile-menu-item" onClick={() => { handleLoginClick(); setMobileMenuOpen(false); }}>Login</li>
-              <li className="homepage-mobile-menu-button teste-toggle" onClick={() => { handleSignupClick('free'); setMobileMenuOpen(false); }}>Teste Grátis</li>
+              <li className="homepage-mobile-menu-button teste-toggle" onClick={() => { handleSignupClick('completo'); setMobileMenuOpen(false); }}>Demonstração</li>
             </ul>
           </div>
         )}
@@ -166,20 +175,20 @@ const HomePage = () => {
         </div>
         
         <div className="homepage-hero-content">
-          <h1 className="homepage-hero-title">Monte sua loja virtual em minutos</h1>
-          <p className="homepage-hero-subtitle">A plataforma mais simples para você vender online. Sem complicação, sem mensalidade escondida.</p>
+          <h1 className="homepage-hero-title">Sistema completo para sua agência de turismo</h1>
+          <p className="homepage-hero-subtitle">Site personalizado, gestão de clientes, motoristas e reservas em uma única plataforma. Tudo que você precisa para expandir seu negócio.</p>
           <div className="homepage-hero-buttons">
             <button 
-              onClick={() => handleSignupClick('plus')}
+              onClick={() => handleSignupClick('completo')}
               className="homepage-hero-primary-button"
             >
-              Comece Agora
+              Solicitar Demonstração
             </button>
             <button 
-              onClick={() => navigate('/demo')}
+              onClick={() => navigate('/solucoes')}
               className="homepage-hero-secondary-button"
             >
-              Ver Demo
+              Conhecer Soluções
             </button>
           </div>
         </div>
@@ -188,7 +197,7 @@ const HomePage = () => {
       {/* Features Section */}
       <section className="homepage-features">
         <div className="homepage-features-container">
-          <h2 className="homepage-features-title">Tudo que você precisa para vender online</h2>
+          <h2 className="homepage-features-title">Sistema três em um para agências de turismo</h2>
           
           <div className="homepage-features-tabs">
             {features.map((feature, index) => (
@@ -214,7 +223,7 @@ const HomePage = () => {
                 <p className="homepage-feature-description">{features[activeFeature].description}</p>
                 <button 
                   className="homepage-feature-button"
-                  onClick={() => navigate('/recursos')}
+                  onClick={() => navigate('/solucoes')}
                 >
                   Saiba mais
                 </button>
@@ -224,10 +233,51 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* System Overview Section */}
+      <section className="homepage-system-overview">
+        <div className="homepage-system-container">
+          <h2 className="homepage-system-title">Como funciona nosso sistema integrado</h2>
+          
+          <div className="homepage-system-cards">
+            <div className="homepage-system-card">
+              <div className="homepage-system-card-icon">
+                <FaGlobe />
+              </div>
+              <h3>Site Personalizado</h3>
+              <p>Seu site com design exclusivo para apresentar serviços, destinos e pacotes promocionais.</p>
+            </div>
+            
+            <div className="homepage-system-card">
+              <div className="homepage-system-card-icon">
+                <FaUsers />
+              </div>
+              <h3>Dashboard do Proprietário</h3>
+              <p>Controle completo da operação: finanças, relatórios, funcionários e desempenho geral.</p>
+            </div>
+            
+            <div className="homepage-system-card">
+              <div className="homepage-system-card-icon">
+                <FaCar />
+              </div>
+              <h3>Portal do Motorista</h3>
+              <p>Aplicativo dedicado para motoristas com agenda de serviços, navegação e gestão de pagamentos.</p>
+            </div>
+            
+            <div className="homepage-system-card">
+              <div className="homepage-system-card-icon">
+                <FaUmbrellaBeach />
+              </div>
+              <h3>Área do Cliente</h3>
+              <p>Espaço para clientes agendarem serviços, acompanharem reservas e histórico de viagens.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Clients Section */}
       <section className="homepage-clients">
         <div className="homepage-clients-container">
-          <h2 className="homepage-clients-title">Clientes que confiam em nossa plataforma</h2>
+          <h2 className="homepage-clients-title">Agências que confiam na MabelSoft</h2>
           
           <div className="homepage-clients-row">
             <div className="homepage-clients-track">
@@ -264,8 +314,8 @@ const HomePage = () => {
       {/* Plans Section */}
       <section className="homepage-plans">
         <div className="homepage-plans-container">
-          <h2 className="homepage-plans-title">Planos que cabem no seu bolso</h2>
-          <p className="homepage-plans-subtitle">Escolha o plano ideal para o seu negócio e comece a vender online hoje mesmo</p>
+          <h2 className="homepage-plans-title">Planos para todos os tamanhos de agência</h2>
+          <p className="homepage-plans-subtitle">Escolha a solução ideal para o seu negócio e potencialize suas operações</p>
           
           <div className="homepage-plans-grid">
             {plans.map((plan, index) => (
@@ -329,10 +379,10 @@ const HomePage = () => {
               <div className="homepage-testimonial-avatar">
                 <img src="/api/placeholder/80/80" alt="Cliente" />
               </div>
-              <p className="homepage-testimonial-text">"Aumentei minhas vendas em 200% no primeiro mês usando a plataforma BenCommerce. O sistema é muito fácil de usar e o suporte é excelente!"</p>
+              <p className="homepage-testimonial-text">"Desde que implementamos o sistema MabelSoft, nossa agência aumentou em 40% a eficiência nas reservas e reduzimos em 60% os erros operacionais. O suporte é excelente!"</p>
               <div>
-                <p className="homepage-testimonial-author">Maria Silva</p>
-                <p className="homepage-testimonial-company">Boutique Elegance</p>
+                <p className="homepage-testimonial-author">Carlos Mendonça</p>
+                <p className="homepage-testimonial-company">Sunset Turismo</p>
               </div>
             </div>
           </div>
@@ -347,18 +397,18 @@ const HomePage = () => {
         </div>
         
         <div className="homepage-cta-content">
-          <h2 className="homepage-cta-title">Pronto para começar a vender?</h2>
+          <h2 className="homepage-cta-title">Pronto para modernizar sua agência?</h2>
           <p className="homepage-cta-text">
-            Crie sua conta agora e tenha sua loja virtual funcionando em poucos minutos.
-            Sem necessidade de cartão de crédito para começar.
+            Agende uma demonstração gratuita e descubra como nosso sistema pode transformar sua operação.
+            Sem compromisso e adaptado às suas necessidades.
           </p>
           <button 
-            onClick={() => handleSignupClick('plus')}
+            onClick={() => handleSignupClick('completo')}
             className="homepage-cta-button"
           >
-            Criar Minha Loja Grátis
+            Agendar Demonstração
           </button>
-          <p className="homepage-cta-subtext">Mais de 10.000 lojas já criadas em nossa plataforma</p>
+          <p className="homepage-cta-subtext">Mais de 200 agências já utilizam nossa plataforma</p>
         </div>
       </section>
 
@@ -366,9 +416,9 @@ const HomePage = () => {
       <footer className="homepage-footer">
         <div className="homepage-footer-container">
           <div className="homepage-footer-brand-section">
-            <div className="homepage-footer-brand">BenCommerce</div>
+            <div className="homepage-footer-brand">MabelSoft</div>
             <p className="homepage-footer-description">
-              Plataforma completa para criação de lojas virtuais. Simples, rápido e acessível.
+              Soluções tecnológicas completas para agências de turismo. Sites personalizados e sistema de gestão integrado.
             </p>
             <div className="homepage-footer-social">
               <a href="#!" className="homepage-footer-social-link">
@@ -390,10 +440,10 @@ const HomePage = () => {
             <h3 className="homepage-footer-title">Links Rápidos</h3>
             <ul className="homepage-footer-links">
               <li><a href="/sobre" className="homepage-footer-link">Sobre nós</a></li>
-              <li><a href="/recursos" className="homepage-footer-link">Recursos</a></li>
-              <li><a href="/planos" className="homepage-footer-link">Preços</a></li>
+              <li><a href="/solucoes" className="homepage-footer-link">Soluções</a></li>
+              <li><a href="/planos" className="homepage-footer-link">Planos</a></li>
               <li><a href="/blog" className="homepage-footer-link">Blog</a></li>
-              <li><a href="/carreiras" className="homepage-footer-link">Carreiras</a></li>
+              <li><a href="/parceiros" className="homepage-footer-link">Seja um Parceiro</a></li>
             </ul>
           </div>
           
@@ -401,10 +451,10 @@ const HomePage = () => {
             <h3 className="homepage-footer-title">Suporte</h3>
             <ul className="homepage-footer-links">
               <li><a href="/ajuda" className="homepage-footer-link">Central de Ajuda</a></li>
-              <li><a href="/tutorial" className="homepage-footer-link">Tutorial</a></li>
+              <li><a href="/tutoriais" className="homepage-footer-link">Tutoriais</a></li>
               <li><a href="/faq" className="homepage-footer-link">FAQ</a></li>
               <li><a href="/contato" className="homepage-footer-link">Contato</a></li>
-              <li><a href="/status" className="homepage-footer-link">Status</a></li>
+              <li><a href="/status" className="homepage-footer-link">Status do Sistema</a></li>
             </ul>
           </div>
           
@@ -413,22 +463,22 @@ const HomePage = () => {
             <ul className="homepage-footer-contact">
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span className="homepage-footer-contact-text">contato@BenCommerce.com.br</span>
+                <span className="homepage-footer-contact-text">contato@mabelsoft.com.br</span>
               </li>
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                <span className="homepage-footer-contact-text">(11) 4002-8922</span>
+                <span className="homepage-footer-contact-text">(11) 3345-6789</span>
               </li>
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span className="homepage-footer-contact-text">Av. Paulista, 1000<br />São Paulo, SP</span>
+                <span className="homepage-footer-contact-text">Av. Brigadeiro Faria Lima, 1500<br />São Paulo, SP</span>
               </li>
             </ul>
           </div>
         </div>
         
         <div className="homepage-footer-bottom">
-          <p className="homepage-footer-copyright">© 2025 BenCommerce. Todos os direitos reservados.</p>
+          <p className="homepage-footer-copyright">© 2025 MabelSoft. Todos os direitos reservados.</p>
           <div className="homepage-footer-legal">
             <a href="/termos" className="homepage-footer-legal-link">Termos de Uso</a>
             <a href="/privacidade" className="homepage-footer-legal-link">Privacidade</a>
@@ -461,10 +511,10 @@ const HomePage = () => {
                 <svg className="homepage-whatsapp-notification-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
-            <p className="homepage-whatsapp-notification-message">Olá! Como posso ajudar você hoje?</p>
+            <p className="homepage-whatsapp-notification-message">Olá! Como posso ajudar sua agência hoje?</p>
             <button
               className="homepage-whatsapp-notification-button"
-              onClick={() => window.open('https://wa.me/5585991470709', '_blank')}
+              onClick={() => window.open('https://wa.me/551133456789', '_blank')}
             >
               Iniciar Conversa
             </button>
