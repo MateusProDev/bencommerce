@@ -1,9 +1,8 @@
 // App.js
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { useState, useEffect } from "react";
 import { db } from './firebaseConfig';
 import { Spinner } from 'react-bootstrap';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -20,13 +19,15 @@ import LojinhaPreview from './components/LojinhaPreview/LojinhaPreview';
 import CategoriaPage from "./components/Lojinha/CategoriaPage/CategoriaPage";
 import ProdutoPage from "./components/Lojinha/ProdutoPage/ProdutoPage";
 import ProdutosPage from "./pages/ProdutosPage";
+import ContactFunnel from './components/ContactFunnel/ContactFunnel';
+import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
 
 // Utils
 import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
 
 // Context
 import { CategoriasProvider } from "./context/CategoriasContext";
-import { UserPlanProvider } from "./context/UserPlanContext"; // Import the UserPlanProvider
+import { UserPlanProvider } from "./context/UserPlanContext";
 
 // Componente de rota protegida
 const ProtectedRoute = ({ user, children }) => {
@@ -116,6 +117,8 @@ const AppContent = () => {
       <Routes location={location}>
         {/* Rotas públicas */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/contato" element={<ContactFunnelPage />} />
+        <Route path="/contato/:plan" element={<ContactFunnelPage />} />
 
         {/* Rotas de autenticação */}
         <Route

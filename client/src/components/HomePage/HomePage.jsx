@@ -1,24 +1,19 @@
+// components/HomePage/HomePage.js (atualizado)
 import React, { useState, useEffect } from 'react';
 import { FaGlobe, FaUsers, FaCar, FaChartLine, FaCreditCard, FaBars, FaWhatsapp, FaCheck, FaPlane, FaHotel, FaUmbrellaBeach } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import useContactFunnel from '../../hooks/useContactFunnel';
 import './HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { openContactFunnel } = useContactFunnel();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showWhatsappNotification, setShowWhatsappNotification] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
 
   const handleLoginClick = () => {
     navigate('/login');
-  };
-
-  const handleSignupClick = (plan = 'basico') => {
-    navigate('/signup', { 
-      state: { 
-        selectedPlan: plan 
-      } 
-    });
   };
 
   const toggleMobileMenu = () => {
@@ -77,7 +72,7 @@ const HomePage = () => {
         "5 motoristas",
         "Gestão de reservas básica",
         "Relatórios simples",
-        "Suporte por email"
+        "Suporte horário comercial"
       ],
       ctaText: "Contratar Agora",
       featured: false
@@ -122,14 +117,14 @@ const HomePage = () => {
   ];
 
   const clients = [
-    { name: "Sunset Turismo", logo: "/client1.png" },
-    { name: "Viagem & Cia", logo: "/client2.png" },
-    { name: "Paraíso Travel", logo: "/client3.png" },
-    { name: "Horizonte Turismo", logo: "/client4.png" },
-    { name: "Mares do Sul", logo: "/client5.png" },
-    { name: "Trilhas Adventure", logo: "/client6.png" },
-    { name: "EuroTravel", logo: "/client7.png" },
-    { name: "Brasil Destinos", logo: "/client8.png" }
+    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
+    { name: "Lisboatur", logo: "/lisboa.png" },
+    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
+    { name: "Lisboatur", logo: "/lisboa.png" },
+    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
+    { name: "Lisboatur", logo: "/lisboa.png" },
+    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
+    { name: "Lisboatur", logo: "/lisboa.png" }
   ];
 
   return (
@@ -138,13 +133,13 @@ const HomePage = () => {
       <nav className="homepage-navbar">
         <div className="homepage-navbar-logo" onClick={() => navigate('/')}>MabelSoft</div>
         {/* Menu Desktop */}
-        <ul className="homepage-nav-links">
+        <ul className="homepage-nav-links" style={{ listStyleType: 'none', paddingLeft: 0 }}>
           <li className="homepage-nav-link" onClick={() => navigate('/')}>Início</li>
           <li className="homepage-nav-link" onClick={() => navigate('/solucoes')}>Soluções</li>
           <li className="homepage-nav-link" onClick={() => navigate('/planos')}>Planos</li>
-          <li className="homepage-nav-link" onClick={() => navigate('/contato')}>Contato</li>
+          <li className="homepage-nav-link" onClick={() => openContactFunnel()}>Contato</li>
           <li className="homepage-nav-link" onClick={handleLoginClick}>Login</li>
-          <li className="homepage-nav-button" onClick={() => handleSignupClick('completo')}>Demonstração</li>
+          <li className="homepage-nav-button" onClick={() => openContactFunnel('completo')}>Demonstração</li>
         </ul>
         {/* Botão do menu mobile */}
         <button className="homepage-mobile-menu-button toggle-button" onClick={toggleMobileMenu}>
@@ -153,13 +148,13 @@ const HomePage = () => {
         {/* Menu Mobile */}
         {mobileMenuOpen && (
           <div className="homepage-mobile-menu">
-            <ul className="homepage-mobile-menu-list">
+            <ul className="homepage-mobile-menu-list" style={{ listStyleType: 'none', paddingLeft: 0 }}>
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/'); setMobileMenuOpen(false); }}>Início</li>
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/solucoes'); setMobileMenuOpen(false); }}>Soluções</li>
               <li className="homepage-mobile-menu-item" onClick={() => { navigate('/planos'); setMobileMenuOpen(false); }}>Planos</li>
-              <li className="homepage-mobile-menu-item" onClick={() => { navigate('/contato'); setMobileMenuOpen(false); }}>Contato</li>
+              <li className="homepage-mobile-menu-item" onClick={() => { openContactFunnel(); setMobileMenuOpen(false); }}>Contato</li>
               <li className="homepage-mobile-menu-item" onClick={() => { handleLoginClick(); setMobileMenuOpen(false); }}>Login</li>
-              <li className="homepage-mobile-menu-button teste-toggle" onClick={() => { handleSignupClick('completo'); setMobileMenuOpen(false); }}>Demonstração</li>
+              <li className="homepage-mobile-menu-button teste-toggle" onClick={() => { openContactFunnel('completo'); setMobileMenuOpen(false); }}>Demonstração</li>
             </ul>
           </div>
         )}
@@ -179,13 +174,13 @@ const HomePage = () => {
           <p className="homepage-hero-subtitle">Site personalizado, gestão de clientes, motoristas e reservas em uma única plataforma. Tudo que você precisa para expandir seu negócio.</p>
           <div className="homepage-hero-buttons">
             <button 
-              onClick={() => handleSignupClick('completo')}
+              onClick={() => openContactFunnel('completo')}
               className="homepage-hero-primary-button"
             >
               Solicitar Demonstração
             </button>
             <button 
-              onClick={() => navigate('/solucoes')}
+              onClick={() => openContactFunnel('completo')}
               className="homepage-hero-secondary-button"
             >
               Conhecer Soluções
@@ -223,7 +218,7 @@ const HomePage = () => {
                 <p className="homepage-feature-description">{features[activeFeature].description}</p>
                 <button 
                   className="homepage-feature-button"
-                  onClick={() => navigate('/solucoes')}
+                  onClick={() => openContactFunnel('completo')}
                 >
                   Saiba mais
                 </button>
@@ -245,6 +240,12 @@ const HomePage = () => {
               </div>
               <h3>Site Personalizado</h3>
               <p>Seu site com design exclusivo para apresentar serviços, destinos e pacotes promocionais.</p>
+              <button 
+                className="homepage-system-card-button"
+                onClick={() => openContactFunnel('basico')}
+              >
+                Solicitar Site
+              </button>
             </div>
             
             <div className="homepage-system-card">
@@ -253,6 +254,12 @@ const HomePage = () => {
               </div>
               <h3>Dashboard do Proprietário</h3>
               <p>Controle completo da operação: finanças, relatórios, funcionários e desempenho geral.</p>
+              <button 
+                className="homepage-system-card-button"
+                onClick={() => openContactFunnel('completo')}
+              >
+                Ver Demo
+              </button>
             </div>
             
             <div className="homepage-system-card">
@@ -261,6 +268,12 @@ const HomePage = () => {
               </div>
               <h3>Portal do Motorista</h3>
               <p>Aplicativo dedicado para motoristas com agenda de serviços, navegação e gestão de pagamentos.</p>
+              <button 
+                className="homepage-system-card-button"
+                onClick={() => openContactFunnel('completo')}
+              >
+                Conhecer
+              </button>
             </div>
             
             <div className="homepage-system-card">
@@ -269,6 +282,12 @@ const HomePage = () => {
               </div>
               <h3>Área do Cliente</h3>
               <p>Espaço para clientes agendarem serviços, acompanharem reservas e histórico de viagens.</p>
+              <button 
+                className="homepage-system-card-button"
+                onClick={() => openContactFunnel('completo')}
+              >
+                Experimentar
+              </button>
             </div>
           </div>
         </div>
@@ -358,7 +377,7 @@ const HomePage = () => {
                   
                   <button 
                     className={`homepage-plan-button ${plan.featured ? 'homepage-plan-button-featured' : 'homepage-plan-button-regular'}`}
-                    onClick={() => handleSignupClick(plan.name.toLowerCase())}
+                    onClick={() => openContactFunnel(plan.name.toLowerCase())}
                   >
                     {plan.ctaText}
                   </button>
@@ -384,6 +403,12 @@ const HomePage = () => {
                 <p className="homepage-testimonial-author">Carlos Mendonça</p>
                 <p className="homepage-testimonial-company">Sunset Turismo</p>
               </div>
+              <button 
+                className="homepage-testimonial-button"
+                onClick={() => openContactFunnel('completo')}
+              >
+                Quero resultados similares
+              </button>
             </div>
           </div>
         </div>
@@ -403,7 +428,7 @@ const HomePage = () => {
             Sem compromisso e adaptado às suas necessidades.
           </p>
           <button 
-            onClick={() => handleSignupClick('completo')}
+            onClick={() => openContactFunnel('completo')}
             className="homepage-cta-button"
           >
             Agendar Demonstração
@@ -438,7 +463,7 @@ const HomePage = () => {
           
           <div className="homepage-footer-links-section">
             <h3 className="homepage-footer-title">Links Rápidos</h3>
-            <ul className="homepage-footer-links">
+            <ul className="homepage-footer-links" style={{ listStyleType: 'none', paddingLeft: 0 }}>
               <li><a href="/sobre" className="homepage-footer-link">Sobre nós</a></li>
               <li><a href="/solucoes" className="homepage-footer-link">Soluções</a></li>
               <li><a href="/planos" className="homepage-footer-link">Planos</a></li>
@@ -449,7 +474,7 @@ const HomePage = () => {
           
           <div className="homepage-footer-support-section">
             <h3 className="homepage-footer-title">Suporte</h3>
-            <ul className="homepage-footer-links">
+            <ul className="homepage-footer-links" style={{ listStyleType: 'none', paddingLeft: 0 }}>
               <li><a href="/ajuda" className="homepage-footer-link">Central de Ajuda</a></li>
               <li><a href="/tutoriais" className="homepage-footer-link">Tutoriais</a></li>
               <li><a href="/faq" className="homepage-footer-link">FAQ</a></li>
@@ -460,7 +485,7 @@ const HomePage = () => {
           
           <div className="homepage-footer-contact-section">
             <h3 className="homepage-footer-title">Contato</h3>
-            <ul className="homepage-footer-contact">
+            <ul className="homepage-footer-contact" style={{ listStyleType: 'none', paddingLeft: 0 }}>
               <li className="homepage-footer-contact-item">
                 <svg className="homepage-footer-contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 <span className="homepage-footer-contact-text">contato@mabelsoft.com.br</span>
