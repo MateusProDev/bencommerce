@@ -24,6 +24,7 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [countdown, setCountdown] = useState(10);
 
   // Configuração dos campos do formulário
   const formConfig = {
@@ -152,6 +153,7 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
       });
       setErrors({});
       setIsSubmitted(false);
+      setCountdown(10);
     }
  }, [isOpen, initialPlan]);
 
@@ -225,11 +227,19 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
         
         setIsSubmitting(false);
         setIsSubmitted(true);
+        setCountdown(10);
         
-        // Limpar formulário após sucesso
-        setTimeout(() => {
-          onClose();
-        }, 3000);
+        // Contador regressivo
+        const countdownInterval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(countdownInterval);
+              onClose();
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
       } catch (error) {
         console.error('Erro ao salvar no Firebase:', error);
         setIsSubmitting(false);
@@ -255,7 +265,22 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
       });
       setErrors({});
       setIsSubmitted(false);
+      setCountdown(10);
       onClose();
+    }
+  };
+
+  // Função para obter o nome formatado do plano
+  const getPlanName = (planValue) => {
+    switch (planValue) {
+      case 'basico':
+        return 'Básico - R$ 149/mês';
+      case 'completo':
+        return 'Completo - R$ 299/mês';
+      case 'enterprise':
+        return 'Enterprise - Sob consulta';
+      default:
+        return 'Não informado';
     }
   };
 
@@ -298,7 +323,6 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
               {field.label} {field.required && <span className="required">*</span>}
             </label>
             <div className="select-with-icon">
-              <IconComponent className="select-icon" />
               <select
                 name={field.name}
                 value={formData[field.name]}
@@ -311,6 +335,7 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
                   </option>
                 ))}
               </select>
+              <IconComponent className="select-icon" />
             </div>
             {errors[field.name] && <span className="error-message">{errors[field.name]}</span>}
           </div>
@@ -339,7 +364,6 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
               {field.label} {field.required && <span className="required">*</span>}
             </label>
             <div className="input-with-icon">
-              <IconComponent className="input-icon" />
               <input
                 type={field.type}
                 name={field.name}
@@ -348,6 +372,7 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
                 onChange={handleInputChange}
                 className={`form-input ${errors[field.name] ? 'error' : ''}`}
               />
+              <IconComponent className="input-icon" />
             </div>
             {errors[field.name] && <span className="error-message">{errors[field.name]}</span>}
           </div>
@@ -370,7 +395,11 @@ const ContactFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
             Nossa equipe entrará em contato em até 24 horas pelo WhatsApp ou e-mail fornecido.
           </p>
           <div className="success-details">
-            <p>Plano selecionado: <strong>{formData.plan === 'basico' ? 'Básico' : formData.plan === 'completo' ? 'Completo' : 'Enterprise'}</strong></p>
+            <p><strong>Resumo da sua solicitação:</strong></p>
+            <p>📋 Plano selecionado: <strong>{getPlanName(formData.plan)}</strong></p>
+            {formData.company && <p>🏢 Agência: <strong>{formData.company}</strong></p>}
+            {formData.employees && <p>👥 Funcionários: <strong>{formData.employees}</strong></p>}
+            <p className="success-note">Esta janela fechará automaticamente em <strong>{countdown}</strong> segundos ou clique em "Fechar".</p>
           </div>
           <button 
             type="button" 
