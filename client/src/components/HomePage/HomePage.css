@@ -145,7 +145,7 @@ section, footer {
 
 @media (min-width: 768px) {
   .homepage-nav-links {
-    display: flex;
+    display: flex !important;
     gap: 1.5rem;
     align-items: center;
   }
@@ -157,6 +157,11 @@ section, footer {
     background-color: transparent;
     width: auto;
     padding: 0;
+  }
+
+  .homepage-mobile-menu-button,
+  .homepage-mobile-menu-button.toggle-button {
+    display: none !important;
   }
 }
 
@@ -205,11 +210,7 @@ section, footer {
   transform: scale(1.05);
 }
 
-@media (min-width: 768px) {
-  .homepage-mobile-menu-button {
-    display: none;
-  }
-}
+
 
 .homepage-mobile-menu {
   position: fixed;
