@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import ProductSection from "../components/Lojinha/ProductSection/ProductSection";
 import { useAuth } from "../utils/useAuth"; // Importação
+import Loading from "../components/Loading";
 
 const ProdutosPage = ({ lojaId }) => {
   const { user, loading } = useAuth(); // Uso do hook
@@ -31,7 +32,7 @@ const ProdutosPage = ({ lojaId }) => {
     fetchAll();
   }, [lojaId]);
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <Loading text="Carregando produtos..." size="large" />;
   if (!user) return <div>Você não está autenticado.</div>;
 
   return (

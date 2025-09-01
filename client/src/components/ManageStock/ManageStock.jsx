@@ -1,5 +1,6 @@
 // ManageStock.js
 import React, { useState, useMemo } from "react";
+import Loading from '../Loading';
 import {
   Button,
   Grid,
@@ -162,7 +163,7 @@ const ManageStock = ({ products, setProducts, lojaId }) => {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
         <CircularProgress />
-        <Typography sx={{ ml: 2 }}>Carregando informações do plano...</Typography>
+        <Loading text="Carregando informações do plano..." size="medium" />
       </Box>
     );
   }

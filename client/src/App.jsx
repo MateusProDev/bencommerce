@@ -6,6 +6,7 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import { db } from './firebaseConfig';
 import { Spinner } from 'react-bootstrap';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Loading from './components/Loading';
 
 // Components
 import HomePage from './components/HomePage/HomePage';
@@ -58,7 +59,7 @@ function LojinhaPage() {
     fetchLojaId();
   }, [slug]);
 
-  if (loading) return <div>Carregando loja...</div>;
+  if (loading) return <Loading text="Carregando loja..." size="large" />;
   if (!lojaId) return <div>Loja não encontrada.</div>;
   return <Lojinha lojaId={lojaId} />;
 }
@@ -104,10 +105,8 @@ const AppContent = () => {
   // Mostra um spinner enquanto verifica o status de autenticação
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" role="status">
-          <span className="visually-hidden">Carregando...</span>
-        </Spinner>
+      <div className="loading-overlay">
+        <Loading text="Inicializando aplicação..." size="large" />
       </div>
     );
   }

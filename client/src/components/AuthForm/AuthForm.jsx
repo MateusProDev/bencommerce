@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import Loading from '../Loading';
 import './AuthForm.css';
 
 const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
@@ -270,7 +271,7 @@ const AuthForm = ({ initialMode = 'login', onLoginSuccess }) => {
             className="google-button w-100"
           >
             <FaGoogle className="me-2" />
-            {loadingProvider ? 'Carregando...' : 'Entrar com Google'}
+            {loadingProvider ? <Loading text="" size="small" /> : 'Entrar com Google'}
           </button>
         )}
       </div>
