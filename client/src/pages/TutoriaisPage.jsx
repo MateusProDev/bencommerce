@@ -10,93 +10,93 @@ const TutoriaisPage = () => {
   const tutoriais = [
     {
       id: 1,
-      titulo: 'Como criar sua primeira loja online',
+      titulo: 'Como criar sua primeira agência de turismo digital',
       categoria: 'primeiros-passos',
       nivel: 'iniciante',
       duracao: '15 min',
       views: '12.5k',
       thumbnail: '🚀',
-      descricao: 'Aprenda passo a passo como criar sua primeira loja online do zero',
+      descricao: 'Aprenda passo a passo como criar sua primeira agência de turismo digital',
       topicos: [
         'Criando sua conta',
-        'Configuração inicial',
-        'Adicionando produtos',
-        'Publicando sua loja'
+        'Configuração inicial da agência',
+        'Cadastrando informações básicas',
+        'Publicando sua agência online'
       ]
     },
     {
       id: 2,
-      titulo: 'Configurando métodos de pagamento',
-      categoria: 'pagamentos',
+      titulo: 'Sistema de Reservas: Configuração Completa',
+      categoria: 'reservas',
       nivel: 'intermediario',
       duracao: '20 min',
       views: '8.3k',
-      thumbnail: '💳',
-      descricao: 'Configure Stripe, PagSeguro e outros métodos de pagamento',
+      thumbnail: '�',
+      descricao: 'Configure o sistema de reservas para otimizar suas vendas',
       topicos: [
-        'Configurando Stripe',
-        'Integrando PagSeguro',
-        'Configurando PIX',
-        'Testando pagamentos'
+        'Configurando calendário',
+        'Definindo disponibilidade',
+        'Criando pacotes turísticos',
+        'Testando reservas'
       ]
     },
     {
       id: 3,
-      titulo: 'Personalizando design da sua loja',
-      categoria: 'design',
+      titulo: 'Gestão de Motoristas e Veículos',
+      categoria: 'motoristas',
       nivel: 'intermediario',
       duracao: '25 min',
       views: '9.7k',
-      thumbnail: '🎨',
-      descricao: 'Deixe sua loja com sua identidade visual',
+      thumbnail: '🚗',
+      descricao: 'Aprenda a gerenciar motoristas e veículos de forma eficiente',
       topicos: [
-        'Escolhendo cores',
-        'Adicionando logo',
-        'Configurando banners',
-        'Customizando footer'
+        'Cadastro de motoristas',
+        'Documentação necessária',
+        'Agendamento de viagens',
+        'Controle de quilometragem'
       ]
     },
     {
       id: 4,
-      titulo: 'SEO para lojas online',
+      titulo: 'Marketing Digital para Agências de Turismo',
       categoria: 'marketing',
       nivel: 'avancado',
       duracao: '30 min',
       views: '6.2k',
       thumbnail: '📈',
-      descricao: 'Otimize sua loja para aparecer no Google',
+      descricao: 'Estratégias de marketing para atrair mais clientes',
       topicos: [
-        'Meta tags essenciais',
-        'URLs amigáveis',
-        'Sitemap e robots.txt',
-        'Google Analytics'
+        'SEO para turismo',
+        'Google Ads para agências',
+        'Marketing em redes sociais',
+        'Email marketing turístico'
       ]
     },
     {
       id: 5,
-      titulo: 'Gestão avançada de estoque',
-      categoria: 'produtos',
+      titulo: 'Relatórios Financeiros e Análises',
+      categoria: 'relatorios',
       nivel: 'avancado',
       duracao: '35 min',
       views: '4.8k',
-      thumbnail: '📦',
-      descricao: 'Controle total do seu estoque e variações',
+      thumbnail: '�',
+      descricao: 'Controle financeiro completo da sua agência',
       topicos: [
-        'Produtos com variações',
-        'Controle automático',
-        'Alertas de estoque baixo',
-        'Relatórios detalhados'
+        'Dashboard financeiro',
+        'Relatórios mensais',
+        'Análise de lucratividade',
+        'Métricas importantes'
       ]
     },
     {
       id: 6,
-      titulo: 'Integrações com redes sociais',
-      categoria: 'marketing',
+      titulo: 'Atendimento ao Cliente Eficiente',
+      categoria: 'atendimento',
       nivel: 'intermediario',
       duracao: '18 min',
       views: '7.1k',
-      thumbnail: '📱',
-      descricao: 'Conecte sua loja com Instagram, Facebook e WhatsApp',
+      thumbnail: '�',
+      descricao: 'Como oferecer um atendimento excepcional aos seus clientes',
       topicos: [
         'Catálogo no Instagram',
         'Facebook Shop',
@@ -109,10 +109,11 @@ const TutoriaisPage = () => {
   const categorias = [
     { value: 'todos', label: 'Todas as Categorias' },
     { value: 'primeiros-passos', label: 'Primeiros Passos' },
-    { value: 'produtos', label: 'Produtos' },
-    { value: 'pagamentos', label: 'Pagamentos' },
-    { value: 'design', label: 'Design' },
-    { value: 'marketing', label: 'Marketing' }
+    { value: 'reservas', label: 'Sistema de Reservas' },
+    { value: 'motoristas', label: 'Gestão de Motoristas' },
+    { value: 'relatorios', label: 'Relatórios' },
+    { value: 'marketing', label: 'Marketing Turístico' },
+    { value: 'atendimento', label: 'Atendimento ao Cliente' }
   ];
 
   const niveis = [
@@ -151,7 +152,7 @@ const TutoriaisPage = () => {
           
           <div className="header-content">
             <h1>Tutoriais</h1>
-            <p>Aprenda passo a passo como usar todas as funcionalidades da plataforma</p>
+            <p>Aprenda passo a passo como usar todas as funcionalidades da plataforma para agências de turismo</p>
           </div>
         </div>
       </div>

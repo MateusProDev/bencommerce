@@ -9,109 +9,109 @@ const BlogPage = () => {
 
   const categorias = [
     { id: 'todos', nome: 'Todos os Posts', icon: '📝' },
-    { id: 'ecommerce', nome: 'E-commerce', icon: '🛒' },
-    { id: 'marketing', nome: 'Marketing Digital', icon: '📊' },
+    { id: 'turismo', nome: 'Turismo', icon: '✈️' },
+    { id: 'gestao', nome: 'Gestão de Agências', icon: '📊' },
     { id: 'tecnologia', nome: 'Tecnologia', icon: '💻' },
-    { id: 'negocios', nome: 'Negócios', icon: '💼' },
+    { id: 'marketing', nome: 'Marketing Turístico', icon: '�' },
     { id: 'dicas', nome: 'Dicas & Tutoriais', icon: '💡' }
   ];
 
   const posts = [
     {
       id: 1,
-      titulo: '10 Dicas para Aumentar as Vendas do seu E-commerce em 2025',
-      categoria: 'ecommerce',
-      resumo: 'Estratégias comprovadas para impulsionar suas vendas online e superar a concorrência.',
+      titulo: '10 Estratégias para Aumentar Reservas da sua Agência de Turismo',
+      categoria: 'turismo',
+      resumo: 'Técnicas comprovadas para impulsionar as vendas e atrair mais clientes para sua agência.',
       autor: 'Ana Costa',
       data: '15 de Janeiro, 2025',
       tempo: '8 min',
       views: '2.5k',
       thumbnail: '🚀',
-      tags: ['vendas', 'estratégia', 'conversão']
+      tags: ['vendas', 'estratégia', 'reservas']
     },
     {
       id: 2,
-      titulo: 'Como Usar Instagram Shopping para Vender Mais',
+      titulo: 'Como Usar Redes Sociais para Promover Destinos Turísticos',
       categoria: 'marketing',
-      resumo: 'Guia completo para configurar e otimizar sua loja no Instagram Shopping.',
+      resumo: 'Guia completo para usar Instagram, Facebook e TikTok no marketing turístico.',
       autor: 'Pedro Santos',
       data: '12 de Janeiro, 2025',
       tempo: '6 min',
       views: '1.8k',
       thumbnail: '📱',
-      tags: ['instagram', 'redes sociais', 'marketing']
+      tags: ['instagram', 'redes sociais', 'destinos']
     },
     {
       id: 3,
-      titulo: 'Inteligência Artificial no E-commerce: Tendências 2025',
+      titulo: 'IA no Turismo: Como Automatizar Atendimento ao Cliente',
       categoria: 'tecnologia',
-      resumo: 'Como a IA está revolucionando o comércio eletrônico e o que esperar no futuro.',
+      resumo: 'Como a Inteligência Artificial está revolucionando o atendimento em agências de turismo.',
       autor: 'Maria Oliveira',
       data: '10 de Janeiro, 2025',
       tempo: '10 min',
       views: '3.2k',
       thumbnail: '🤖',
-      tags: ['ia', 'futuro', 'inovação']
+      tags: ['ia', 'automação', 'atendimento']
     },
     {
       id: 4,
-      titulo: 'SEO para Lojas Online: Guia Completo 2025',
+      titulo: 'SEO para Agências de Turismo: Apareça no Google',
       categoria: 'marketing',
-      resumo: 'Tudo que você precisa saber para otimizar sua loja e aparecer no Google.',
+      resumo: 'Tudo que você precisa saber para otimizar sua agência e aparecer no Google.',
       autor: 'Carlos Silva',
       data: '8 de Janeiro, 2025',
       tempo: '12 min',
       views: '4.1k',
       thumbnail: '🔍',
-      tags: ['seo', 'google', 'tráfego']
+      tags: ['seo', 'google', 'visibilidade']
     },
     {
       id: 5,
-      titulo: 'Como Escolher a Plataforma Ideal para seu E-commerce',
-      categoria: 'negocios',
-      resumo: 'Fatores essenciais para escolher a melhor solução de e-commerce para seu negócio.',
+      titulo: 'Gestão de Motoristas: Organização e Controle Eficiente',
+      categoria: 'gestao',
+      resumo: 'Como organizar e gerenciar sua equipe de motoristas para máxima eficiência.',
       autor: 'Ana Costa',
       data: '5 de Janeiro, 2025',
       tempo: '7 min',
       views: '1.9k',
-      thumbnail: '⚖️',
-      tags: ['plataforma', 'decisão', 'negócio']
+      thumbnail: '🚗',
+      tags: ['motoristas', 'gestão', 'organização']
     },
     {
       id: 6,
-      titulo: 'Checkout Otimizado: Reduza o Abandono de Carrinho',
-      categoria: 'ecommerce',
-      resumo: 'Técnicas para criar um processo de checkout que converte mais clientes.',
+      titulo: 'Sistema de Reservas: Otimize seu Processo de Vendas',
+      categoria: 'tecnologia',
+      resumo: 'Técnicas para criar um sistema de reservas que converte mais clientes.',
       autor: 'Pedro Santos',
       data: '3 de Janeiro, 2025',
       tempo: '9 min',
       views: '2.7k',
-      thumbnail: '💳',
-      tags: ['checkout', 'conversão', 'ux']
+      thumbnail: '�',
+      tags: ['reservas', 'vendas', 'sistema']
     },
     {
       id: 7,
-      titulo: 'Email Marketing para E-commerce: Estratégias que Funcionam',
-      categoria: 'marketing',
-      resumo: 'Como usar email marketing para aumentar vendas e fidelizar clientes.',
+      titulo: 'WhatsApp Business para Agências: Atenda Melhor seus Clientes',
+      categoria: 'dicas',
+      resumo: 'Como usar WhatsApp Business para melhorar atendimento e aumentar vendas.',
       autor: 'Maria Oliveira',
       data: '1 de Janeiro, 2025',
       tempo: '8 min',
       views: '2.1k',
-      thumbnail: '📧',
-      tags: ['email', 'fidelização', 'automação']
+      thumbnail: '�',
+      tags: ['whatsapp', 'atendimento', 'vendas']
     },
     {
       id: 8,
-      titulo: 'Análise de Dados: KPIs Essenciais para E-commerce',
-      categoria: 'negocios',
-      resumo: 'Métricas fundamentais para acompanhar o desempenho da sua loja online.',
+      titulo: 'Relatórios de Turismo: KPIs Essenciais para Agências',
+      categoria: 'gestao',
+      resumo: 'Métricas fundamentais para acompanhar o desempenho da sua agência de turismo.',
       autor: 'Carlos Silva',
       data: '29 de Dezembro, 2024',
       tempo: '11 min',
       views: '3.8k',
-      thumbnail: '📈',
-      tags: ['analytics', 'kpi', 'métricas']
+      thumbnail: '�',
+      tags: ['relatórios', 'kpi', 'métricas']
     }
   ];
 
@@ -140,7 +140,7 @@ const BlogPage = () => {
           
           <div className="header-content">
             <h1>Blog</h1>
-            <p>Insights, dicas e tendências do mundo do e-commerce</p>
+            <p>Insights, dicas e tendências do mundo do turismo e gestão de agências</p>
             
             <div className="search-box">
               <input
@@ -291,20 +291,20 @@ const BlogPage = () => {
       <section className="blog-cta">
         <div className="container">
           <div className="cta-content">
-            <h2>Pronto para Colocar em Prática?</h2>
-            <p>Transforme o conhecimento em resultados com nossa plataforma de e-commerce</p>
+            <h2>Pronto para Modernizar sua Agência?</h2>
+            <p>Transforme o conhecimento em resultados com nossa plataforma para agências de turismo</p>
             <div className="cta-buttons">
               <button 
                 className="btn-primary"
                 onClick={() => navigate('/planos')}
               >
-                Criar Minha Loja
+                Ver Planos
               </button>
               <button 
                 className="btn-secondary"
                 onClick={() => navigate('/contato')}
               >
-                Falar com Especialista
+                Falar com Consultor
               </button>
             </div>
           </div>

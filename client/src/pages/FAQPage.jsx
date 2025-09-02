@@ -11,9 +11,9 @@ const FAQPage = () => {
   const categorias = [
     { id: 'geral', nome: 'Geral', icon: '❓' },
     { id: 'conta', nome: 'Conta', icon: '👤' },
-    { id: 'produtos', nome: 'Produtos', icon: '📦' },
-    { id: 'pagamentos', nome: 'Pagamentos', icon: '💳' },
-    { id: 'configuracao', nome: 'Configuração', icon: '⚙️' },
+    { id: 'reservas', nome: 'Reservas', icon: '�' },
+    { id: 'motoristas', nome: 'Motoristas', icon: '�' },
+    { id: 'relatorios', nome: 'Relatórios', icon: '📊' },
     { id: 'tecnico', nome: 'Técnico', icon: '🔧' }
   ];
 
@@ -21,30 +21,30 @@ const FAQPage = () => {
     // Geral
     {
       categoria: 'geral',
-      pergunta: 'O que é o BenCommerce?',
-      resposta: 'O BenCommerce é uma plataforma completa para criação e gestão de lojas online. Oferecemos todas as ferramentas necessárias para você vender seus produtos na internet de forma profissional e eficiente.'
+      pergunta: 'O que é o MabelSoft?',
+      resposta: 'O MabelSoft é uma plataforma completa para gestão de agências de turismo. Oferecemos todas as ferramentas necessárias para você gerenciar clientes, motoristas, reservas e relatórios de forma profissional e eficiente.'
     },
     {
       categoria: 'geral',
-      pergunta: 'Quanto tempo leva para criar uma loja?',
-      resposta: 'Você pode ter sua loja online funcionando em menos de 30 minutos! Nossa plataforma é intuitiva e oferece templates prontos que facilitam todo o processo de criação.'
+      pergunta: 'Quanto tempo leva para configurar minha agência?',
+      resposta: 'Você pode ter sua agência de turismo funcionando em menos de 30 minutos! Nossa plataforma é intuitiva e oferece configurações prontas que facilitam todo o processo.'
     },
     {
       categoria: 'geral',
       pergunta: 'Preciso ter conhecimento técnico?',
-      resposta: 'Não! Nossa plataforma foi desenvolvida para ser usada por qualquer pessoa, independente do conhecimento técnico. Tudo é visual e intuitivo.'
+      resposta: 'Não! Nossa plataforma foi desenvolvida para ser usada por qualquer pessoa do setor de turismo, independente do conhecimento técnico. Tudo é visual e intuitivo.'
     },
     {
       categoria: 'geral',
-      pergunta: 'Existe limite de produtos?',
-      resposta: 'Depende do seu plano. O plano Básico permite até 100 produtos, o Completo até 1.000 produtos e o Enterprise não tem limites.'
+      pergunta: 'Existe limite de clientes ou motoristas?',
+      resposta: 'Depende do seu plano. O plano Básico permite até 100 clientes, o Completo até 500 clientes e o Enterprise não tem limites.'
     },
 
     // Conta
     {
       categoria: 'conta',
       pergunta: 'Como criar uma conta?',
-      resposta: 'Basta clicar em "Criar Conta" no topo da página, preencher seus dados básicos e confirmar seu email. É rápido e gratuito!'
+      resposta: 'Basta clicar em "Criar Conta" no topo da página, preencher seus dados da agência e confirmar seu email. É rápido e gratuito!'
     },
     {
       categoria: 'conta',
@@ -177,7 +177,7 @@ const FAQPage = () => {
           
           <div className="header-content">
             <h1>Perguntas Frequentes</h1>
-            <p>Encontre respostas rápidas para as dúvidas mais comuns</p>
+            <p>Encontre respostas rápidas para as dúvidas mais comuns sobre gestão de agências de turismo</p>
             
             <div className="search-box">
               <input
