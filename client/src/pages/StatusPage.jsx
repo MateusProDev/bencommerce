@@ -185,7 +185,7 @@ const StatusPage = () => {
           
           <div className="header-content">
             <h1>Status do Sistema</h1>
-            <p>Acompanhe em tempo real o status de todos os nossos serviços</p>
+            <p>Acompanhe em tempo real o status de todos os serviços da plataforma para agências de turismo</p>
             
             <div className="status-overview">
               <div className="status-badge operacional">

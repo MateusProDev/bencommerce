@@ -19,34 +19,34 @@ const ParceiroPage = () => {
       id: 'revenda',
       titulo: 'Revenda',
       icon: '🤝',
-      descricao: 'Revenda nossa plataforma e ganhe comissões atrativas',
+      descricao: 'Revenda nossa plataforma para agências de turismo e ganhe comissões atrativas',
       beneficios: [
         'Comissão de até 30% por venda',
-        'Material de vendas exclusivo',
+        'Material de vendas especializado em turismo',
         'Suporte dedicado para parceiros',
-        'Treinamento completo'
+        'Treinamento completo no setor turístico'
       ]
     },
     {
-      id: 'agencia',
-      titulo: 'Agência Digital',
-      icon: '🎨',
-      descricao: 'Ofereça soluções completas de e-commerce aos seus clientes',
+      id: 'consultoria',
+      titulo: 'Consultoria Turística',
+      icon: '�',
+      descricao: 'Ofereça consultoria e implementação para agências de turismo',
       beneficios: [
-        'Desconto especial para agências',
-        'White label disponível',
+        'Desconto especial para consultores',
+        'Certificação em turismo digital',
         'Suporte técnico prioritário',
-        'Certificação oficial'
+        'Material de apoio especializado'
       ]
     },
     {
       id: 'desenvolvedor',
       titulo: 'Desenvolvedor',
       icon: '💻',
-      descricao: 'Integre nossa API e crie soluções personalizadas',
+      descricao: 'Integre nossa API e crie soluções personalizadas para turismo',
       beneficios: [
         'Acesso completo à API',
-        'Documentação técnica detalhada',
+        'Documentação técnica para turismo',
         'Suporte técnico especializado',
         'Programa de desenvolvedores'
       ]
@@ -55,9 +55,9 @@ const ParceiroPage = () => {
       id: 'afiliado',
       titulo: 'Afiliado',
       icon: '📈',
-      descricao: 'Indique clientes e ganhe comissões recorrentes',
+      descricao: 'Indique agências de turismo e ganhe comissões recorrentes',
       beneficios: [
-        'Comissão por vida do cliente',
+        'Comissão por vida da agência',
         'Dashboard de acompanhamento',
         'Material promocional',
         'Pagamentos automáticos'
@@ -69,48 +69,48 @@ const ParceiroPage = () => {
     {
       icon: '💰',
       titulo: 'Renda Extra',
-      descricao: 'Ganhe comissões atrativas e crie uma fonte de renda adicional'
+      descricao: 'Ganhe comissões atrativas trabalhando com o setor de turismo em crescimento'
     },
     {
       icon: '📚',
       titulo: 'Treinamento',
-      descricao: 'Acesso a materiais exclusivos e treinamentos especializados'
+      descricao: 'Acesso a materiais exclusivos sobre turismo digital e gestão de agências'
     },
     {
       icon: '🎯',
       titulo: 'Suporte Dedicado',
-      descricao: 'Equipe especializada para dar suporte aos nossos parceiros'
+      descricao: 'Equipe especializada em turismo para dar suporte aos nossos parceiros'
     },
     {
       icon: '🚀',
       titulo: 'Crescimento',
-      descricao: 'Escale seu negócio com nossa plataforma em constante evolução'
+      descricao: 'Escale seu negócio com nossa plataforma focada no mercado turístico'
     }
   ];
 
   const depoimentos = [
     {
       nome: 'Roberto Silva',
-      empresa: 'Digital Solutions',
+      empresa: 'TurismoTech',
       cargo: 'CEO',
       foto: '👨‍💼',
-      depoimento: 'Parceria incrível! Em 6 meses aumentamos nossa receita em 40% oferecendo soluções de e-commerce com o BenCommerce.',
+      depoimento: 'Parceria incrível! Em 6 meses ajudamos 20 agências de turismo a modernizar suas operações com o MabelSoft.',
       rating: 5
     },
     {
       nome: 'Mariana Costa',
-      empresa: 'WebMax Agency',
+      empresa: 'Consultoria Turística Brasil',
       cargo: 'Diretora Comercial',
       foto: '👩‍💻',
-      depoimento: 'O suporte é excepcional e nossos clientes ficam muito satisfeitos com a plataforma. Recomendo a parceria!',
+      depoimento: 'O suporte é excepcional e as agências ficam muito satisfeitas com a plataforma. Recomendo a parceria!',
       rating: 5
     },
     {
       nome: 'Carlos Mendes',
-      empresa: 'TechPartner',
+      empresa: 'DevTurismo',
       cargo: 'Desenvolvedor',
       foto: '👨‍🔧',
-      depoimento: 'A API é muito bem documentada e facilita muito o desenvolvimento de integrações personalizadas.',
+      depoimento: 'A API é muito bem documentada e facilita muito o desenvolvimento de soluções para agências de turismo.',
       rating: 5
     }
   ];
@@ -144,15 +144,15 @@ const ParceiroPage = () => {
           
           <div className="header-content">
             <h1>Seja um Parceiro</h1>
-            <p>Junte-se a nós e construa o futuro do e-commerce brasileiro</p>
+            <p>Junte-se a nós e construa o futuro do turismo digital brasileiro</p>
             
             <div className="header-stats">
               <div className="stat">
-                <strong>500+</strong>
+                <strong>200+</strong>
                 <span>Parceiros Ativos</span>
               </div>
               <div className="stat">
-                <strong>R$ 2M+</strong>
+                <strong>R$ 800k+</strong>
                 <span>Comissões Pagas</span>
               </div>
               <div className="stat">
