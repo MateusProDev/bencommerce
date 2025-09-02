@@ -22,6 +22,8 @@ import ProdutoPage from "./components/Lojinha/ProdutoPage/ProdutoPage";
 import ProdutosPage from "./pages/ProdutosPage";
 import ContactFunnel from './components/ContactFunnel/ContactFunnel';
 import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
+import SolucoesPage from './pages/SolucoesPage';
+import PlanosPage from './pages/PlanosPage';
 
 // Admin Components
 import AdminLogin from './components/Admin/AdminLogin';
@@ -121,6 +123,8 @@ const AppContent = () => {
       <Routes location={location}>
         {/* Rotas públicas */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/solucoes" element={<SolucoesPage />} />
+        <Route path="/planos" element={<PlanosPage />} />
         <Route path="/contato" element={<ContactFunnelPage />} />
         <Route path="/contato/:plan" element={<ContactFunnelPage />} />
 
