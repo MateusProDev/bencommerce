@@ -142,11 +142,42 @@
 
   .bottom {
     font-size: 13px;
+    text-align: left; /* Alinhamento à esquerda em mobile */
+    padding: 20px 0;
+  }
+
+  .bottom p {
+    text-align: left; /* Nome da empresa alinhado à esquerda */
+    margin-bottom: 15px;
   }
 
   .legal {
-    align-items: center;
+    justify-content: flex-start; /* Links alinhados à esquerda */
+    align-items: flex-start;
     gap: 8px;
     margin-bottom: 20px;
+    flex-direction: column; /* Links em coluna em mobile */
+  }
+
+  .legal a {
+    padding: 5px 0; /* Espaçamento vertical */
+  }
+}
+
+/* Tablet responsivo */
+@media (max-width: 992px) and (min-width: 769px) {
+  .bottom {
+    text-align: left;
+    padding: 20px 0;
+  }
+
+  .bottom p {
+    text-align: left;
+    margin-bottom: 15px;
+  }
+
+  .legal {
+    justify-content: flex-start;
+    gap: 15px;
   }
 }
