@@ -24,7 +24,10 @@ import ContactFunnel from './components/ContactFunnel/ContactFunnel';
 import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
 import SolucoesPage from './pages/SolucoesPage';
 import PlanosPage from './pages/PlanosPage';
-import CentralAjudaPage from './pages/CentralAjudaPage';
+import TermosPage from './pages/TermosPage';
+import PrivacidadePage from './pages/PrivacidadePage';
+import CookiesPage from './pages/CookiesPage';
+// import CentralAjudaPage from './pages/CentralAjudaPage';
 import TutoriaisPage from './pages/TutoriaisPage';
 import FAQPage from './pages/FAQPage';
 import StatusPage from './pages/StatusPage';
@@ -132,9 +135,12 @@ const AppContent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/solucoes" element={<SolucoesPage />} />
         <Route path="/planos" element={<PlanosPage />} />
-        <Route path="/contato" element={<ContactFunnelPage />} />
-        <Route path="/contato/:plan" element={<ContactFunnelPage />} />
-        <Route path="/ajuda" element={<CentralAjudaPage />} />
+  <Route path="/contato" element={<ContactFunnelPage />} />
+  <Route path="/contato/:plan" element={<ContactFunnelPage />} />
+  {/* Static legal pages */}
+  <Route path="/termos" element={<TermosPage />} />
+  <Route path="/privacidade" element={<PrivacidadePage />} />
+  <Route path="/cookies" element={<CookiesPage />} />
         <Route path="/tutoriais" element={<TutoriaisPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/status" element={<StatusPage />} />

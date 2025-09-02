@@ -94,7 +94,7 @@ const ParceiroPage = () => {
       empresa: 'TurismoTech',
       cargo: 'CEO',
       foto: '👨‍💼',
-      depoimento: 'Parceria incrível! Em 6 meses ajudamos 20 agências de turismo a modernizar suas operações com o MabelSoft.',
+      depoimento: 'Parceria incrível! Em 6 meses ajudamos 20 agências de turismo a modernizar suas operações com a Turvia.',
       rating: 5
     },
     {

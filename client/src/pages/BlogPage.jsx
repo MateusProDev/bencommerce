@@ -275,7 +275,7 @@ const BlogPage = () => {
         <div className="container">
           <div className="newsletter-content">
             <h2>📬 Receba os Melhores Conteúdos</h2>
-            <p>Assine nossa newsletter e seja o primeiro a receber artigos exclusivos sobre e-commerce</p>
+            <p>Assine nossa newsletter e seja o primeiro a receber artigos exclusivos sobre turismo</p>
             
             <div className="newsletter-form">
               <input type="email" placeholder="Seu melhor email" />
