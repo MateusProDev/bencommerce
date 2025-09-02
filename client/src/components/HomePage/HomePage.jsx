@@ -423,7 +423,7 @@ const HomePage = () => {
       <section className="homepage-clients">
         <div className="homepage-clients-container">
           <h2 className="homepage-clients-title">
-            Agências que confiam na MabelSoft
+            Agências que confiam na Turvia
           </h2>
 
           <div className="homepage-clients-row">
@@ -723,7 +723,7 @@ const HomePage = () => {
                 </a>
               </li>
               <li>
-                <a href="/parceiros" className="homepage-footer-link">
+                <a href="/parceiro" className="homepage-footer-link">
                   Seja um Parceiro
                 </a>
               </li>
@@ -736,11 +736,7 @@ const HomePage = () => {
               className="homepage-footer-links"
               style={{ listStyleType: "none", paddingLeft: 0 }}
             >
-              <li>
-                <a href="/ajuda" className="homepage-footer-link">
-                  Central de Ajuda
-                </a>
-              </li>
+              
               <li>
                 <a href="/tutoriais" className="homepage-footer-link">
                   Tutoriais

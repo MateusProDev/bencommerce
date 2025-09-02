@@ -21,8 +21,8 @@ const FAQPage = () => {
     // Geral
     {
       categoria: 'geral',
-      pergunta: 'O que é o MabelSoft?',
-      resposta: 'O MabelSoft é uma plataforma completa para gestão de agências de turismo. Oferecemos todas as ferramentas necessárias para você gerenciar clientes, motoristas, reservas e relatórios de forma profissional e eficiente.'
+      pergunta: 'O que é a Turvia?',
+      resposta: 'A Turvia é uma plataforma completa para gestão de agências de turismo. Oferecemos todas as ferramentas necessárias para você gerenciar clientes, motoristas, reservas e relatórios de forma profissional e eficiente.'
     },
     {
       categoria: 'geral',
@@ -58,36 +58,36 @@ const FAQPage = () => {
     },
     {
       categoria: 'conta',
-      pergunta: 'Posso ter múltiplas lojas?',
-      resposta: 'Sim! Dependendo do seu plano, você pode criar múltiplas lojas. O plano Completo permite até 3 lojas e o Enterprise lojas ilimitadas.'
+      pergunta: 'Posso ter múltiplas agências?',
+      resposta: 'Sim! Dependendo do seu plano, você pode gerenciar múltiplas agências. O plano Completo permite até 3 agências e o Enterprise agências ilimitadas.'
     },
 
-    // Produtos
+    // Reservas
     {
-      categoria: 'produtos',
-      pergunta: 'Como adicionar produtos?',
-      resposta: 'No painel administrativo, vá em "Produtos" > "Adicionar Produto". Preencha as informações, adicione fotos e publique. É muito simples!'
+      categoria: 'reservas',
+      pergunta: 'Como criar uma nova reserva?',
+      resposta: 'No painel administrativo, vá em "Reservas" > "Nova Reserva". Selecione o cliente, destino, datas e motorista. O sistema organizará tudo automaticamente!'
     },
     {
-      categoria: 'produtos',
-      pergunta: 'Posso importar produtos em massa?',
-      resposta: 'Sim! Oferecemos importação via CSV e integração com planilhas do Excel. Você pode importar centenas de produtos de uma só vez.'
+      categoria: 'reservas',
+      pergunta: 'Posso importar reservas em massa?',
+      resposta: 'Sim! Oferecemos importação via CSV e integração com planilhas do Excel. Você pode importar centenas de reservas de uma só vez.'
     },
     {
-      categoria: 'produtos',
-      pergunta: 'Como funciona o controle de estoque?',
-      resposta: 'O sistema atualiza automaticamente o estoque a cada venda. Você pode configurar alertas para produtos com estoque baixo e definir se permite vendas sem estoque.'
+      categoria: 'reservas',
+      pergunta: 'Como funciona o controle de disponibilidade?',
+      resposta: 'O sistema atualiza automaticamente a disponibilidade de motoristas e veículos. Você pode configurar alertas e definir regras de agendamento.'
     },
     {
-      categoria: 'produtos',
-      pergunta: 'Posso criar produtos com variações?',
-      resposta: 'Claro! Você pode criar variações de cor, tamanho, modelo e muito mais. Cada variação pode ter preço e estoque diferentes.'
+      categoria: 'reservas',
+      pergunta: 'Posso criar pacotes turísticos?',
+      resposta: 'Claro! Você pode criar pacotes com múltiplos destinos, durações diferentes e preços personalizados para cada tipo de cliente.'
     },
 
-    // Pagamentos
+    // Motoristas
     {
-      categoria: 'pagamentos',
-      pergunta: 'Quais formas de pagamento aceito?',
+      categoria: 'motoristas',
+      pergunta: 'Como cadastrar motoristas?',
       resposta: 'Integramos com Stripe, PagSeguro, PayPal e PIX. Seus clientes podem pagar com cartão de crédito, débito, boleto e PIX.'
     },
     {
@@ -141,8 +141,8 @@ const FAQPage = () => {
     },
     {
       categoria: 'tecnico',
-      pergunta: 'A loja funciona no celular?',
-      resposta: 'Sim! Todas as lojas são 100% responsivas e otimizadas para celular. A maioria das vendas hoje acontece pelo mobile.'
+      pergunta: 'O sistema funciona no celular?',
+      resposta: 'Sim! Todo o sistema é 100% responsivo e otimizado para celular. Você pode gerenciar sua agência de qualquer dispositivo.'
     },
     {
       categoria: 'tecnico',

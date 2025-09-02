@@ -22,11 +22,11 @@ const StatusPage = () => {
       descricao: 'Site principal e páginas de marketing'
     },
     {
-      nome: 'Dashboard de Lojas',
+      nome: 'Dashboard de Agências',
       status: 'operacional',
       uptime: '99.97%',
       responseTime: '180ms',
-      descricao: 'Painel administrativo das lojas'
+      descricao: 'Painel administrativo das agências de turismo'
     },
     {
       nome: 'API de Produtos',
@@ -358,7 +358,7 @@ const StatusPage = () => {
               </button>
               <button 
                 className="btn-secondary"
-                onClick={() => window.open('https://twitter.com/bencommerce', '_blank')}
+                onClick={() => window.open('https://twitter.com/turvia', '_blank')}
               >
                 Seguir no Twitter
               </button>
