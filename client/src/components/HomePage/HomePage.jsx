@@ -908,6 +908,17 @@ const HomePage = () => {
             </button>
           </div>
         )}
+
+        {/* Admin Access Link - Hidden */}
+        <div className="admin-access-footer">
+          <button
+            className="admin-access-link"
+            onClick={() => navigate('/admin/login')}
+            title="Painel Administrativo"
+          >
+            Admin
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -23,6 +23,11 @@ import ProdutosPage from "./pages/ProdutosPage";
 import ContactFunnel from './components/ContactFunnel/ContactFunnel';
 import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
 
+// Admin Components
+import AdminLogin from './components/Admin/AdminLogin';
+import LeadsManager from './components/Admin/LeadsManager';
+import AdminProtectedRoute from './components/Admin/AdminProtectedRoute';
+
 // Utils
 import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
 
@@ -118,6 +123,18 @@ const AppContent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/contato" element={<ContactFunnelPage />} />
         <Route path="/contato/:plan" element={<ContactFunnelPage />} />
+
+        {/* Rotas administrativas */}
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route 
+          path="/admin/leads" 
+          element={
+            <AdminProtectedRoute>
+              <LeadsManager />
+            </AdminProtectedRoute>
+          } 
+        />
 
         {/* Rotas de autenticação */}
         <Route

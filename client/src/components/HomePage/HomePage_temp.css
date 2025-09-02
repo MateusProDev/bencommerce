@@ -2013,30 +2013,3 @@ img, svg {
   color: var(--gray-600);
   line-height: 1.6;
 }
-
-/* Admin Access Link - Discreto */
-.admin-access-footer {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 100;
-}
-
-.admin-access-link {
-  background: rgba(0, 0, 0, 0.7);
-  color: rgba(255, 255, 255, 0.8);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0.3;
-}
-
-.admin-access-link:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  transform: scale(1.05);
-}
