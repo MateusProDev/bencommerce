@@ -24,6 +24,13 @@ import ContactFunnel from './components/ContactFunnel/ContactFunnel';
 import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
 import SolucoesPage from './pages/SolucoesPage';
 import PlanosPage from './pages/PlanosPage';
+import CentralAjudaPage from './pages/CentralAjudaPage';
+import TutoriaisPage from './pages/TutoriaisPage';
+import FAQPage from './pages/FAQPage';
+import StatusPage from './pages/StatusPage';
+import SobreNosPage from './pages/SobreNosPage';
+import BlogPage from './pages/BlogPage';
+import ParceiroPage from './pages/ParceiroPage';
 
 // Admin Components
 import AdminLogin from './components/Admin/AdminLogin';
@@ -127,6 +134,13 @@ const AppContent = () => {
         <Route path="/planos" element={<PlanosPage />} />
         <Route path="/contato" element={<ContactFunnelPage />} />
         <Route path="/contato/:plan" element={<ContactFunnelPage />} />
+        <Route path="/ajuda" element={<CentralAjudaPage />} />
+        <Route path="/tutoriais" element={<TutoriaisPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/status" element={<StatusPage />} />
+        <Route path="/sobre" element={<SobreNosPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/parceiro" element={<ParceiroPage />} />
 
         {/* Rotas administrativas */}
         <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
