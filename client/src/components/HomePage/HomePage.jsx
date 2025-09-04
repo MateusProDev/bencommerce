@@ -158,8 +158,18 @@ const HomePage = () => {
     <div className="homepage-container">
       {/* Navbar */}
       <nav className="homepage-navbar">
-        <div className="homepage-navbar-logo" onClick={() => navigate("/")}>
-          Turvia
+        <div
+          className="homepage-navbar-logo"
+          onClick={() => navigate("/")}
+          title="Turvia — Para agências de Turismo"
+        >
+          <img
+            className="homepage-navbar-logo-img"
+            src="/Turvia.jpg"
+            alt="Logo Turvia"
+            loading="eager"
+            decoding="async"
+          />
         </div>
         {/* Menu Desktop */}
         <ul
@@ -654,7 +664,15 @@ const HomePage = () => {
       <footer className="homepage-footer">
         <div className="homepage-footer-container">
           <div className="homepage-footer-brand-section">
-            <div className="homepage-footer-brand">Turvia</div>
+            <div className="homepage-footer-brand">
+              <img
+                className="homepage-footer-brand-img"
+                src="/Turvia.jpg"
+                alt="Logo Turvia"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
             <p className="homepage-footer-description">
               Soluções tecnológicas completas para agências de turismo. Sites
               personalizados e sistema de gestão integrado.
