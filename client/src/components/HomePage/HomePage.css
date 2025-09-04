@@ -109,15 +109,31 @@ section, footer {
 }
 
 .homepage-navbar-logo {
-  font-size: 1.75rem;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
   margin-left: 20px;
+  transition: all 0.3s ease;
+}
+
+.homepage-navbar-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+  margin-left: -10px;
+}
+
+.homepage-navbar-logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: all 0.3s ease;
+  line-height: 1;
 }
 
 .homepage-navbar-logo:hover {
@@ -322,6 +338,33 @@ section, footer {
 .homepage-mobile-menu-icon {
   font-size: 1.25rem;
   color: var(--primary-blue);
+}
+
+/* Footer brand with logo */
+.homepage-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+
+.homepage-footer-brand-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+}
+
+.homepage-footer-brand-text {
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .homepage-navbar-logo-img { height: 40px; }
+  .homepage-footer-brand-img { height: 26px; }
+  .homepage-navbar-logo { gap: 6px; }
+  .homepage-footer-brand { gap: 8px; }
 }
 
 /* Hero Section Moderna */
