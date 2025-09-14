@@ -165,7 +165,7 @@ const HomePage = () => {
         >
           <img
             className="homepage-navbar-logo-img"
-            src="/turviasemfundo.png"
+            src="/turviaSemFundo.png"
             alt="Logo Turvia"
             loading="eager"
             decoding="async"
@@ -667,7 +667,7 @@ const HomePage = () => {
             <div className="homepage-footer-brand">
               <img
                 className="homepage-footer-brand-img"
-                src="/Turvia.png"
+                src="/turvia.png"
                 alt="Logo Turvia"
                 loading="lazy"
                 decoding="async"
