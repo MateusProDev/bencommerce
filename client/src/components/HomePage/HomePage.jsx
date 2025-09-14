@@ -32,6 +32,7 @@ import TurviaLogo from "../../assets/Turvia.png";
 import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
+import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -74,12 +75,33 @@ const HomePage = () => {
     return () => clearTimeout(loadingTimer);
   }, []);
 
+  // Google Analytics - Page View
+  useEffect(() => {
+    pageView(window.location.pathname + window.location.search);
+  }, []);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+    trackEvents.menuClick('mobile_menu_toggle');
   };
 
   const toggleWhatsappNotification = () => {
     setShowWhatsappNotification(!showWhatsappNotification);
+  };
+
+  // Funções auxiliares para tracking
+  const handleContactFunnelOpen = (type, location) => {
+    trackEvents.contactFormSubmit(`${type} - ${location}`);
+    openContactFunnel(type);
+  };
+
+  const handleWhatsAppClick = (location) => {
+    trackEvents.whatsappClick(location);
+    window.open('https://wa.me/5511999999999', '_blank'); // Substitua pelo seu número
+  };
+
+  const handleCTAClick = (ctaText, location) => {
+    trackEvents.ctaClick(ctaText, location);
   };
 
   // Auto-rotate features every 4 seconds
@@ -345,13 +367,19 @@ const HomePage = () => {
           </p>
           <div className="homepage-hero-buttons">
             <button
-              onClick={() => openContactFunnel("completo")}
+              onClick={() => {
+                handleCTAClick('Solicitar Demonstração', 'hero');
+                handleContactFunnelOpen("completo", "hero_primary");
+              }}
               className="homepage-hero-primary-button"
             >
               Solicitar Demonstração
             </button>
             <button
-              onClick={() => openContactFunnel("completo")}
+              onClick={() => {
+                handleCTAClick('Conhecer Soluções', 'hero');
+                handleContactFunnelOpen("completo", "hero_secondary");
+              }}
               className="homepage-hero-secondary-button"
             >
               Conhecer Soluções
