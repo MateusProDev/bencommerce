@@ -46,21 +46,33 @@ const HomePage = () => {
   // Nome da empresa para efeito typewriter
   const companyName = "Turvia";
 
-  // Efeito typewriter mais rápido e moderno
+  // Efeito typewriter em loop contínuo
   useEffect(() => {
     let timeout;
     
     if (typewriterText.length < companyName.length) {
+      // Digitando o nome
       timeout = setTimeout(() => {
         setTypewriterText(companyName.slice(0, typewriterText.length + 1));
-      }, 120); // Ainda mais rápido: 120ms por caractere
+      }, 150); // 150ms por caractere
     } else {
-      // Finalizar loading após completar o nome
-      timeout = setTimeout(() => setIsLoading(false), 300); // Pausa muito menor
+      // Nome completo - espera e depois apaga para repetir
+      timeout = setTimeout(() => {
+        setTypewriterText(''); // Apaga e reinicia
+      }, 1500); // Pausa 1.5s com nome completo
     }
 
     return () => clearTimeout(timeout);
   }, [typewriterText, companyName]);
+
+  // Auto-finalizar loading após algumas repetições
+  useEffect(() => {
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 4000); // 4 segundos de animação loop
+
+    return () => clearTimeout(loadingTimer);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
