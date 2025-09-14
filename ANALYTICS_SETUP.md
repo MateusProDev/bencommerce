@@ -24,14 +24,17 @@ export const GA_CONFIG = {
 ```
 
 #### Arquivo 2: `public/index.html`
-Procure por esta linha e substitua:
+Código oficial do Google Analytics:
 ```html
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1HMMH0L3QH"></script>
-```
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-E também esta:
-```javascript
-gtag('config', 'G-1HMMH0L3QH');
+  gtag('config', 'G-1HMMH0L3QH');
+</script>
 ```
 
 ### 3. Verificar se está Funcionando
