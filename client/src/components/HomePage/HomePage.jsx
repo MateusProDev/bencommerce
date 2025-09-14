@@ -28,8 +28,8 @@ import {
 } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
-import TurviaLogo from "../../assets/turvia.png";
-import TurviaSemFundoLogo from "../../assets/turviaSemFundo.png";
+import TurviaLogo from "../../assets/Turvia.png";
+import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import "./HomePage.css";
