@@ -27,6 +27,10 @@ import PlanosPage from './pages/PlanosPage';
 import TermosPage from './pages/TermosPage';
 import PrivacidadePage from './pages/PrivacidadePage';
 import CookiesPage from './pages/CookiesPage';
+import LoginForm from './components/Auth/LoginForm';
+import ContactsDashboard from './components/Dashboard/ContactsDashboard';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
+import CreateAdmin from './components/Auth/CreateAdmin';
 // import CentralAjudaPage from './pages/CentralAjudaPage';
 import TutoriaisPage from './pages/TutoriaisPage';
 import FAQPage from './pages/FAQPage';
@@ -46,11 +50,7 @@ import { verificarPlanoUsuario } from './utils/verificarPlanoUsuario';
 // Context
 import { CategoriasProvider } from "./context/CategoriasContext";
 import { UserPlanProvider } from "./context/UserPlanContext";
-
-// Componente de rota protegida
-const ProtectedRoute = ({ user, children }) => {
-  return user ? children : <Navigate to="/login" replace />;
-};
+import { AuthProvider } from "./context/AuthContext";
 
 // Rota que requer loja criada
 const StoreRequiredRoute = ({ user, hasStore, children }) => {
@@ -148,6 +148,18 @@ const AppContent = () => {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/parceiro" element={<ParceiroPage />} />
 
+        {/* Rotas de autenticação */}
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/create-admin" element={<CreateAdmin />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <ContactsDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
         {/* Rotas administrativas */}
         <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -156,6 +168,14 @@ const AppContent = () => {
           element={
             <AdminProtectedRoute>
               <LeadsManager />
+            </AdminProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <AdminProtectedRoute>
+              <ContactsDashboard />
             </AdminProtectedRoute>
           } 
         />
@@ -275,9 +295,11 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 };
 
