@@ -31,6 +31,7 @@ import useContactFunnel from "../../hooks/useContactFunnel";
 import TurviaLogo from "../../assets/turvia.png";
 import TurviaSemFundoLogo from "../../assets/turviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
+import LisboaLogo from "../../assets/lisboa.png";
 import "./HomePage.css";
 
 const HomePage = () => {
@@ -191,10 +192,10 @@ const HomePage = () => {
   ];
 
   const clients = [
-    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
-    { name: "Lisboatur", logo: "/lisboa.png" },
-    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
-    { name: "Lisboatur", logo: "/lisboa.png" },
+    { name: "20Buscar Vacation Beach", logo: BuscarLogo },
+    { name: "Lisboatur", logo: LisboaLogo },
+    { name: "20Buscar Vacation Beach", logo: BuscarLogo },
+    { name: "Lisboatur", logo: LisboaLogo },
   ];
 
   return (
