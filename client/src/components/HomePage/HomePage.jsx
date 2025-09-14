@@ -42,39 +42,25 @@ const HomePage = () => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [typewriterText, setTypewriterText] = useState('');
-  const [currentPhrase, setCurrentPhrase] = useState(0);
 
-  // Frases para o efeito typewriter
-  const phrases = [
-    "Soluções pensadas para agências de turismo",
-    "Transforme visitantes em clientes",
-    "Gerencie leads de forma inteligente",
-    "Aumente suas conversões hoje mesmo"
-  ];
+  // Nome da empresa para efeito typewriter
+  const companyName = "Turvia";
 
-  // Efeito typewriter
+  // Efeito typewriter mais rápido e moderno
   useEffect(() => {
     let timeout;
-    const currentText = phrases[currentPhrase];
     
-    if (typewriterText.length < currentText.length) {
+    if (typewriterText.length < companyName.length) {
       timeout = setTimeout(() => {
-        setTypewriterText(currentText.slice(0, typewriterText.length + 1));
-      }, 100);
+        setTypewriterText(companyName.slice(0, typewriterText.length + 1));
+      }, 150); // Mais rápido: 150ms por caractere
     } else {
-      timeout = setTimeout(() => {
-        if (currentPhrase < phrases.length - 1) {
-          setCurrentPhrase(prev => prev + 1);
-          setTypewriterText('');
-        } else {
-          // Finalizar loading após última frase
-          setTimeout(() => setIsLoading(false), 1000);
-        }
-      }, 2000);
+      // Finalizar loading após completar o nome
+      timeout = setTimeout(() => setIsLoading(false), 800); // Pausa menor
     }
 
     return () => clearTimeout(timeout);
-  }, [typewriterText, currentPhrase, phrases]);
+  }, [typewriterText, companyName]);
 
   // Loading inicial
   useEffect(() => {
@@ -204,14 +190,12 @@ const HomePage = () => {
       {isLoading && (
         <div className="loading-overlay">
           <div className="loading-content">
-            <div className="loading-logo">
-              <img src={TurviaSemFundoLogo} alt="Turvia" />
-            </div>
             <div className="typewriter-container">
               <h1 className="typewriter-text">
                 {typewriterText}
                 <span className="cursor">|</span>
               </h1>
+              <p className="loading-subtitle">Plataforma para agências de turismo</p>
             </div>
             <div className="loading-dots">
               <div className="dot"></div>
