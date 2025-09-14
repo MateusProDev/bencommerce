@@ -95,7 +95,7 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src="/Turvia.png" alt="Turvia Logo" className="login-logo" />
+          <img src="/turvia.png" alt="Turvia Logo" className="login-logo" />
           <h1>Turvia Dashboard</h1>
           <p>{isRegisterMode ? 'Criar conta administrativa' : 'Acesso administrativo'}</p>
         </div>

@@ -195,7 +195,7 @@ const ContactsDashboard = () => {
       <div className="dashboard-header">
         <div className="header-content">
           <div className="header-logo">
-            <img src="/TurviaSemFundo.png" alt="Turvia Logo" className="dashboard-logo" />
+            <img src="/turviaSemFundo.png" alt="Turvia Logo" className="dashboard-logo" />
             <div className="header-text">
               <h1>Dashboard de Contatos</h1>
               <p>Análise completa dos leads e conversões da Turvia</p>
