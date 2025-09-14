@@ -53,24 +53,14 @@ const HomePage = () => {
     if (typewriterText.length < companyName.length) {
       timeout = setTimeout(() => {
         setTypewriterText(companyName.slice(0, typewriterText.length + 1));
-      }, 150); // Mais rápido: 150ms por caractere
+      }, 120); // Ainda mais rápido: 120ms por caractere
     } else {
       // Finalizar loading após completar o nome
-      timeout = setTimeout(() => setIsLoading(false), 800); // Pausa menor
+      timeout = setTimeout(() => setIsLoading(false), 300); // Pausa muito menor
     }
 
     return () => clearTimeout(timeout);
   }, [typewriterText, companyName]);
-
-  // Loading inicial
-  useEffect(() => {
-    // Iniciar com um pequeno delay
-    const timer = setTimeout(() => {
-      setTypewriterText('');
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
