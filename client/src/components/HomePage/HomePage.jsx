@@ -28,15 +28,62 @@ import {
 } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
+import TurviaLogo from "../../assets/turvia.png";
+import TurviaSemFundoLogo from "../../assets/turviaSemFundo.png";
+import BuscarLogo from "../../assets/20buscar.png";
 import "./HomePage.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { openContactFunnel } = useContactFunnel();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showWhatsappNotification, setShowWhatsappNotification] =
-    useState(false);
+  const [showWhatsappNotification, setShowWhatsappNotification] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [typewriterText, setTypewriterText] = useState('');
+  const [currentPhrase, setCurrentPhrase] = useState(0);
+
+  // Frases para o efeito typewriter
+  const phrases = [
+    "Soluções pensadas para agências de turismo",
+    "Transforme visitantes em clientes",
+    "Gerencie leads de forma inteligente",
+    "Aumente suas conversões hoje mesmo"
+  ];
+
+  // Efeito typewriter
+  useEffect(() => {
+    let timeout;
+    const currentText = phrases[currentPhrase];
+    
+    if (typewriterText.length < currentText.length) {
+      timeout = setTimeout(() => {
+        setTypewriterText(currentText.slice(0, typewriterText.length + 1));
+      }, 100);
+    } else {
+      timeout = setTimeout(() => {
+        if (currentPhrase < phrases.length - 1) {
+          setCurrentPhrase(prev => prev + 1);
+          setTypewriterText('');
+        } else {
+          // Finalizar loading após última frase
+          setTimeout(() => setIsLoading(false), 1000);
+        }
+      }, 2000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [typewriterText, currentPhrase, phrases]);
+
+  // Loading inicial
+  useEffect(() => {
+    // Iniciar com um pequeno delay
+    const timer = setTimeout(() => {
+      setTypewriterText('');
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -155,8 +202,37 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="homepage-container">
-      {/* Navbar */}
+    <>
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-content">
+            <div className="loading-logo">
+              <img src={TurviaSemFundoLogo} alt="Turvia" />
+            </div>
+            <div className="typewriter-container">
+              <h1 className="typewriter-text">
+                {typewriterText}
+                <span className="cursor">|</span>
+              </h1>
+            </div>
+            <div className="loading-dots">
+              <div className="dot"></div>
+              <div className="dot"></div>
+              <div className="dot"></div>
+            </div>
+          </div>
+          <div className="loading-background">
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+            <div className="particle"></div>
+          </div>
+        </div>
+      )}
+
+      <div className="homepage-container">{/* Navbar */}
       <nav className="homepage-navbar">
         <div
           className="homepage-navbar-logo"
@@ -165,7 +241,7 @@ const HomePage = () => {
         >
           <img
             className="homepage-navbar-logo-img"
-            src="/turviaSemFundo.png"
+            src={TurviaSemFundoLogo}
             alt="Logo Turvia"
             loading="eager"
             decoding="async"
@@ -607,7 +683,7 @@ const HomePage = () => {
           <div className="homepage-testimonial-card">
             <div className="homepage-testimonial-content">
               <div className="homepage-testimonial-avatar">
-                <img src="/20buscar.png" alt="Cliente" />
+                <img src={BuscarLogo} alt="Cliente" />
               </div>
               <p className="homepage-testimonial-text">
                 "Desde que começamos a usar o sistema Turvia, nossa agência
@@ -667,7 +743,7 @@ const HomePage = () => {
             <div className="homepage-footer-brand">
               <img
                 className="homepage-footer-brand-img"
-                src="/turvia.png"
+                src={TurviaLogo}
                 alt="Logo Turvia"
                 loading="lazy"
                 decoding="async"
@@ -924,6 +1000,7 @@ const HomePage = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
