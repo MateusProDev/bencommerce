@@ -195,10 +195,6 @@ const HomePage = () => {
     { name: "Lisboatur", logo: "/lisboa.png" },
     { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
     { name: "Lisboatur", logo: "/lisboa.png" },
-    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
-    { name: "Lisboatur", logo: "/lisboa.png" },
-    { name: "20Buscar Vacation Beach", logo: "/20buscar.png" },
-    { name: "Lisboatur", logo: "/lisboa.png" },
   ];
 
   return (
