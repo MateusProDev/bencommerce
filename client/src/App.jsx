@@ -84,7 +84,7 @@ function LojinhaPage() {
 const AppContent = () => {
   const [user, setUser] = useState(null);
   const [hasStore, setHasStore] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Removido loading inicial
   const auth = getAuth();
   const location = useLocation();
   const navigate = useNavigate();
