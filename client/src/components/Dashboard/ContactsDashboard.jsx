@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { AuthContext } from '../../context/AuthContext';
-import TurviaSemFundoLogo from '../../assets/turviaSemFundo.png';
+import TurviaSemFundoLogo from '../../assets/TurviaSemFundo.png';
 import { 
   FaUsers, 
   FaChartLine, 

@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { auth } from '../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaSpinner, FaUserPlus, FaSignInAlt } from 'react-icons/fa';
-import TurviaLogo from '../../assets/turvia.png';
+import TurviaLogo from '../../assets/Turvia.png';
 import './LoginForm.css';
 
 const LoginForm = () => {
