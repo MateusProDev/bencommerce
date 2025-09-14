@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { auth } from '../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaSpinner, FaUserPlus, FaSignInAlt } from 'react-icons/fa';
+import TurviaLogo from '../../assets/turvia.png';
 import './LoginForm.css';
 
 const LoginForm = () => {
@@ -95,7 +96,7 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src="/turvia.png" alt="Turvia Logo" className="login-logo" />
+          <img src={TurviaLogo} alt="Turvia Logo" className="login-logo" />
           <h1>Turvia Dashboard</h1>
           <p>{isRegisterMode ? 'Criar conta administrativa' : 'Acesso administrativo'}</p>
         </div>
