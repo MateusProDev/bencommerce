@@ -2394,8 +2394,8 @@ img, svg {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
-  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white !important;
   padding: 1rem 2rem;
   border: none;
   border-radius: 12px;
@@ -2405,18 +2405,161 @@ img, svg {
   transition: all 0.3s ease;
   text-decoration: none;
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.homepage-social-media-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.homepage-social-media-cta:hover::before {
+  left: 100%;
 }
 
 .homepage-social-media-cta:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.homepage-social-media-cta:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 .homepage-social-media-cta .cta-icon {
   font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.homepage-social-media-cta:hover .cta-icon {
+  transform: scale(1.1);
+}
+
+/* Animação pulsante para o CTA principal */
+@keyframes pulse-cta {
+  0% {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes pulse-cta-central {
+  0% {
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6);
+  }
+  100% {
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+  }
+}
+
+.homepage-social-media-cta {
+  animation: pulse-cta 2.5s infinite;
+}
+
+.homepage-social-media-cta.central {
+  animation: pulse-cta-central 2s infinite;
+}
+
+.homepage-social-media-cta:hover,
+.homepage-social-media-cta.central:hover {
+  animation: none;
 }
 
 .homepage-social-media-right {
+  display: flex;
+  justify-content: center;
+}
+
+/* Nova seção CTA central */
+.social-media-cta-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  padding: 1rem;
+}
+
+.homepage-social-media-cta.central {
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white !important;
+  padding: 1.25rem 2.5rem;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.homepage-social-media-cta.central::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.homepage-social-media-cta.central:hover::before {
+  left: 100%;
+}
+
+.homepage-social-media-cta.central:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 35px rgba(59, 130, 246, 0.5);
+  border-color: rgba(59, 130, 246, 0.7);
+}
+
+.homepage-social-media-cta.central:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.homepage-social-media-cta.central .cta-icon {
+  font-size: 1.4rem;
+  transition: transform 0.3s ease;
+}
+
+.homepage-social-media-cta.central:hover .cta-icon {
+  transform: scale(1.2) rotate(15deg);
+}
+
+/* Seção dos planos */
+.social-pricing-section {
+  width: 100%;
   display: flex;
   justify-content: center;
 }
@@ -2669,27 +2812,173 @@ img, svg {
   gap: 0.5rem;
   text-decoration: none;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  color: white !important;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.social-plan-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.social-plan-btn:hover::before {
+  left: 100%;
 }
 
 .social-plan-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.social-plan-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .social-plan-btn.premium {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .social-plan-btn.premium:hover {
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.social-plan-btn svg {
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.social-plan-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Animação pulsante para destacar os botões */
+@keyframes pulse-social {
+  0% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+}
+
+@keyframes pulse-premium {
+  0% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.social-plan-btn {
+  animation: pulse-social 2s infinite;
+}
+
+.social-plan-btn.premium {
+  animation: pulse-premium 2s infinite;
+}
+
+.social-plan-btn:hover {
+  animation: none;
 }
 
 @media (max-width: 768px) {
   .social-plan-btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
+  }
+
+  .homepage-social-media-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .homepage-social-media-left {
+    margin-bottom: 2rem;
+  }
+
+  .social-pricing-plans {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .social-plan-card {
+    max-width: 100%;
+  }
+
+  .homepage-social-media-title {
+    font-size: 2rem;
+  }
+
+  .homepage-social-media-subtitle {
+    font-size: 1rem;
+  }
+
+  .homepage-social-media-cta.central {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .social-media-cta-section {
+    margin: 1.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .social-plan-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .homepage-social-media-title {
+    font-size: 1.75rem;
+  }
+
+  .social-plan-card {
+    padding: 1.25rem;
+  }
+
+  .plan-price .amount {
+    font-size: 2rem;
+  }
+
+  .platform-tag {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .feature-item {
+    font-size: 0.85rem;
+  }
+
+  .homepage-social-media-cta.central {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .homepage-social-media-cta.central .cta-icon {
+    font-size: 1.2rem;
   }
 }
