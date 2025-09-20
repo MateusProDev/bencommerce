@@ -28,6 +28,8 @@ import {
 } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
+import useSocialMediaFunnel from "../../hooks/useSocialMediaFunnel";
+import SocialMediaFunnel from "../SocialMediaFunnel/SocialMediaFunnel";
 import TurviaLogo from "../../assets/Turvia.png";
 import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
@@ -38,6 +40,13 @@ import "./HomePage.css";
 const HomePage = () => {
   const navigate = useNavigate();
   const { openContactFunnel } = useContactFunnel();
+  const { 
+    isOpen: isSocialMediaOpen, 
+    selectedPlan, 
+    openSocialMediaFunnel, 
+    closeSocialMediaFunnel, 
+    submitLead 
+  } = useSocialMediaFunnel();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showWhatsappNotification, setShowWhatsappNotification] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
@@ -93,6 +102,11 @@ const HomePage = () => {
   const handleContactFunnelOpen = (type, location) => {
     trackEvents.contactFormSubmit(`${type} - ${location}`);
     openContactFunnel(type);
+  };
+
+  const handleSocialMediaFunnelOpen = (plan, location) => {
+    trackEvents.contactFormSubmit(`Social Media ${plan} - ${location}`);
+    openSocialMediaFunnel(plan);
   };
 
   const handleWhatsAppClick = (location) => {
@@ -598,7 +612,7 @@ const HomePage = () => {
               <button
                 onClick={() => {
                   handleCTAClick('Impulsionar Redes Sociais', 'social_media');
-                  handleContactFunnelOpen("completo", "social_media_cta");
+                  handleSocialMediaFunnelOpen("", "social_media_cta");
                 }}
                 className="homepage-social-media-cta"
               >
@@ -653,6 +667,15 @@ const HomePage = () => {
                       <span>Relatório mensal básico</span>
                     </div>
                   </div>
+                  <button 
+                    className="social-plan-btn"
+                    onClick={() => {
+                      handleCTAClick('Solicitar Plano Básico', 'social_media_basic');
+                      handleSocialMediaFunnelOpen("basico", "social_media_basic_card");
+                    }}
+                  >
+                    <FaRocket /> Solicitar Plano Básico
+                  </button>
                 </div>
 
                 <div className="social-plan-card premium-plan">
@@ -709,6 +732,15 @@ const HomePage = () => {
                       <span>Suporte prioritário</span>
                     </div>
                   </div>
+                  <button 
+                    className="social-plan-btn premium"
+                    onClick={() => {
+                      handleCTAClick('Solicitar Plano Premium', 'social_media_premium');
+                      handleSocialMediaFunnelOpen("premium", "social_media_premium_card");
+                    }}
+                  >
+                    <FaBolt /> Solicitar Plano Premium
+                  </button>
                 </div>
               </div>
             </div>
@@ -1162,6 +1194,14 @@ const HomePage = () => {
             </button>
           </div>
         )}
+
+        {/* Social Media Funnel Modal */}
+        <SocialMediaFunnel 
+          isOpen={isSocialMediaOpen}
+          onClose={closeSocialMediaFunnel}
+          onSubmit={submitLead}
+          initialPlan={selectedPlan}
+        />
       </div>
     </div>
     </>
