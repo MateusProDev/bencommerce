@@ -585,7 +585,7 @@ const HomePage = () => {
             <div className="homepage-social-media-left">
               <h2 className="homepage-social-media-title">
                 <FaRocket className="title-icon" />
-                Gerenciamento de Redes Sociais
+                Gerenciamento de Redes Sociais!
               </h2>
               <p className="homepage-social-media-subtitle">
                 Potencialize sua presença digital e atraia mais turistas com nossa 
@@ -609,17 +609,25 @@ const HomePage = () => {
                   <span>Engajamento e interação 24/7</span>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  handleCTAClick('Impulsionar Redes Sociais', 'social_media');
-                  handleSocialMediaFunnelOpen("", "social_media_cta");
-                }}
-                className="homepage-social-media-cta"
-              >
-                <FaBolt className="cta-icon" />
-                Impulsionar Redes Sociais
-              </button>
             </div>
+          </div>
+          
+          {/* CTA Central acima dos planos
+          <div className="social-media-cta-section">
+            <button
+              onClick={() => {
+                handleCTAClick('Impulsionar Redes Sociais', 'social_media');
+                handleSocialMediaFunnelOpen("", "social_media_cta");
+              }}
+              className="homepage-social-media-cta central"
+            >
+              <FaBolt className="cta-icon" />
+              🚀 Impulsionar Redes Sociais!
+            </button>
+          </div> */}
+
+          {/* Planos de Preços */}
+          <div className="social-pricing-section">
             <div className="homepage-social-media-right">
               <div className="social-pricing-plans">
                 <div className="social-plan-card basic-plan">
@@ -671,10 +679,10 @@ const HomePage = () => {
                     className="social-plan-btn"
                     onClick={() => {
                       handleCTAClick('Solicitar Plano Básico', 'social_media_basic');
-                      handleSocialMediaFunnelOpen("basico", "social_media_basic_card");
+                      handleSocialMediaFunnelOpen("basic", "social_media_basic_card");
                     }}
                   >
-                    <FaRocket /> Solicitar Plano Básico
+                    <FaRocket /> 🌟 Solicitar Plano Básico!
                   </button>
                 </div>
 
@@ -739,7 +747,7 @@ const HomePage = () => {
                       handleSocialMediaFunnelOpen("premium", "social_media_premium_card");
                     }}
                   >
-                    <FaBolt /> Solicitar Plano Premium
+                    <FaBolt /> 🚀 Solicitar Plano Premium!
                   </button>
                 </div>
               </div>
