@@ -34,7 +34,6 @@ import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
-import "./SocialMediaSection.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
