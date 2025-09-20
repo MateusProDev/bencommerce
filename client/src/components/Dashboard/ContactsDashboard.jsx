@@ -27,18 +27,20 @@ import './ContactsDashboard.css';
 const ContactsDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const [leads, setLeads] = useState([]);
+  const [socialMediaLeads, setSocialMediaLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('mes');
   const [selectedLead, setSelectedLead] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    // Query para leads normais
     const leadsQuery = query(
       collection(db, 'leads'),
       orderBy('createdAt', 'desc')
     );
     
-    const unsubscribe = onSnapshot(leadsQuery, 
+    const unsubscribeLeads = onSnapshot(leadsQuery, 
       (querySnapshot) => {
         const leadsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
@@ -47,15 +49,40 @@ const ContactsDashboard = () => {
         }));
         
         setLeads(leadsData);
-        setLoading(false);
       },
       (error) => {
         console.error('Erro ao buscar leads:', error);
+      }
+    );
+
+    // Query para leads das redes sociais
+    const socialMediaQuery = query(
+      collection(db, 'social_media_leads'),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const unsubscribeSocialMedia = onSnapshot(socialMediaQuery, 
+      (querySnapshot) => {
+        const socialData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          type: 'redes_sociais'
+        }));
+        
+        setSocialMediaLeads(socialData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Erro ao buscar leads de redes sociais:', error);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeLeads();
+      unsubscribeSocialMedia();
+    };
   }, []);
 
   // Filtrar leads por período
@@ -86,26 +113,66 @@ const ContactsDashboard = () => {
     return leads.filter(lead => lead.createdAt >= startDate);
   }, [leads, selectedPeriod]);
 
+  // Filtrar leads das redes sociais por período
+  const filteredSocialMediaLeads = useMemo(() => {
+    const now = new Date();
+    const startDate = new Date();
+    
+    switch (selectedPeriod) {
+      case 'hoje':
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'semana':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case 'mes':
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'trimestre':
+        startDate.setMonth(now.getMonth() - 3);
+        break;
+      case 'ano':
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+      default:
+        return socialMediaLeads;
+    }
+    
+    return socialMediaLeads.filter(lead => lead.createdAt >= startDate);
+  }, [socialMediaLeads, selectedPeriod]);
+
+  // Combinar todos os leads para estatísticas
+  const allLeads = [...filteredLeads, ...filteredSocialMediaLeads];
+
   // Estatísticas gerais
   const stats = useMemo(() => {
     return {
-      total: filteredLeads.length,
-      novos: filteredLeads.filter(lead => lead.status === 'novo').length,
-      contato: filteredLeads.filter(lead => lead.status === 'contato').length,
-      convertidos: filteredLeads.filter(lead => lead.status === 'convertido').length,
-      perdidos: filteredLeads.filter(lead => lead.status === 'perdido').length
+      total: allLeads.length,
+      novos: allLeads.filter(lead => lead.status === 'novo').length,
+      contato: allLeads.filter(lead => lead.status === 'contato').length,
+      convertidos: allLeads.filter(lead => lead.status === 'convertido').length,
+      perdidos: allLeads.filter(lead => lead.status === 'perdido').length
     };
-  }, [filteredLeads]);
+  }, [allLeads]);
 
   // Análise por planos
   const planStats = useMemo(() => {
     const planCount = {};
+    
+    // Contar planos dos leads normais
     filteredLeads.forEach(lead => {
       const plan = lead.plan || 'nao_informado';
       planCount[plan] = (planCount[plan] || 0) + 1;
     });
+    
+    // Contar planos dos leads das redes sociais
+    filteredSocialMediaLeads.forEach(lead => {
+      const plan = lead.plan || 'nao_informado';
+      planCount[plan] = (planCount[plan] || 0) + 1;
+    });
+    
     return planCount;
-  }, [filteredLeads]);
+  }, [filteredLeads, filteredSocialMediaLeads]);
 
   // Taxa de conversão
   const conversionRate = useMemo(() => {
@@ -126,9 +193,16 @@ const ContactsDashboard = () => {
       const nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
       
-      const count = leads.filter(lead => 
+      // Contar leads normais + leads de redes sociais
+      const normalLeads = leads.filter(lead => 
         lead.createdAt >= date && lead.createdAt < nextDay
       ).length;
+      
+      const socialLeads = socialMediaLeads.filter(lead => 
+        lead.createdAt >= date && lead.createdAt < nextDay
+      ).length;
+      
+      const count = normalLeads + socialLeads;
       
       last7Days.push({
         date: date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
@@ -137,7 +211,7 @@ const ContactsDashboard = () => {
     }
     
     return last7Days;
-  }, [leads]);
+  }, [leads, socialMediaLeads]);
 
   const getPlanName = (plan) => {
     switch (plan) {
@@ -410,6 +484,80 @@ const ContactsDashboard = () => {
           {filteredLeads.length === 0 && (
             <div className="no-data">
               <p>Nenhum contato encontrado no período selecionado.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Leads das Redes Sociais Table */}
+      <div className="recent-leads">
+        <div className="table-header">
+          <h3>Leads das Redes Sociais ({selectedPeriod})</h3>
+        </div>
+        
+        <div className="table-container">
+          <table className="leads-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Empresa</th>
+                <th>Plano</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSocialMediaLeads.slice(0, 10).map((lead) => (
+                <tr key={lead.id}>
+                  <td className="lead-name">
+                    <strong>{lead.name}</strong>
+                  </td>
+                  <td className="lead-contact">
+                    <div className="contact-info">
+                      <div><FaEnvelope /> {lead.email}</div>
+                      <div><FaWhatsapp /> {lead.whatsapp}</div>
+                    </div>
+                  </td>
+                  <td className="lead-company">
+                    {lead.company && (
+                      <div><FaBuilding /> {lead.company}</div>
+                    )}
+                  </td>
+                  <td className="lead-plan">
+                    <span className={`plan-badge ${lead.plan}`}>
+                      {lead.plan === 'basic' ? 'Básico' : lead.plan === 'premium' ? 'Premium' : getPlanName(lead.plan)}
+                    </span>
+                  </td>
+                  <td className="lead-status">
+                    <span className={`status-badge ${lead.status}`}>
+                      {getStatusLabel(lead.status)}
+                    </span>
+                  </td>
+                  <td className="lead-date">
+                    {lead.createdAt.toLocaleDateString('pt-BR')}
+                  </td>
+                  <td className="lead-actions">
+                    <button
+                      className="action-btn view"
+                      onClick={() => {
+                        setSelectedLead(lead);
+                        setIsModalOpen(true);
+                      }}
+                      title="Ver detalhes"
+                    >
+                      <FaEye />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filteredSocialMediaLeads.length === 0 && (
+            <div className="no-data">
+              <p>Nenhum lead de redes sociais encontrado no período selecionado.</p>
             </div>
           )}
         </div>

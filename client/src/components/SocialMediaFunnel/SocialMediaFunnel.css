@@ -1,0 +1,45 @@
+/* SocialMediaFunnel.css */
+/* Herda todos os estilos do ContactFunnel.css e adiciona customizações específicas */
+
+.social-media-funnel {
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+.social-media-funnel .funnel-container {
+  border: 2px solid rgba(59, 130, 246, 0.1);
+}
+
+.social-media-funnel .progress-fill {
+  background: linear-gradient(90deg, #e1306c 0%, #1877f2 50%, #3b82f6 100%);
+}
+
+.social-media-funnel .funnel-next-btn,
+.social-media-funnel .funnel-submit-btn {
+  background: linear-gradient(135deg, #e1306c 0%, #1877f2 100%);
+}
+
+.social-media-funnel .funnel-next-btn:hover,
+.social-media-funnel .funnel-submit-btn:hover {
+  background: linear-gradient(135deg, #c13584 0%, #166fe5 100%);
+}
+
+.social-media-funnel .success-checkmark {
+  background: linear-gradient(135deg, #e1306c 0%, #1877f2 100%);
+}
+
+/* Estilos específicos para campos de redes sociais */
+.social-media-funnel .form-input:focus,
+.social-media-funnel .form-select:focus,
+.social-media-funnel .form-textarea:focus {
+  border-color: #e1306c;
+  box-shadow: 0 0 0 3px rgba(225, 48, 108, 0.1);
+}
+
+.social-media-funnel .step-number {
+  background: linear-gradient(135deg, #e1306c 0%, #1877f2 100%);
+}
+
+.social-media-funnel .funnel-step.active .step-number {
+  background: linear-gradient(135deg, #e1306c 0%, #1877f2 100%);
+  box-shadow: 0 0 0 3px rgba(225, 48, 108, 0.2);
+}

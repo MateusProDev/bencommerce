@@ -45,6 +45,7 @@ import SalesReports from "../SalesReports/SalesReports";
 import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
 import DashboardHome from "./DashboardHome";
 import PaymentsSettings from "../PaymentsSettings/PaymentsSettings"; // <-- 1. Importe o novo componente
+import SocialMediaLeadsReport from "./SocialMediaLeadsReport"; // Importe do componente de leads de redes sociais
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -220,6 +221,7 @@ const Dashboard = ({ user }) => {
     { text: "Editar Banner", icon: <ImageIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Editar Rodapé", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] }, // Usando EditIcon
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Leads Redes Sociais", icon: <AssessmentIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
@@ -302,6 +304,8 @@ const Dashboard = ({ user }) => {
             lojaId={currentUser?.uid} // <-- Passando lojaId
           />
         );
+      case "Leads Redes Sociais":
+        return <SocialMediaLeadsReport currentUser={currentUser} />;
       case "Relatórios de Vendas":
         return <SalesReports currentUser={currentUser} />;
       case "Configurar WhatsApp":
