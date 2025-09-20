@@ -2298,3 +2298,356 @@ img, svg {
   color: var(--gray-600);
   line-height: 1.6;
 }
+
+/* ========================================
+   SOCIAL MEDIA MANAGEMENT SECTION
+   ======================================== */
+
+.homepage-social-media {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.homepage-social-media::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.homepage-social-media-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.homepage-social-media-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.homepage-social-media-left {
+  padding-right: 2rem;
+}
+
+.homepage-social-media-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.homepage-social-media-title .title-icon {
+  color: var(--primary-blue);
+  font-size: 2.5rem;
+}
+
+.homepage-social-media-subtitle {
+  font-size: 1.25rem;
+  color: var(--gray-600);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.homepage-social-media-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.benefit-icon {
+  color: var(--success-green);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.benefit-item span {
+  font-size: 1.1rem;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.homepage-social-media-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.homepage-social-media-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+}
+
+.homepage-social-media-cta .cta-icon {
+  font-size: 1.2rem;
+}
+
+.homepage-social-media-right {
+  display: flex;
+  justify-content: center;
+}
+
+.social-pricing-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.social-plan-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.social-plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.social-plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.social-plan-card:hover::before {
+  opacity: 1;
+}
+
+.social-plan-card.premium-plan {
+  border-color: var(--primary-blue);
+  position: relative;
+}
+
+.social-plan-card.premium-plan::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  opacity: 1;
+}
+
+.plan-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0 0 12px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  z-index: 2;
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+}
+
+.premium-plan .plan-header {
+  padding-top: 2rem;
+}
+
+.plan-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.plan-price .currency {
+  font-size: 1.2rem;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.plan-price .amount {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  line-height: 1;
+}
+
+.plan-price .period {
+  font-size: 1rem;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.plan-platforms {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.platform-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-blue);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.platform-tag.instagram {
+  background: rgba(225, 48, 108, 0.1);
+  color: #e1306c;
+}
+
+.platform-tag.facebook {
+  background: rgba(24, 119, 242, 0.1);
+  color: #1877f2;
+}
+
+.platform-tag i {
+  font-size: 1rem;
+}
+
+.plan-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.feature-icon {
+  color: var(--success-green);
+  font-size: 1rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.feature-item.premium .feature-icon {
+  color: var(--primary-blue);
+}
+
+.feature-item span {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  line-height: 1.4;
+}
+
+.feature-item strong {
+  color: var(--gray-900);
+  font-weight: 700;
+}
+
+.feature-item.premium span strong {
+  color: var(--primary-blue);
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .homepage-social-media-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+  
+  .homepage-social-media-left {
+    padding-right: 0;
+    order: 2;
+  }
+  
+  .homepage-social-media-right {
+    order: 1;
+  }
+  
+  .homepage-social-media-title {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-social-media {
+    padding: 4rem 0;
+  }
+  
+  .social-pricing-plans {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .homepage-social-media-title {
+    font-size: 2.25rem;
+  }
+  
+  .homepage-social-media-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .social-plan-card {
+    padding: 1.5rem;
+  }
+  
+  .plan-price .amount {
+    font-size: 2.5rem;
+  }
+}
