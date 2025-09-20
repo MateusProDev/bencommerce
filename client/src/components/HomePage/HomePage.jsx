@@ -34,6 +34,7 @@ import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
+import "./SocialMediaSection.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -206,6 +207,7 @@ const HomePage = () => {
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "20Buscar Vacation Beach", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
+    // { name: "VcTur", logo: VcTurLogo },
   ];
 
   return (
@@ -558,6 +560,158 @@ const HomePage = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Media Management Section */}
+      <section className="homepage-social-media">
+        <div className="homepage-social-media-container">
+          <div className="homepage-social-media-content">
+            <div className="homepage-social-media-left">
+              <h2 className="homepage-social-media-title">
+                <FaRocket className="title-icon" />
+                Gerenciamento de Redes Sociais
+              </h2>
+              <p className="homepage-social-media-subtitle">
+                Potencialize sua presença digital e atraia mais turistas com nossa 
+                gestão completa de redes sociais especializada em turismo.
+              </p>
+              <div className="homepage-social-media-benefits">
+                <div className="benefit-item">
+                  <FaCheck className="benefit-icon" />
+                  <span>Conteúdo visual profissional dos destinos</span>
+                </div>
+                <div className="benefit-item">
+                  <FaCheck className="benefit-icon" />
+                  <span>Campanhas direcionadas para seu público</span>
+                </div>
+                <div className="benefit-item">
+                  <FaCheck className="benefit-icon" />
+                  <span>Relatórios detalhados de performance</span>
+                </div>
+                <div className="benefit-item">
+                  <FaCheck className="benefit-icon" />
+                  <span>Engajamento e interação 24/7</span>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  handleCTAClick('Impulsionar Redes Sociais', 'social_media');
+                  handleContactFunnelOpen("completo", "social_media_cta");
+                }}
+                className="homepage-social-media-cta"
+              >
+                <FaBolt className="cta-icon" />
+                Impulsionar Redes Sociais
+              </button>
+            </div>
+            <div className="homepage-social-media-right">
+              <div className="social-pricing-plans">
+                <div className="social-plan-card basic-plan">
+                  <div className="plan-header">
+                    <h3>Plano Básico</h3>
+                    <div className="plan-price">
+                      <span className="currency">R$</span>
+                      <span className="amount">99,99</span>
+                      <span className="period">/mês</span>
+                    </div>
+                  </div>
+                  <div className="plan-platforms">
+                    <div className="platform-tag instagram">
+                      <i className="fab fa-instagram"></i>
+                      Instagram
+                    </div>
+                    <div className="platform-tag facebook">
+                      <i className="fab fa-facebook-f"></i>
+                      Facebook
+                    </div>
+                  </div>
+                  <div className="plan-features">
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>15 posts mensais por plataforma</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Stories personalizados</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Conteúdo visual profissional</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Planejamento de conteúdo</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Engajamento e respostas</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Relatório mensal básico</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="social-plan-card premium-plan">
+                  <div className="plan-badge">Mais Completo</div>
+                  <div className="plan-header">
+                    <h3>Plano Premium</h3>
+                    <div className="plan-price">
+                      <span className="currency">R$</span>
+                      <span className="amount">197,99</span>
+                      <span className="period">/mês</span>
+                    </div>
+                  </div>
+                  <div className="plan-platforms">
+                    <div className="platform-tag instagram">
+                      <i className="fab fa-instagram"></i>
+                      Instagram
+                    </div>
+                    <div className="platform-tag facebook">
+                      <i className="fab fa-facebook-f"></i>
+                      Facebook
+                    </div>
+                  </div>
+                  <div className="plan-features">
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span><strong>Tudo do Plano Básico +</strong></span>
+                    </div>
+                    <div className="feature-item premium">
+                      <FaBolt className="feature-icon" />
+                      <span><strong>Gestão de Tráfego Pago</strong></span>
+                    </div>
+                    <div className="feature-item premium">
+                      <FaBolt className="feature-icon" />
+                      <span>Campanhas Facebook/Instagram Ads</span>
+                    </div>
+                    <div className="feature-item premium">
+                      <FaBolt className="feature-icon" />
+                      <span>Segmentação avançada de público</span>
+                    </div>
+                    <div className="feature-item premium">
+                      <FaBolt className="feature-icon" />
+                      <span>Otimização de conversões</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>25 posts mensais por plataforma</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Relatórios detalhados de ROI</span>
+                    </div>
+                    <div className="feature-item">
+                      <FaCheck className="feature-icon" />
+                      <span>Suporte prioritário</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
