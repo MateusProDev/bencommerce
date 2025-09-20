@@ -1,4 +1,4 @@
-/* HomePage.css - MabelSoft Theme */
+﻿/* HomePage.css - MabelSoft Theme */
 
 /* ========================================
    LOADING SCREEN - ESTILO CHATGPT
@@ -140,7 +140,7 @@
   animation-duration: 5s;
 }
 
-/* Animations - Mais rápidas e modernas */
+/* Animations - Mais rÃ¡pidas e modernas */
 @keyframes loadingFadeIn {
   from {
     opacity: 0;
@@ -1530,7 +1530,7 @@ section, footer {
 }
 
 /* Testimonials Section */
-/* Botão de depoimento moderno */
+/* BotÃ£o de depoimento moderno */
 .homepage-testimonial-button {
   background: var(--gradient-primary);
   color: var(--white);
