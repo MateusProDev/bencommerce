@@ -49,8 +49,8 @@ const HomePage = () => {
     submitLead 
   } = useSocialMediaFunnel();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showWhatsappNotification, setShowWhatsappNotification] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [activeService, setActiveService] = useState(1); // Card featured por padrão (índice 1)
   const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [typewriterText, setTypewriterText] = useState('');
@@ -96,9 +96,62 @@ const HomePage = () => {
     trackEvents.menuClick('mobile_menu_toggle');
   };
 
-  const toggleWhatsappNotification = () => {
-    setShowWhatsappNotification(!showWhatsappNotification);
+  // Função para navegar pelos serviços no carousel
+  const scrollToService = (index) => {
+    const track = document.querySelector('.turvia-services-track');
+    if (track) {
+      const card = track.children[index];
+      if (card) {
+        const trackRect = track.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const scrollLeft = card.offsetLeft - (trackRect.width / 2) + (cardRect.width / 2);
+        
+        track.scrollTo({
+          left: Math.max(0, scrollLeft),
+          behavior: 'smooth'
+        });
+        setActiveService(index);
+      }
+    }
   };
+
+  // Detectar qual card está no centro durante o scroll
+  useEffect(() => {
+    const track = document.querySelector('.turvia-services-track');
+    if (!track) return;
+
+    const handleScroll = () => {
+      const trackRect = track.getBoundingClientRect();
+      const centerX = trackRect.left + trackRect.width / 2;
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      Array.from(track.children).forEach((card, index) => {
+        if (card.classList.contains('scroll-indicator')) return; // Skip indicators
+        
+        const cardRect = card.getBoundingClientRect();
+        const cardCenterX = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(centerX - cardCenterX);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      if (closestIndex !== activeService) {
+        setActiveService(closestIndex);
+      }
+    };
+
+    track.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
+
+    return () => {
+      track.removeEventListener('scroll', handleScroll);
+    };
+  }, [activeService]);
 
   // Funções auxiliares para tracking
   const handleContactFunnelOpen = (type, location) => {
@@ -468,70 +521,85 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="turvia-services-grid">
-            <div className="turvia-service-card">
-              <div className="turvia-service-icon">
-                <FaGlobe />
+          <div className="turvia-services-carousel">
+            <div className="turvia-services-track">
+              <div className={`turvia-service-card ${activeService === 0 ? 'center-active' : ''}`}>
+                <div className="turvia-service-icon">
+                  <FaGlobe />
+                </div>
+                <h3 className="turvia-service-title">Sites Personalizados</h3>
+                <p className="turvia-service-description">
+                  Criamos sites únicos e responsivos que representam a identidade da sua agência e convertem visitantes em clientes.
+                </p>
+                <ul className="turvia-service-features">
+                  <li>Design exclusivo e responsivo</li>
+                  <li>SEO otimizado para turismo</li>
+                  <li>Integração com redes sociais</li>
+                  <li>Sistema de reservas integrado</li>
+                </ul>
               </div>
-              <h3 className="turvia-service-title">Sites Personalizados</h3>
-              <p className="turvia-service-description">
-                Criamos sites únicos e responsivos que representam a identidade da sua agência e convertem visitantes em clientes.
-              </p>
-              <ul className="turvia-service-features">
-                <li>Design exclusivo e responsivo</li>
-                <li>SEO otimizado para turismo</li>
-                <li>Integração com redes sociais</li>
-                <li>Sistema de reservas integrado</li>
-              </ul>
-            </div>
 
-            <div className="turvia-service-card featured">
-              <div className="turvia-service-badge">Mais Popular</div>
-              <div className="turvia-service-icon">
-                <FaCogs />
+              <div className={`turvia-service-card featured ${activeService === 1 ? 'center-active' : ''}`}>
+                <div className="turvia-service-badge">Mais Popular</div>
+                <div className="turvia-service-icon">
+                  <FaCogs />
+                </div>
+                <h3 className="turvia-service-title">Sistema Completo 3em1</h3>
+                <p className="turvia-service-description">
+                  Plataforma completa que integra site, gestão de clientes e sistema de reservas em uma única solução.
+                </p>
+                <ul className="turvia-service-features">
+                  <li>Site + Gestão + Reservas</li>
+                  <li>Dashboard inteligente</li>
+                  <li>Controle financeiro</li>
+                  <li>Relatórios avançados</li>
+                </ul>
               </div>
-              <h3 className="turvia-service-title">Sistema Completo 3em1</h3>
-              <p className="turvia-service-description">
-                Plataforma completa que integra site, gestão de clientes e sistema de reservas em uma única solução.
-              </p>
-              <ul className="turvia-service-features">
-                <li>Site + Gestão + Reservas</li>
-                <li>Dashboard inteligente</li>
-                <li>Controle financeiro</li>
-                <li>Relatórios avançados</li>
-              </ul>
-            </div>
 
-            <div className="turvia-service-card">
-              <div className="turvia-service-icon">
-                <FaUsers />
+              <div className={`turvia-service-card ${activeService === 2 ? 'center-active' : ''}`}>
+                <div className="turvia-service-icon">
+                  <FaUsers />
+                </div>
+                <h3 className="turvia-service-title">Gerenciamento de Redes Sociais</h3>
+                <p className="turvia-service-description">
+                  Cuidamos das suas redes sociais com conteúdo profissional e estratégias que atraem turistas.
+                </p>
+                <ul className="turvia-service-features">
+                  <li>Conteúdo visual profissional</li>
+                  <li>Campanhas direcionadas</li>
+                  <li>Relatórios de performance</li>
+                  <li>Engajamento 24/7</li>
+                </ul>
               </div>
-              <h3 className="turvia-service-title">Gerenciamento de Redes Sociais</h3>
-              <p className="turvia-service-description">
-                Cuidamos das suas redes sociais com conteúdo profissional e estratégias que atraem turistas.
-              </p>
-              <ul className="turvia-service-features">
-                <li>Conteúdo visual profissional</li>
-                <li>Campanhas direcionadas</li>
-                <li>Relatórios de performance</li>
-                <li>Engajamento 24/7</li>
-              </ul>
-            </div>
 
-            <div className="turvia-service-card">
-              <div className="turvia-service-icon">
-                <FaPalette />
+              <div className={`turvia-service-card ${activeService === 3 ? 'center-active' : ''}`}>
+                <div className="turvia-service-icon">
+                  <FaPalette />
+                </div>
+                <h3 className="turvia-service-title">Identidade Visual</h3>
+                <p className="turvia-service-description">
+                  Desenvolvemos a identidade visual completa da sua agência, desde logo até materiais promocionais.
+                </p>
+                <ul className="turvia-service-features">
+                  <li>Logo e marca profissional</li>
+                  <li>Materiais gráficos</li>
+                  <li>Identidade digital</li>
+                  <li>Manual da marca</li>
+                </ul>
               </div>
-              <h3 className="turvia-service-title">Identidade Visual</h3>
-              <p className="turvia-service-description">
-                Desenvolvemos a identidade visual completa da sua agência, desde logo até materiais promocionais.
-              </p>
-              <ul className="turvia-service-features">
-                <li>Logo e marca profissional</li>
-                <li>Materiais gráficos</li>
-                <li>Identidade digital</li>
-                <li>Manual da marca</li>
-              </ul>
+            </div>
+            
+            <div className="turvia-services-scroll-indicators">
+              {[0, 1, 2, 3].map((index) => (
+                <div
+                  key={index}
+                  className={`scroll-indicator ${activeService === index ? 'active' : ''}`}
+                  onClick={() => scrollToService(index)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Ir para serviço ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
 
@@ -1299,73 +1367,22 @@ const HomePage = () => {
         </div>
       </footer>
 
-      {/* WhatsApp Button */}
-      <div className="homepage-whatsapp-button">
-        <button
-          className="homepage-whatsapp-button-icon"
-          onClick={toggleWhatsappNotification}
-        >
-          <FaWhatsapp className="homepage-whatsapp-icon" />
-        </button>
+      {/* Social Media Funnel Modal */}
+      <SocialMediaFunnel 
+        isOpen={isSocialMediaOpen}
+        onClose={closeSocialMediaFunnel}
+        onSubmit={submitLead}
+        initialPlan={selectedPlan}
+      />
 
-        {/* WhatsApp Notification */}
-        {showWhatsappNotification && (
-          <div className="homepage-whatsapp-notification">
-            <div className="homepage-whatsapp-notification-header">
-              <div className="homepage-whatsapp-notification-title">
-                <FaWhatsapp className="homepage-whatsapp-notification-title-icon" />
-                <span>Atendimento</span>
-              </div>
-              <button
-                className="homepage-whatsapp-notification-close"
-                onClick={toggleWhatsappNotification}
-              >
-                <svg
-                  className="homepage-whatsapp-notification-close-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <p className="homepage-whatsapp-notification-message">
-              Olá! Como posso ajudar sua agência hoje?
-            </p>
-            <button
-              className="homepage-whatsapp-notification-button"
-              onClick={() =>
-                window.open("https://wa.me/5585991470709", "_blank")
-              }
-            >
-              Iniciar Conversa
-            </button>
-          </div>
-        )}
-
-        {/* Social Media Funnel Modal */}
-        <SocialMediaFunnel 
-          isOpen={isSocialMediaOpen}
-          onClose={closeSocialMediaFunnel}
-          onSubmit={submitLead}
-          initialPlan={selectedPlan}
-        />
-
-        {/* Botão Flutuante WhatsApp */}
-        <div 
-          className="whatsapp-floating-button"
-          onClick={() => handleWhatsAppClick('floating')}
-          title="Fale conosco no WhatsApp"
-        >
-          <FaWhatsapp />
-        </div>
+      {/* Botão Flutuante WhatsApp */}
+      <div 
+        className="whatsapp-floating-button"
+        onClick={() => handleWhatsAppClick('floating')}
+        title="Fale conosco no WhatsApp"
+      >
+        <FaWhatsapp />
+      </div>
 
         {/* WhatsApp Services Modal */}
         {whatsappModalOpen && (
@@ -1396,7 +1413,6 @@ const HomePage = () => {
             </div>
           </div>
         )}
-      </div>
     </div>
     </>
   );

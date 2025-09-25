@@ -78,36 +78,77 @@
   line-height: 1.6;
 }
 
-.turvia-services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+.turvia-services-carousel {
+  position: relative;
+  width: 100%;
   margin-bottom: 4rem;
+  overflow: hidden;
+}
+
+.turvia-services-track {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Center the first and last items */
+  padding-left: calc(50% - 160px);
+  padding-right: calc(50% - 160px);
+}
+
+.turvia-services-track::-webkit-scrollbar {
+  display: none;
 }
 
 .turvia-service-card {
   background: white;
   border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(23, 0, 56, 0.1);
-  transition: all 0.3s ease;
+  padding: 2rem;
+  min-width: 320px;
+  max-width: 320px;
+  box-shadow: 0 10px 40px rgba(23, 0, 56, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   border: 1px solid rgba(129, 168, 197, 0.2);
+  scroll-snap-align: center;
+  opacity: 0.6;
+  transform: scale(0.85);
+  flex-shrink: 0;
 }
 
 .turvia-service-card:hover {
-  transform: translateY(-5px);
+  opacity: 1;
+  transform: scale(0.95) translateY(-3px);
+  box-shadow: 0 15px 50px rgba(23, 0, 56, 0.12);
+  border-color: var(--turvia-secondary);
+}
+
+/* Card em destaque (no centro da tela) */
+.turvia-service-card.center-active {
+  opacity: 1;
+  transform: scale(1);
   box-shadow: 0 20px 60px rgba(23, 0, 56, 0.15);
   border-color: var(--turvia-secondary);
+  z-index: 10;
+}
+
+.turvia-service-card.center-active:hover {
+  transform: scale(1.02) translateY(-5px);
+  box-shadow: 0 25px 70px rgba(23, 0, 56, 0.2);
 }
 
 .turvia-service-card.featured {
   border: 2px solid var(--turvia-secondary);
-  transform: scale(1.05);
 }
 
-.turvia-service-card.featured:hover {
-  transform: scale(1.05) translateY(-5px);
+.turvia-service-card.featured.center-active {
+  border: 2px solid var(--turvia-secondary);
+  box-shadow: 0 20px 60px rgba(129, 168, 197, 0.2);
 }
 
 .turvia-service-badge {
@@ -170,6 +211,32 @@
   font-size: 1.1rem;
 }
 
+.turvia-services-scroll-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.scroll-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(129, 168, 197, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scroll-indicator.active {
+  background: var(--turvia-secondary);
+  transform: scale(1.2);
+}
+
+.scroll-indicator:hover {
+  background: var(--turvia-secondary);
+  opacity: 0.8;
+}
+
 .turvia-services-cta {
   text-align: center;
   margin-top: 3rem;
@@ -223,17 +290,61 @@
     font-size: 2.5rem;
   }
   
-  .turvia-services-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .turvia-service-card.featured {
-    transform: none;
+  .turvia-services-track {
+    padding-left: calc(50% - 140px);
+    padding-right: calc(50% - 140px);
+    gap: 1rem;
   }
   
   .turvia-service-card {
-    padding: 2rem;
+    min-width: 280px;
+    max-width: 280px;
+    padding: 1.75rem;
+  }
+  
+  .turvia-service-card.center-active {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .turvia-services-track {
+    padding-left: calc(50% - 120px);
+    padding-right: calc(50% - 120px);
+    gap: 0.75rem;
+  }
+  
+  .turvia-service-card {
+    min-width: 240px;
+    max-width: 240px;
+    padding: 1.5rem;
+  }
+  
+  .turvia-service-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .turvia-service-title {
+    font-size: 1.25rem;
+  }
+  
+  .turvia-service-description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .turvia-services-track {
+    padding-left: calc(50% - 110px);
+    padding-right: calc(50% - 110px);
+  }
+  
+  .turvia-service-card {
+    min-width: 220px;
+    max-width: 220px;
+    padding: 1.25rem;
   }
 }
 
