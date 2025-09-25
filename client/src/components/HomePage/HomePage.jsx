@@ -35,6 +35,7 @@ import TurviaLogo from "../../assets/Turvia.png";
 import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
+import VcTurLogo from "../../assets/VcturLogo.png";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
 
@@ -304,11 +305,12 @@ const HomePage = () => {
   ];
 
   const clients = [
-    { name: "20Buscar Vacation Beach", logo: BuscarLogo },
+    { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
-    { name: "20Buscar Vacation Beach", logo: BuscarLogo },
+    { name: "VcTur", logo: VcTurLogo },
+    { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
-    // { name: "VcTur", logo: VcTurLogo },
+    { name: "VcTur", logo: VcTurLogo },
   ];
 
   return (
