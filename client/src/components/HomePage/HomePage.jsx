@@ -427,12 +427,11 @@ const HomePage = () => {
 
         <div className="homepage-hero-content">
           <h1 className="homepage-hero-title">
-            Turvia - Agência Especializada em Soluções Digitais
+            Especialistas em Soluções para Agências de Turismo
           </h1>
           <p className="homepage-hero-subtitle">
-            Para donos de agências: criamos sites personalizados, sistemas completos 3em1, 
-            gerenciamento de redes sociais e desenvolvemos sua identidade visual. 
-            Sua agência com presença digital completa e profissional.
+            Sites personalizados, sistemas completos, redes sociais e identidade visual. 
+            Tudo para sua agência de turismo conquistar mais clientes online.
           </p>
           <div className="homepage-hero-buttons">
             <button
