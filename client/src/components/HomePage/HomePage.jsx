@@ -20,6 +20,7 @@ import {
   FaCogs,
   FaTags,
   FaEnvelope,
+  FaPalette,
 } from "react-icons/fa";
 import { 
   HiSparkles, 
@@ -50,6 +51,7 @@ const HomePage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showWhatsappNotification, setShowWhatsappNotification] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [typewriterText, setTypewriterText] = useState('');
 
@@ -111,7 +113,40 @@ const HomePage = () => {
 
   const handleWhatsAppClick = (location) => {
     trackEvents.whatsappClick(location);
-    window.open('https://wa.me/5511999999999', '_blank'); // Substitua pelo seu número
+    if (location === 'floating') {
+      setWhatsappModalOpen(true);
+    } else {
+      window.open('https://wa.me/5585991470709', '_blank');
+    }
+  };
+
+  const whatsappServices = [
+    {
+      title: "Site Personalizado",
+      icon: "🌐",
+      message: "Olá! Gostaria de saber mais sobre criação de site personalizado para minha agência de turismo. Podem me ajudar com mais informações sobre preços e funcionalidades?"
+    },
+    {
+      title: "Sistema Completo",
+      icon: "⚙️",
+      message: "Olá! Tenho interesse no sistema completo 3em1 para agência de turismo. Gostaria de saber mais sobre as funcionalidades, preços e como funciona a implementação."
+    },
+    {
+      title: "Gerenciamento de Redes Sociais",
+      icon: "📱",
+      message: "Olá! Preciso de ajuda com gerenciamento de redes sociais para minha agência de turismo. Podem me explicar como funciona o serviço e os valores?"
+    },
+    {
+      title: "Criação de Identidade Visual",
+      icon: "🎨",
+      message: "Olá! Gostaria de criar uma identidade visual profissional para minha agência de turismo. Podem me mostrar portfólio e orçamento?"
+    }
+  ];
+
+  const handleWhatsAppServiceClick = (service) => {
+    const message = encodeURIComponent(service.message);
+    window.open(`https://wa.me/5585991470709?text=${message}`, '_blank');
+    setWhatsappModalOpen(false);
   };
 
   const handleCTAClick = (ctaText, location) => {
@@ -129,33 +164,33 @@ const HomePage = () => {
   const features = [
     {
       icon: <FaGlobe />,
-      title: "Site Personalizado",
+      title: "Desenvolvimento Web Especializado",
       description:
-        "Desenvolvemos seu site totalmente personalizado com identidade visual única para sua agência",
+        "Criamos sites únicos para agências de turismo com foco em conversão e experiência do usuário, otimizados para o mercado turístico",
+    },
+    {
+      icon: <FaCogs />,
+      title: "Integração Completa",
+      description:
+        "Desenvolvemos sistemas que integram site, gestão de clientes, reservas e pagamentos em uma única plataforma eficiente",
     },
     {
       icon: <FaUsers />,
-      title: "Sistema de Clientes",
+      title: "Estratégia Digital",
       description:
-        "Cadastro completo de clientes com histórico de reservas e preferências de viagem",
-    },
-    {
-      icon: <FaCar />,
-      title: "Gestão de Motoristas",
-      description:
-        "Controle completo da frota e motoristas com agenda de serviços e acompanhamento em tempo real",
+        "Cuidamos da presença digital completa da sua agência: redes sociais, identidade visual e marketing digital especializado",
     },
     {
       icon: <FaChartLine />,
-      title: "Dashboard Inteligente",
+      title: "Análise e Otimização",
       description:
-        "Acompanhe o desempenho da sua agência com relatórios detalhados e métricas importantes",
+        "Monitoramos e otimizamos constantemente o desempenho digital da sua agência com relatórios detalhados e insights valiosos",
     },
     {
-      icon: <FaCreditCard />,
-      title: "Gestão Financeira",
+      icon: <FaRocket />,
+      title: "Suporte Especializado",
       description:
-        "Controle de pagamentos, comissões e finanças da sua agência de forma integrada",
+        "Equipe dedicada com expertise em turismo para garantir que sua agência tenha sempre o melhor suporte técnico e estratégico",
     },
   ];
 
@@ -173,7 +208,7 @@ const HomePage = () => {
         "Relatórios simples",
         "Suporte horário comercial",
       ],
-      ctaText: "Contratar Agora",
+      ctaText: "Vamos Começar",
       featured: false,
     },
     {
@@ -192,7 +227,7 @@ const HomePage = () => {
         "Suporte prioritário",
         "7 dias grátis para teste",
       ],
-      ctaText: "Testar Grátis",
+      ctaText: "Agendar Demonstração",
       featured: true,
     },
     {
@@ -210,7 +245,7 @@ const HomePage = () => {
         "Treinamento da equipe",
         "Consultoria especializada",
       ],
-      ctaText: "Falar com Vendas",
+      ctaText: "Vamos Conversar",
       featured: false,
     },
   ];
@@ -287,6 +322,14 @@ const HomePage = () => {
           <li className="homepage-nav-link" onClick={() => openContactFunnel()}>
             Contato
           </li>
+          <li 
+            className="homepage-nav-whatsapp"
+            onClick={() => window.open('https://wa.me/5585991470709', '_blank')}
+            title="Fale conosco no WhatsApp"
+          >
+            <FaWhatsapp />
+            +55 85 99147-0709
+          </li>
           <li
             className="homepage-nav-button"
             onClick={() => openContactFunnel("completo")}
@@ -349,6 +392,16 @@ const HomePage = () => {
                 Contato
               </li>
               <li
+                className="homepage-mobile-menu-whatsapp"
+                onClick={() => {
+                  window.open('https://wa.me/5585991470709', '_blank');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <FaWhatsapp />
+                WhatsApp
+              </li>
+              <li
                 className="homepage-mobile-menu-button teste-toggle"
                 onClick={() => {
                   openContactFunnel("completo");
@@ -374,30 +427,125 @@ const HomePage = () => {
 
         <div className="homepage-hero-content">
           <h1 className="homepage-hero-title">
-            Sistema completo para sua agência de turismo
+            Turvia - Agência Especializada em Soluções Digitais
           </h1>
           <p className="homepage-hero-subtitle">
-            Site personalizado, gestão de clientes, motoristas e reservas em uma
-            única plataforma. Tudo que você precisa para expandir seu negócio.
+            Para donos de agências: criamos sites personalizados, sistemas completos 3em1, 
+            gerenciamento de redes sociais e desenvolvemos sua identidade visual. 
+            Sua agência com presença digital completa e profissional.
           </p>
           <div className="homepage-hero-buttons">
             <button
               onClick={() => {
-                handleCTAClick('Solicitar Demonstração', 'hero');
+                handleCTAClick('Vamos Trabalhar Juntos', 'hero');
                 handleContactFunnelOpen("completo", "hero_primary");
               }}
               className="homepage-hero-primary-button"
             >
-              Solicitar Demonstração
+              Vamos Trabalhar Juntos
             </button>
             <button
               onClick={() => {
-                handleCTAClick('Conhecer Soluções', 'hero');
+                handleCTAClick('Ver Nossos Serviços', 'hero');
                 handleContactFunnelOpen("completo", "hero_secondary");
               }}
               className="homepage-hero-secondary-button"
             >
-              Conhecer Soluções
+              Ver Nossos Serviços
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Turvia Agency Services Section */}
+      <section className="turvia-services-section">
+        <div className="turvia-services-container">
+          <div className="turvia-services-header">
+            <h2 className="turvia-services-title">
+              Soluções Completas para Agências de Turismo
+            </h2>
+            <p className="turvia-services-subtitle">
+              Somos especialistas em transformar agências de turismo com soluções digitais completas e personalizadas
+            </p>
+          </div>
+
+          <div className="turvia-services-grid">
+            <div className="turvia-service-card">
+              <div className="turvia-service-icon">
+                <FaGlobe />
+              </div>
+              <h3 className="turvia-service-title">Sites Personalizados</h3>
+              <p className="turvia-service-description">
+                Criamos sites únicos e responsivos que representam a identidade da sua agência e convertem visitantes em clientes.
+              </p>
+              <ul className="turvia-service-features">
+                <li>Design exclusivo e responsivo</li>
+                <li>SEO otimizado para turismo</li>
+                <li>Integração com redes sociais</li>
+                <li>Sistema de reservas integrado</li>
+              </ul>
+            </div>
+
+            <div className="turvia-service-card featured">
+              <div className="turvia-service-badge">Mais Popular</div>
+              <div className="turvia-service-icon">
+                <FaCogs />
+              </div>
+              <h3 className="turvia-service-title">Sistema Completo 3em1</h3>
+              <p className="turvia-service-description">
+                Plataforma completa que integra site, gestão de clientes e sistema de reservas em uma única solução.
+              </p>
+              <ul className="turvia-service-features">
+                <li>Site + Gestão + Reservas</li>
+                <li>Dashboard inteligente</li>
+                <li>Controle financeiro</li>
+                <li>Relatórios avançados</li>
+              </ul>
+            </div>
+
+            <div className="turvia-service-card">
+              <div className="turvia-service-icon">
+                <FaUsers />
+              </div>
+              <h3 className="turvia-service-title">Gerenciamento de Redes Sociais</h3>
+              <p className="turvia-service-description">
+                Cuidamos das suas redes sociais com conteúdo profissional e estratégias que atraem turistas.
+              </p>
+              <ul className="turvia-service-features">
+                <li>Conteúdo visual profissional</li>
+                <li>Campanhas direcionadas</li>
+                <li>Relatórios de performance</li>
+                <li>Engajamento 24/7</li>
+              </ul>
+            </div>
+
+            <div className="turvia-service-card">
+              <div className="turvia-service-icon">
+                <FaPalette />
+              </div>
+              <h3 className="turvia-service-title">Identidade Visual</h3>
+              <p className="turvia-service-description">
+                Desenvolvemos a identidade visual completa da sua agência, desde logo até materiais promocionais.
+              </p>
+              <ul className="turvia-service-features">
+                <li>Logo e marca profissional</li>
+                <li>Materiais gráficos</li>
+                <li>Identidade digital</li>
+                <li>Manual da marca</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="turvia-services-cta">
+            <button
+              onClick={() => {
+                handleCTAClick('Vamos Conversar Sobre Seu Projeto', 'services');
+                handleContactFunnelOpen("completo", "services_cta");
+              }}
+              className="turvia-services-cta-button"
+            >
+              <FaRocket />
+              Vamos Conversar Sobre Seu Projeto
             </button>
           </div>
         </div>
@@ -407,7 +555,7 @@ const HomePage = () => {
       <section className="homepage-features">
         <div className="homepage-features-container">
           <h2 className="homepage-features-title">
-            Sistema três em um para agências de turismo
+            Como Transformamos Sua Agência Digitalmente
           </h2>
 
           <div className="homepage-features-tabs">
@@ -444,7 +592,7 @@ const HomePage = () => {
                   className="homepage-feature-button"
                   onClick={() => openContactFunnel("completo")}
                 >
-                  Saiba mais
+                  Vamos Conversar
                 </button>
               </div>
             </div>
@@ -588,8 +736,8 @@ const HomePage = () => {
                 Gerenciamento de Redes Sociais!
               </h2>
               <p className="homepage-social-media-subtitle">
-                Potencialize sua presença digital e atraia mais turistas com nossa 
-                gestão completa de redes sociais especializada em turismo.
+                Deixe que nossa equipe especializada cuide das redes sociais da sua agência 
+                enquanto você foca no que faz de melhor: atender seus clientes.
               </p>
               <div className="homepage-social-media-benefits">
                 <div className="benefit-item">
@@ -1195,7 +1343,7 @@ const HomePage = () => {
             <button
               className="homepage-whatsapp-notification-button"
               onClick={() =>
-                window.open("https://wa.me/551133456789", "_blank")
+                window.open("https://wa.me/5585991470709", "_blank")
               }
             >
               Iniciar Conversa
@@ -1210,6 +1358,45 @@ const HomePage = () => {
           onSubmit={submitLead}
           initialPlan={selectedPlan}
         />
+
+        {/* Botão Flutuante WhatsApp */}
+        <div 
+          className="whatsapp-floating-button"
+          onClick={() => handleWhatsAppClick('floating')}
+          title="Fale conosco no WhatsApp"
+        >
+          <FaWhatsapp />
+        </div>
+
+        {/* WhatsApp Services Modal */}
+        {whatsappModalOpen && (
+          <div className="whatsapp-modal-overlay" onClick={() => setWhatsappModalOpen(false)}>
+            <div className="whatsapp-modal" onClick={e => e.stopPropagation()}>
+              <div className="whatsapp-modal-header">
+                <h3>Sobre qual assunto você deseja falar?</h3>
+                <button 
+                  className="whatsapp-modal-close"
+                  onClick={() => setWhatsappModalOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="whatsapp-modal-services">
+                {whatsappServices.map((service, index) => (
+                  <button
+                    key={index}
+                    className="whatsapp-service-option"
+                    onClick={() => handleWhatsAppServiceClick(service)}
+                  >
+                    <span className="whatsapp-service-icon">{service.icon}</span>
+                    <span className="whatsapp-service-title">{service.title}</span>
+                    <FaWhatsapp className="whatsapp-service-arrow" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
     </>
