@@ -427,7 +427,7 @@ const HomePage = () => {
 
         <div className="homepage-hero-content">
           <h1 className="homepage-hero-title">
-            Especialistas em Soluções para Agências de Turismo
+            Especialistas em Soluções Digitais para Agências de Turismo
           </h1>
           <p className="homepage-hero-subtitle">
             Sites personalizados, sistemas completos, redes sociais e identidade visual. 
