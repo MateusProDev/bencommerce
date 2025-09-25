@@ -2721,7 +2721,7 @@ img, svg {
 
 .homepage-social-media-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 40px auto;
   padding: 0 2rem;
   position: relative;
   z-index: 1;
