@@ -31,6 +31,7 @@ import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
 import useSocialMediaFunnel from "../../hooks/useSocialMediaFunnel";
 import SocialMediaFunnel from "../SocialMediaFunnel/SocialMediaFunnel";
+import SEO from "../SEO/SEO";
 import TurviaLogo from "../../assets/Turvia.png";
 import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
@@ -315,6 +316,13 @@ const HomePage = () => {
 
   return (
     <>
+      <SEO 
+        title="Turvia - Soluções Digitais para Agências de Turismo | Sistema de Gestão 3em1"
+        description="Sites personalizados, sistemas completos de reservas, gerenciamento de redes sociais e identidade visual. Transforme sua agência de turismo com soluções digitais completas."
+        keywords="sistema para agência de turismo, site para turismo, gestão agência de viagens, reservas online turismo, CRM turismo, dashboard agência turismo, sistema 3em1 turismo, gerenciamento redes sociais turismo"
+        url="/"
+      />
+      
       {/* Loading Screen */}
       {isLoading && (
         <div className="loading-overlay">
