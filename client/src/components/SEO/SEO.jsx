@@ -1,5 +1,4 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 const SEO = ({ 
   title = "Turvia - Soluções Digitais para Agências de Turismo",
@@ -13,34 +12,57 @@ const SEO = ({
   const fullUrl = url.startsWith('http') ? url : `${siteUrl}${url}`;
   const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
   
-  return (
-    <Helmet>
-      {/* Título da página */}
-      <title>{title}</title>
+  useEffect(() => {
+    // Update title
+    document.title = title;
+    
+    // Update or create meta tags
+    const updateMetaTag = (property, content, isProperty = false) => {
+      const attribute = isProperty ? 'property' : 'name';
+      let element = document.querySelector(`meta[${attribute}="${property}"]`);
       
-      {/* Meta tags básicas */}
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImage} />
-      <meta property="og:site_name" content="Turvia" />
-      
-      {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={fullUrl} />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={fullImage} />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
-    </Helmet>
-  );
+      if (element) {
+        element.setAttribute('content', content);
+      } else {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, property);
+        element.setAttribute('content', content);
+        document.head.appendChild(element);
+      }
+    };
+    
+    // Basic meta tags
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    
+    // Open Graph
+    updateMetaTag('og:type', type, true);
+    updateMetaTag('og:url', fullUrl, true);
+    updateMetaTag('og:title', title, true);
+    updateMetaTag('og:description', description, true);
+    updateMetaTag('og:image', fullImage, true);
+    updateMetaTag('og:site_name', 'Turvia', true);
+    
+    // Twitter
+    updateMetaTag('twitter:card', 'summary_large_image', true);
+    updateMetaTag('twitter:url', fullUrl, true);
+    updateMetaTag('twitter:title', title, true);
+    updateMetaTag('twitter:description', description, true);
+    updateMetaTag('twitter:image', fullImage, true);
+    
+    // Update canonical link
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (canonicalLink) {
+      canonicalLink.setAttribute('href', fullUrl);
+    } else {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      canonicalLink.setAttribute('href', fullUrl);
+      document.head.appendChild(canonicalLink);
+    }
+  }, [title, description, keywords, fullUrl, fullImage, type]);
+  
+  return null;
 };
 
 export default SEO;
