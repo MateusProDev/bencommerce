@@ -1120,7 +1120,7 @@ const HomePage = () => {
                 suporte também é excelente!"
               </p>
               <div>
-                <p className="homepage-testimonial-author">Edinardo Crispim</p>
+                <p className="homepage-testimonial-author">Edinardo Santiago</p>
                 <p className="homepage-testimonial-company">
                   20Buscar Vacation Beach
                 </p>
@@ -1305,7 +1305,7 @@ const HomePage = () => {
                   ></path>
                 </svg>
                 <span className="homepage-footer-contact-text">
-                  contato@Turvia.com.br
+                  contato@turvia.com.br
                 </span>
               </li>
               <li className="homepage-footer-contact-item">
