@@ -36,6 +36,7 @@ import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import VcTurLogo from "../../assets/VcturLogo.png";
+import MaiaturLogo from "../../assets/maiaturlogo.png";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
 
@@ -305,9 +306,11 @@ const HomePage = () => {
     { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
+    { name: "Maiatur", logo: MaiaturLogo },
     { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
+    { name: "Maiatur", logo: MaiaturLogo },
   ];
 
   return (
