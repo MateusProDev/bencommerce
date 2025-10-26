@@ -1,3 +1,14 @@
+# Turvia - Robots.txt
 # https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://turvia.com.br/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
