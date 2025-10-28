@@ -1927,7 +1927,97 @@ section, footer {
 }
 
 /* Testimonials Section */
-/* BotÃ£o de depoimento moderno */
+/* Carrossel de Avaliações */
+.homepage-reviews-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(23, 0, 56, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.homepage-reviews-track {
+  display: flex;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.homepage-review-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.homepage-review-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 600px;
+}
+
+.homepage-reviews-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.homepage-review-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  outline: none;
+}
+
+.homepage-review-indicator:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.3);
+  border-color: white;
+}
+
+.homepage-review-indicator.active {
+  background: white;
+  width: 32px;
+  border-radius: 10px;
+  border-color: white;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Botão de depoimento moderno */
 .homepage-testimonial-button {
   background: var(--gradient-primary);
   color: var(--white);
@@ -1967,12 +2057,28 @@ section, footer {
   padding: 5rem 1.5rem;
   background: linear-gradient(to bottom right, var(--primary-blue), var(--dark-blue));
   color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.homepage-testimonials::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .homepage-testimonials-container {
   max-width: 56rem;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .homepage-testimonials-title {
@@ -2549,6 +2655,34 @@ section, footer {
   .homepage-navbar {
     padding: 0 8px !important;
   }
+
+  /* Carrossel de avaliações - Tablet */
+  .homepage-reviews-carousel {
+    max-width: 95%;
+    border-radius: 16px;
+  }
+
+  .homepage-review-image {
+    max-height: none;
+    height: auto;
+  }
+}
+
+/* Tablets e telas médias */
+@media (min-width: 701px) and (max-width: 1024px) {
+  .homepage-reviews-carousel {
+    max-width: 90%;
+  }
+
+  .homepage-review-image {
+    max-height: none;
+    height: auto;
+  }
+
+  .homepage-reviews-indicators {
+    bottom: 16px;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -2603,6 +2737,100 @@ section, footer {
   }
   .homepage-hero-subtitle {
     font-size: 1.1rem !important;
+  }
+
+  /* Carrossel de avaliações - Mobile */
+  .homepage-reviews-carousel {
+    border-radius: 12px;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .homepage-review-slide {
+    padding: 0;
+    min-height: auto;
+  }
+
+  .homepage-review-image {
+    max-height: none;
+    height: auto;
+    object-fit: contain;
+    width: 100%;
+  }
+
+  .homepage-reviews-indicators {
+    bottom: 12px;
+    gap: 8px;
+    padding: 8px 16px;
+  }
+
+  .homepage-review-indicator {
+    width: 8px;
+    height: 8px;
+    border-width: 1.5px;
+  }
+
+  .homepage-review-indicator.active {
+    width: 24px;
+  }
+}
+
+/* Telas muito pequenas */
+@media (max-width: 480px) {
+  .homepage-testimonials {
+    padding: 3rem 0.5rem;
+  }
+
+  .homepage-testimonials-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .homepage-reviews-carousel {
+    border-radius: 8px;
+  }
+
+  .homepage-review-image {
+    max-height: none;
+    height: auto;
+  }
+
+  .homepage-reviews-indicators {
+    bottom: 8px;
+    gap: 6px;
+    padding: 6px 12px;
+  }
+
+  .homepage-review-indicator {
+    width: 6px;
+    height: 6px;
+  }
+
+  .homepage-review-indicator.active {
+    width: 20px;
+  }
+}
+
+/* Otimização para telas de alta resolução (Retina) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .homepage-review-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Telas muito grandes (desktops) */
+@media (min-width: 1440px) {
+  .homepage-reviews-carousel {
+    max-width: 1000px;
+  }
+
+  .homepage-review-image {
+    max-height: 700px;
+  }
+
+  .homepage-testimonials-title {
+    font-size: 2.5rem;
   }
 }
 

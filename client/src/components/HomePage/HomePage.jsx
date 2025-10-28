@@ -38,6 +38,8 @@ import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import VcTurLogo from "../../assets/VcturLogo.png";
 import MaiaturLogo from "../../assets/maiaturlogo.png";
+import AvaliacaoUm from "../../assets/avaliacaoum.jpeg";
+import AvaliacaoDois from "../../assets/avaliacaodois.jpeg";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
 
@@ -54,9 +56,14 @@ const HomePage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeService, setActiveService] = useState(1); // Card featured por padrão (índice 1)
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [typewriterText, setTypewriterText] = useState('');
+  const [activeReview, setActiveReview] = useState(0);
+
+  // Imagens das avaliações
+  const reviewImages = [AvaliacaoUm, AvaliacaoDois];
 
   // Nome da empresa para efeito typewriter
   const companyName = "Turvia";
@@ -155,6 +162,52 @@ const HomePage = () => {
       track.removeEventListener('scroll', handleScroll);
     };
   }, [activeService]);
+
+  // Carrossel automático de avaliações
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveReview((prev) => (prev + 1) % reviewImages.length);
+    }, 5000); // Troca a cada 5 segundos
+
+    return () => clearInterval(interval);
+  }, [reviewImages.length]);
+
+  // Suporte a gestos de toque (swipe) para o carrossel de avaliações
+  useEffect(() => {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const handleTouchStart = (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    };
+
+    const handleTouchEnd = (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    };
+
+    const handleSwipe = () => {
+      const swipeThreshold = 50;
+      if (touchStartX - touchEndX > swipeThreshold) {
+        // Swipe left - próxima imagem
+        setActiveReview((prev) => (prev + 1) % reviewImages.length);
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        // Swipe right - imagem anterior
+        setActiveReview((prev) => (prev - 1 + reviewImages.length) % reviewImages.length);
+      }
+    };
+
+    const carousel = document.querySelector('.homepage-reviews-carousel');
+    if (carousel) {
+      carousel.addEventListener('touchstart', handleTouchStart);
+      carousel.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        carousel.removeEventListener('touchstart', handleTouchStart);
+        carousel.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [reviewImages.length]);
 
   // Funções auxiliares para tracking
   const handleContactFunnelOpen = (type, location) => {
@@ -1109,28 +1162,25 @@ const HomePage = () => {
             O que nossos clientes dizem
           </h2>
 
-          <div className="homepage-testimonial-card">
-            <div className="homepage-testimonial-content">
-              <div className="homepage-testimonial-avatar">
-                <img src={BuscarLogo} alt="Cliente" />
-              </div>
-              <p className="homepage-testimonial-text">
-                "Desde que começamos a usar o sistema Turvia, nossa agência
-                ficou muito mais organizada nas reservas e com menos erros. O
-                suporte também é excelente!"
-              </p>
-              <div>
-                <p className="homepage-testimonial-author">Edinardo Santiago</p>
-                <p className="homepage-testimonial-company">
-                  20Buscar Vacation Beach
-                </p>
-              </div>
-              <button
-                className="homepage-testimonial-button"
-                onClick={() => openContactFunnel("completo")}
-              >
-                Quero resultados similares
-              </button>
+          <div className="homepage-reviews-carousel">
+            <div className="homepage-reviews-track" style={{ transform: `translateX(-${activeReview * 100}%)` }}>
+              {reviewImages.map((image, index) => (
+                <div key={index} className="homepage-review-slide">
+                  <img src={image} alt={`Avaliação ${index + 1}`} className="homepage-review-image" />
+                </div>
+              ))}
+            </div>
+            
+            {/* Indicadores */}
+            <div className="homepage-reviews-indicators">
+              {reviewImages.map((_, index) => (
+                <button
+                  key={index}
+                  className={`homepage-review-indicator ${activeReview === index ? 'active' : ''}`}
+                  onClick={() => setActiveReview(index)}
+                  aria-label={`Ver avaliação ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
