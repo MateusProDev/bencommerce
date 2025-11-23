@@ -1,0 +1,29 @@
+.partners-page {
+  padding: 3rem 1.5rem;
+}
+.partners-container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.partner-card {
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: white;
+}
+.partner-cta {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #170038;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
