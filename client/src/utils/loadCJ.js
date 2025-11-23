@@ -14,14 +14,27 @@ export function loadCJScript() {
   }
 
   // Avoid duplicate insertion
-  if (document.querySelector(`script[src="${CJ_SRC}"]`)) return;
+  if (document.querySelector(`script[src="${CJ_SRC}"]`)) {
+    console.debug('[CJ] Script already present, skipping insert.');
+    return;
+  }
 
   const script = document.createElement('script');
   script.src = CJ_SRC;
   script.async = true;
   script.defer = true;
   script.crossOrigin = 'anonymous';
+  script.onload = () => {
+    // eslint-disable-next-line no-console
+    console.log('[CJ] Script loaded successfully:', CJ_SRC);
+  };
+  script.onerror = (e) => {
+    // eslint-disable-next-line no-console
+    console.error('[CJ] Script failed to load:', CJ_SRC, e);
+  };
   document.body.appendChild(script);
+  // eslint-disable-next-line no-console
+  console.log('[CJ] Script tag inserted:', CJ_SRC);
 }
 
 export default loadCJScript;

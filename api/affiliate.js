@@ -1,3 +1,6 @@
+// Vercel Serverless Function: /api/affiliate
+// Recebe query param `id` do parceiro, registra uma impressão (se Firestore disponível)
+// e redireciona o usuário para a URL do parceiro (affiliateUrl se disponível).
 const admin = require('firebase-admin');
 
 function buildServiceAccountFromEnv() {
@@ -37,6 +40,7 @@ async function initFirebase() {
   }
 }
 
+// Simple partners mapping (mirror of client-side list)
 const PARTNERS = {
   'booking-com': { name: 'Booking.com', url: 'https://www.booking.com', affiliateUrl: null },
   'expedia': { name: 'Expedia', url: 'https://www.expedia.com', affiliateUrl: null },
@@ -47,17 +51,6 @@ const PARTNERS = {
 };
 
 module.exports = async (req, res) => {
-  // Debug: log every call and bypass info
-  console.log('[Affiliate API] Called:', {
-    url: req.url,
-    method: req.method,
-    bypass: req.query && req.query['x-vercel-protection-bypass'],
-    headers: {
-      'x-vercel-protection-bypass': req.headers['x-vercel-protection-bypass'],
-      'x-vercel-set-bypass-cookie': req.headers['x-vercel-set-bypass-cookie'],
-      'user-agent': req.headers['user-agent'],
-    }
-  });
   try {
     const id = (req.query && req.query.id) || (req.body && req.body.id);
     if (!id || !PARTNERS[id]) {
@@ -67,41 +60,28 @@ module.exports = async (req, res) => {
     const partner = PARTNERS[id];
     const target = partner.affiliateUrl || partner.url;
 
-    // Allow a debug mode so we can inspect behavior without following the redirect.
-    const debug = req.query && (req.query.debug === '1' || req.query.debug === 'true');
-
+    // Record impression/click for auditing
     const db = await initFirebase();
     const record = {
       partnerId: id,
       partnerName: partner.name,
-      ip: req.headers['x-forwarded-for'] || (req.connection && req.connection.remoteAddress) || null,
+      ip: req.headers['x-forwarded-for'] || req.connection?.remoteAddress || null,
       userAgent: req.headers['user-agent'] || null,
       timestamp: new Date().toISOString(),
       path: req.url,
     };
 
     if (db) {
-      try {
-        await db.collection('affiliate_impressions').add(record);
-      } catch (dbErr) {
-        // Log DB errors but continue to redirect (best-effort logging)
-        console.error('Failed to write affiliate impression:', dbErr?.message || dbErr);
-      }
+      await db.collection('affiliate_impressions').add(record);
     } else {
       console.log('Affiliate impression (no db):', JSON.stringify(record));
     }
 
-    if (debug) {
-      // Return useful debug info instead of redirecting
-      return res.status(200).json({ ok: true, target, record, dbConfigured: !!db });
-    }
-
-    // Normal behavior: redirect the user to the partner target
+    // Redirect user to partner (302)
     res.writeHead(302, { Location: target });
     return res.end();
   } catch (err) {
-    console.error('Error in /api/affiliate:', err?.stack || err?.message || err);
-    // Provide a small helpful message for quick debugging
-    return res.status(500).json({ error: 'server_error', message: String(err?.message || err) });
+    console.error('Error in /api/affiliate:', err);
+    return res.status(500).json({ error: 'server_error' });
   }
 };
