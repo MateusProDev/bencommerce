@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "firebase-admin": "^11.10.0"
+    "firebase-admin": "^11.11.1"
   }
 }
