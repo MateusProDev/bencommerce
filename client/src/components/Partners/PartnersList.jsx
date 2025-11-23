@@ -17,7 +17,7 @@ const PartnersList = () => {
               <h3>{p.name}</h3>
               <p>{p.note || 'Reservas'}</p>
               <a
-                href={p.affiliateUrl || p.url}
+                href={`/api/affiliate?id=${encodeURIComponent(p.id)}`}
                 className="partner-cta cj-link"
                 target="_blank"
                 rel="noopener noreferrer"
