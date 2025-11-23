@@ -1354,9 +1354,9 @@ const HomePage = () => {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   ></path>
                 </svg>
-                <span className="homepage-footer-contact-text">
+                <a href="mailto:contato@turvia.com.br" className="homepage-footer-contact-text">
                   contato@turvia.com.br
-                </span>
+                </a>
               </li>
               <li className="homepage-footer-contact-item">
                 <svg

@@ -98,6 +98,36 @@ app.get('/', (req, res) => {
   res.send('Servidor StoreSync funcionando ✅. Firebase Admin SDK status: ' + (admin.apps.length ? 'Inicializado com sucesso ('+admin.apps.length+' app(s))' : 'NÃO INICIALIZADO OU FALHOU'));
 });
 
+// Endpoint para registrar consentimentos de cookies (auditoria)
+app.post('/api/consents', async (req, res) => {
+  try {
+    const { consent, userId, page, userAgent, timestamp, metadata } = req.body || {};
+    const record = {
+      consent: consent || 'unknown',
+      userId: userId || null,
+      page: page || req.headers.referer || null,
+      userAgent: userAgent || req.headers['user-agent'] || null,
+      ip: req.ip || (req.connection && req.connection.remoteAddress) || null,
+      timestamp: timestamp || new Date().toISOString(),
+      metadata: metadata || null,
+    };
+
+    if (db) {
+      const docRef = await db.collection('consents').add(record);
+      console.log('Consent recorded, id:', docRef.id);
+      return res.status(201).json({ id: docRef.id });
+    }
+
+    // Fallback: if Firestore não estiver disponível, apenas loga
+    console.warn('Firestore não disponível - consent will be logged to console');
+    console.log(JSON.stringify(record));
+    return res.status(201).json({ id: null, note: 'db-not-available' });
+  } catch (err) {
+    console.error('Erro ao gravar consent:', err);
+    return res.status(500).json({ error: 'failed_to_save_consent' });
+  }
+});
+
 // Rota de checkout padrão (redirecionamento PARA PAGAMENTO DE PLANO DA PLATAFORMA)
 app.post('/api/create-preference', async (req, res) => {
   console.log("Log: Rota POST /api/create-preference (PLANOS) acessada. Body:", req.body);

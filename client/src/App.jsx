@@ -38,6 +38,9 @@ import StatusPage from './pages/StatusPage';
 import SobreNosPage from './pages/SobreNosPage';
 import BlogPage from './pages/BlogPage';
 import ParceiroPage from './pages/ParceiroPage';
+import PartnersList from './components/Partners/PartnersList';
+import PartnerRedirect from './components/Partners/PartnerRedirect';
+import CookieConsent from './components/CookieConsent/CookieConsent';
 
 // Admin Components
 import AdminLogin from './components/Admin/AdminLogin';
@@ -130,6 +133,7 @@ const AppContent = () => {
 
   return (
     <UserPlanProvider>
+      <CookieConsent />
       <Routes location={location}>
         {/* Rotas públicas */}
         <Route path="/" element={<HomePage />} />
@@ -147,6 +151,8 @@ const AppContent = () => {
         <Route path="/sobre" element={<SobreNosPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/parceiro" element={<ParceiroPage />} />
+        <Route path="/parceiros" element={<PartnersList />} />
+        <Route path="/parceiros/:id" element={<PartnerRedirect />} />
 
         {/* Rotas de autenticação */}
         <Route path="/login" element={<LoginForm />} />

@@ -2400,6 +2400,13 @@ section, footer {
 .homepage-footer-contact-text {
   color: var(--gray-400);
   line-height: 1.5;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.homepage-footer-contact-text:hover {
+  color: var(--white);
+  text-decoration: underline;
 }
 
 .homepage-footer-bottom {
