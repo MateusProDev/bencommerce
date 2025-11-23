@@ -18,24 +18,32 @@ function buildServiceAccountFromEnv() {
 }
 
 async function initFirebase() {
-  if (admin.apps && admin.apps.length) return admin.firestore();
+  if (admin.apps && admin.apps.length) {
+    console.log('[LOG] Firebase já inicializado. Retornando Firestore.');
+    return admin.firestore();
+  }
   try {
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      console.log('[LOG] Inicializando Firebase com GOOGLE_APPLICATION_CREDENTIALS_JSON');
       const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
     } else {
       const serviceAccount = buildServiceAccountFromEnv();
       if (serviceAccount) {
+        console.log('[LOG] Inicializando Firebase com variáveis FIREBASE_*');
         admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
       } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        console.log('[LOG] Inicializando Firebase com GOOGLE_APPLICATION_CREDENTIALS (path)');
         admin.initializeApp({ credential: admin.credential.applicationDefault() });
       } else {
+        console.error('[LOG] Nenhuma credencial Firebase encontrada nas variáveis de ambiente.');
         return null;
       }
     }
+    console.log('[LOG] Firebase inicializado com sucesso. Retornando Firestore.');
     return admin.firestore();
   } catch (err) {
-    console.error('Firebase init error (affiliate):', err?.message || err);
+    console.error('[LOG] Erro ao inicializar Firebase (affiliate):', err?.message || err);
     return null;
   }
 }
@@ -53,12 +61,15 @@ const PARTNERS = {
 module.exports = async (req, res) => {
   try {
     const id = (req.query && req.query.id) || (req.body && req.body.id);
+    console.log(`[LOG] Requisição recebida para parceiro: ${id}`);
     if (!id || !PARTNERS[id]) {
+      console.error(`[LOG] ID de parceiro inválido: ${id}`);
       return res.status(400).json({ error: 'invalid_partner_id' });
     }
 
     const partner = PARTNERS[id];
     const target = partner.affiliateUrl || partner.url;
+    console.log(`[LOG] Redirecionando para: ${target}`);
 
     // Record impression/click for auditing
     const db = await initFirebase();
@@ -72,16 +83,23 @@ module.exports = async (req, res) => {
     };
 
     if (db) {
-      await db.collection('affiliate_impressions').add(record);
+      try {
+        const docRef = await db.collection('affiliate_impressions').add(record);
+        console.log(`[LOG] Impressão registrada no Firestore. ID: ${docRef.id}`);
+      } catch (dbErr) {
+        console.error('[LOG] Erro ao registrar impressão no Firestore:', dbErr?.message || dbErr);
+      }
     } else {
-      console.log('Affiliate impression (no db):', JSON.stringify(record));
+      console.warn('[LOG] Firestore não disponível. Impressão não registrada no banco.');
+      console.log('[LOG] Dados da impressão:', JSON.stringify(record));
     }
 
     // Redirect user to partner (302)
     res.writeHead(302, { Location: target });
+    console.log('[LOG] Redirecionamento realizado com sucesso.');
     return res.end();
   } catch (err) {
-    console.error('Error in /api/affiliate:', err);
+    console.error('[LOG] Erro na função /api/affiliate:', err?.message || err);
     return res.status(500).json({ error: 'server_error' });
   }
 };
