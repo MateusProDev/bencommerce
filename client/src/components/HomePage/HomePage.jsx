@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaInstagram, FaFacebookF } from "react-icons/fa";
 import {
   FaGlobe,
   FaUsers,
@@ -919,11 +920,11 @@ const HomePage = () => {
                   </div>
                   <div className="plan-platforms">
                     <div className="platform-tag instagram">
-                      <i className="fab fa-instagram"></i>
+                      <FaInstagram />
                       Instagram
                     </div>
                     <div className="platform-tag facebook">
-                      <i className="fab fa-facebook-f"></i>
+                      <FaFacebookF />
                       Facebook
                     </div>
                   </div>
@@ -976,11 +977,11 @@ const HomePage = () => {
                   </div>
                   <div className="plan-platforms">
                     <div className="platform-tag instagram">
-                      <i className="fab fa-instagram"></i>
+                      <FaInstagram />
                       Instagram
                     </div>
                     <div className="platform-tag facebook">
-                      <i className="fab fa-facebook-f"></i>
+                      <FaFacebookF />
                       Facebook
                     </div>
                   </div>

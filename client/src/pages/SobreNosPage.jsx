@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import './SobreNosPage.css';
 
@@ -37,7 +38,7 @@ const SobreNosPage = () => {
       <header className="sobre-header">
         <div className="container">
           <button className="btn-back" onClick={() => navigate('/')}>
-            <i className="fas fa-arrow-left" /> Voltar
+            <FaArrowLeft /> Voltar
           </button>
           <div className="header-content">
             <h1>Sobre a Turvia</h1>
