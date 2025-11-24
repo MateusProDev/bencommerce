@@ -61,7 +61,7 @@ async function sendGa4Event(clientId, eventName, params = {}) {
     const body = {
       client_id: clientId || `server-${Date.now()}`,
       events: [{ name: eventName, params }]
-    };
+    }; 
 
     // Use global fetch available in Node 18+ on Vercel
     const res = await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`, {
