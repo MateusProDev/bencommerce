@@ -45,7 +45,27 @@ async function initFirebase() {
   try {
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
       _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_JSON';
-      const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+      let serviceAccount = null;
+      try {
+        serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+      } catch (e) {
+        console.error('[DIAG] Falha ao parsear GOOGLE_APPLICATION_CREDENTIALS_JSON:', e?.message || e);
+        throw e;
+      }
+      try {
+        if (serviceAccount && serviceAccount.private_key) {
+          let pk = serviceAccount.private_key.trim();
+          if ((pk.startsWith('"') && pk.endsWith('"')) || (pk.startsWith("'") && pk.endsWith("'"))) {
+            pk = pk.slice(1, -1);
+          }
+          pk = pk.replace(/\\r\\n/g, '\\n').replace(/\\n/g, '\n');
+          pk = pk.replace(/\r\n/g, '\n').trim();
+          serviceAccount.private_key = pk;
+          console.log('[DIAG] GOOGLE_APPLICATION_CREDENTIALS_JSON.private_key contains PEM header:', pk.includes('PRIVATE KEY'));
+        }
+      } catch (e) {
+        console.error('[DIAG] Error normalizing private_key from JSON:', e?.message || e);
+      }
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
       console.log('Firebase initialized from GOOGLE_APPLICATION_CREDENTIALS_JSON');
     } else {
