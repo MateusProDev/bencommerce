@@ -26,5 +26,13 @@ dist-ssr/
 server/.env  # Ignora o .env dentro da pasta server
 
 # Credenciais do Firebase
-server/serviceAccountKey.json # Ignora a chave dentro da pasta server
-A   
+# Evitar commitar chaves de serviço e arquivos sensíveis
+server/serviceAccountKey.json
+server/*.json
+*.pem
+*.key
+*.p12
+.firebase/
+.firebaserc
+/.env
+.env*
