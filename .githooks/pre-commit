@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Pre-commit hook to prevent accidental commits of private keys and API keys
+# Usage: git config core.hooksPath .githooks (once per repo)
+
+set -e
+
+echo "[hook] running pre-commit secret checks..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | tr '\n' '\0')
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+FOUND=0
+
+check_file() {
+  file="$1"
+  # Only check files that exist in working tree (skips deleted)
+  if [ ! -f "$file" ]; then
+    return
+  fi
+  # Check for private key blocks
+  if grep -q "-----BEGIN PRIVATE KEY-----" "$file" 2>/dev/null; then
+    echo "[hook] Private key found in $file"
+    FOUND=1
+  fi
+  # Check for Google API key pattern (starts with AIza)
+  if grep -qE "AIza[0-9A-Za-z_-]{35}" "$file" 2>/dev/null; then
+    echo "[hook] Possible Google API key found in $file"
+    FOUND=1
+  fi
+  # Check for common service account fields
+  if grep -q '"private_key"' "$file" 2>/dev/null || grep -q '"client_email"' "$file" 2>/dev/null; then
+    echo "[hook] Possible service account JSON found in $file"
+    FOUND=1
+  fi
+}
+
+# iterate staged files
+IFS='\0'
+for f in $STAGED_FILES; do
+  check_file "$f"
+done
+
+if [ "$FOUND" -eq 1 ]; then
+  echo "\nCommit aborted. Remove secrets from staged files or add them to .gitignore."
+  echo "To bypass (not recommended) run: git commit --no-verify"
+  exit 1
+fi
+
+exit 0
