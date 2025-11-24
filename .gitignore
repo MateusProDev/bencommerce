@@ -36,3 +36,4 @@ server/*.json
 .firebaserc
 /.env
 .env*
+.vercel
