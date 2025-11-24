@@ -135,10 +135,20 @@ const PARTNERS = {
 };
 
 module.exports = async (req, res) => {
+  // Entry diagnostics
   try {
+    console.log('[affiliate] invoked', {
+      method: req.method,
+      url: req.url,
+      host: req.headers?.host || '(none)',
+      forwardedFor: req.headers['x-forwarded-for'] || null,
+      userAgent: req.headers['user-agent'] ? req.headers['user-agent'].slice(0, 120) : null,
+      query: req.query || null,
+    });
+
     const id = (req.query && req.query.id) || (req.body && req.body.id);
     const debug = req.query && (req.query.debug === '1' || req.query.debug === 'true');
-    console.log(`[LOG] Requisição recebida para parceiro: ${id} (debug=${debug})`);
+    console.log(`[affiliate] partner request: ${id} (debug=${debug})`);
 
     if (!id || !PARTNERS[id]) {
       console.error(`[LOG] ID de parceiro inválido: ${id}`);
@@ -188,17 +198,31 @@ module.exports = async (req, res) => {
     const gaSent = await sendGa4Event(clientId, 'affiliate_click', gaParams);
 
     if (debug) {
+      // Diagnostic headers to prove the function executed
+      try {
+        res.setHeader('X-Handled-By', 'api-affiliate');
+        res.setHeader('X-Firebase-Credential-Source', _firebaseCredentialSource || 'unknown');
+      } catch (e) {
+        console.warn('[affiliate] failed to set diagnostic headers:', e?.message || e);
+      }
       // Return useful debug info instead of redirecting (include non-sensitive credential source)
       return res.status(200).json({ ok: true, target, record, dbConfigured: !!db, gaSent, credentialSource: _firebaseCredentialSource });
     }
 
     // Normal behavior: redirect the user to the partner target
     try {
+      // Set diagnostic header before redirect so we can confirm function executed
+      try {
+        res.setHeader('X-Handled-By', 'api-affiliate');
+        res.setHeader('X-Firebase-Credential-Source', _firebaseCredentialSource || 'unknown');
+      } catch (e) {
+        console.warn('[affiliate] failed to set diagnostic headers before redirect:', e?.message || e);
+      }
       res.writeHead(302, { Location: target });
-      console.log('[LOG] Redirecionamento realizado com sucesso.');
+      console.log('[affiliate] redirecting to target:', target);
       return res.end();
     } catch (errRedirect) {
-      console.error('[LOG] Erro ao redirecionar:', errRedirect?.message || errRedirect);
+      console.error('[affiliate] redirect error:', errRedirect?.message || errRedirect);
       return res.status(500).json({ error: 'redirect_failed' });
     }
   } catch (err) {
