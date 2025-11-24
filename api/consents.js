@@ -1,6 +1,8 @@
 // Vercel Serverless Function: /api/consents
 // Recebe POST com payload de consentimento e grava no Firestore (se credenciais disponíveis)
 const admin = require('firebase-admin');
+// Diagnostic variable: non-sensitive indicator of which credential path was used
+let _firebaseCredentialSource = null;
 
 function buildServiceAccountFromEnv() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -34,31 +36,42 @@ function buildServiceAccountFromEnv() {
 }
 
 async function initFirebase() {
-  if (admin.apps && admin.apps.length) return admin.firestore();
+  if (admin.apps && admin.apps.length) {
+    console.log('Firebase already initialized.');
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
+    return admin.firestore();
+  }
 
   try {
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_JSON';
       const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
       console.log('Firebase initialized from GOOGLE_APPLICATION_CREDENTIALS_JSON');
     } else {
       const serviceAccount = buildServiceAccountFromEnv();
       if (serviceAccount) {
+        _firebaseCredentialSource = 'FIREBASE_VARS';
         admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
         console.log('Firebase initialized from FIREBASE_* env vars');
       } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_path_or_ADC';
         // Path-based credential (unlikely on Vercel)
         admin.initializeApp({ credential: admin.credential.applicationDefault() });
         console.log('Firebase initialized from application default credentials');
       } else {
+        _firebaseCredentialSource = 'none';
         console.warn('No Firebase credentials found in env; Firestore will not be available');
         return null;
       }
     }
 
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
     return admin.firestore();
   } catch (err) {
+    _firebaseCredentialSource = 'error';
     console.error('Firebase init error:', err?.message || err);
+    console.error('[DIAG] firebase credential source set to error');
     return null;
   }
 }

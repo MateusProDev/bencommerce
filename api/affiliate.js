@@ -2,6 +2,8 @@
 // Recebe query param `id` do parceiro, registra uma impressão (se Firestore disponível)
 // e redireciona o usuário para a URL do parceiro (affiliateUrl se disponível).
 const admin = require('firebase-admin');
+// Diagnostic variable: non-sensitive indicator of which credential path was used
+let _firebaseCredentialSource = null;
 
 function buildServiceAccountFromEnv() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -30,30 +32,38 @@ function buildServiceAccountFromEnv() {
 async function initFirebase() {
   if (admin.apps && admin.apps.length) {
     console.log('[LOG] Firebase já inicializado. Retornando Firestore.');
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
     return admin.firestore();
   }
   try {
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_JSON';
       console.log('[LOG] Inicializando Firebase com GOOGLE_APPLICATION_CREDENTIALS_JSON');
       const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
     } else {
       const serviceAccount = buildServiceAccountFromEnv();
       if (serviceAccount) {
+        _firebaseCredentialSource = 'FIREBASE_VARS';
         console.log('[LOG] Inicializando Firebase com variáveis FIREBASE_*');
         admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
       } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_path_or_ADC';
         console.log('[LOG] Inicializando Firebase com GOOGLE_APPLICATION_CREDENTIALS (path)');
         admin.initializeApp({ credential: admin.credential.applicationDefault() });
       } else {
+        _firebaseCredentialSource = 'none';
         console.error('[LOG] Nenhuma credencial Firebase encontrada nas variáveis de ambiente.');
         return null;
       }
     }
     console.log('[LOG] Firebase inicializado com sucesso. Retornando Firestore.');
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
     return admin.firestore();
   } catch (err) {
+    _firebaseCredentialSource = 'error';
     console.error('[LOG] Erro ao inicializar Firebase (affiliate):', err?.message || err);
+    console.error('[DIAG] firebase credential source set to error');
     return null;
   }
 }
@@ -157,8 +167,8 @@ module.exports = async (req, res) => {
     const gaSent = await sendGa4Event(clientId, 'affiliate_click', gaParams);
 
     if (debug) {
-      // Return useful debug info instead of redirecting
-      return res.status(200).json({ ok: true, target, record, dbConfigured: !!db, gaSent });
+      // Return useful debug info instead of redirecting (include non-sensitive credential source)
+      return res.status(200).json({ ok: true, target, record, dbConfigured: !!db, gaSent, credentialSource: _firebaseCredentialSource });
     }
 
     // Normal behavior: redirect the user to the partner target

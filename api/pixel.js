@@ -1,6 +1,8 @@
 // Vercel Serverless Function: /api/pixel
 // Records a fallback impression and returns a 1x1 transparent GIF
 const admin = require('firebase-admin');
+// Diagnostic variable: non-sensitive indicator of which credential path was used
+let _firebaseCredentialSource = null;
 
 function buildServiceAccountFromEnv() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -27,24 +29,35 @@ function buildServiceAccountFromEnv() {
 }
 
 async function initFirebase() {
-  if (admin.apps && admin.apps.length) return admin.firestore();
+  if (admin.apps && admin.apps.length) {
+    console.log('[pixel] Firebase already initialized.');
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
+    return admin.firestore();
+  }
   try {
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_JSON';
       const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
     } else {
       const serviceAccount = buildServiceAccountFromEnv();
       if (serviceAccount) {
+        _firebaseCredentialSource = 'FIREBASE_VARS';
         admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
       } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        _firebaseCredentialSource = 'GOOGLE_APPLICATION_CREDENTIALS_path_or_ADC';
         admin.initializeApp({ credential: admin.credential.applicationDefault() });
       } else {
+        _firebaseCredentialSource = 'none';
         return null;
       }
     }
+    console.log('[DIAG] firebase credential source:', _firebaseCredentialSource);
     return admin.firestore();
   } catch (err) {
+    _firebaseCredentialSource = 'error';
     console.error('[pixel] Firebase init error:', err?.message || err);
+    console.error('[DIAG] firebase credential source set to error');
     return null;
   }
 }
