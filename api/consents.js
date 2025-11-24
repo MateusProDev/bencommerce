@@ -9,8 +9,21 @@ function buildServiceAccountFromEnv() {
 
   if (!projectId || !clientEmail || !privateKey) return null;
 
-  // In many CI / Vercel setups the private key newlines are escaped, restore them
-  privateKey = privateKey.replace(/\\n/g, '\n');
+  // Normalize common env var formatting mistakes:
+  // - Remove surrounding quotes (some dashboards copy/paste with quotes)
+  // - Replace escaped newlines with real newlines
+  // - Trim whitespace
+  try {
+    privateKey = privateKey.trim();
+    if ((privateKey.startsWith("\"") && privateKey.endsWith("\"")) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\r\\n/g, '\\n').replace(/\\n/g, '\n');
+    privateKey = privateKey.replace(/\r\n/g, '\n');
+    privateKey = privateKey.trim();
+  } catch (e) {
+    // if normalization fails, continue and let admin.credential.cert throw a meaningful error
+  }
 
   return {
     type: 'service_account',
@@ -94,3 +107,4 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'failed_to_save_consent' });
   }
 };
+

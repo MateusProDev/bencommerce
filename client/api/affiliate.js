@@ -5,7 +5,17 @@ function buildServiceAccountFromEnv() {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   let privateKey = process.env.FIREBASE_PRIVATE_KEY;
   if (!projectId || !clientEmail || !privateKey) return null;
-  privateKey = privateKey.replace(/\\n/g, '\n');
+
+  try {
+    privateKey = privateKey.trim();
+    if ((privateKey.startsWith("\"") && privateKey.endsWith("\"")) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\r\\n/g, '\\n').replace(/\\n/g, '\n');
+    privateKey = privateKey.replace(/\r\n/g, '\n');
+    privateKey = privateKey.trim();
+  } catch (e) {}
+
   return {
     type: 'service_account',
     project_id: projectId,
