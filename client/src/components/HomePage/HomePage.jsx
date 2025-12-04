@@ -923,15 +923,11 @@ const HomePage = () => {
                       <FaInstagram />
                       Instagram
                     </div>
-                    <div className="platform-tag facebook">
-                      <FaFacebookF />
-                      Facebook
-                    </div>
                   </div>
                   <div className="plan-features">
                     <div className="feature-item">
                       <FaCheck className="feature-icon" />
-                      <span>15 posts mensais por plataforma</span>
+                      <span>15 posts mensais</span>
                     </div>
                     <div className="feature-item">
                       <FaCheck className="feature-icon" />
@@ -961,7 +957,7 @@ const HomePage = () => {
                       handleSocialMediaFunnelOpen("basic", "social_media_basic_card");
                     }}
                   >
-                    <FaRocket /> 🌟 Solicitar Plano Básico!
+                    <FaRocket /> 🌟 Solicitar Plano
                   </button>
                 </div>
 
@@ -971,7 +967,7 @@ const HomePage = () => {
                     <h3>Plano Premium</h3>
                     <div className="plan-price">
                       <span className="currency">R$</span>
-                      <span className="amount">197,99</span>
+                      <span className="amount">297,90</span>
                       <span className="period">/mês</span>
                     </div>
                   </div>
@@ -1026,7 +1022,7 @@ const HomePage = () => {
                       handleSocialMediaFunnelOpen("premium", "social_media_premium_card");
                     }}
                   >
-                    <FaBolt /> 🚀 Solicitar Plano Premium!
+                    <FaBolt /> 🚀 Solicitar Plano
                   </button>
                 </div>
               </div>
