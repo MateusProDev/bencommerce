@@ -24,6 +24,7 @@ import ContactFunnel from './components/ContactFunnel/ContactFunnel';
 import ContactFunnelPage from './components/ContactFunnel/ContactFunnelPage';
 import SolucoesPage from './pages/SolucoesPage';
 import PlanosPage from './pages/PlanosPage';
+import SocialOnboarding from './pages/SocialOnboarding';
 import TermosPage from './pages/TermosPage';
 import PrivacidadePage from './pages/PrivacidadePage';
 import CookiesPage from './pages/CookiesPage';
@@ -139,6 +140,7 @@ const AppContent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/solucoes" element={<SolucoesPage />} />
         <Route path="/planos" element={<PlanosPage />} />
+        <Route path="/onboarding-redes" element={<SocialOnboarding />} />
   <Route path="/contato" element={<ContactFunnelPage />} />
   <Route path="/contato/:plan" element={<ContactFunnelPage />} />
   {/* Static legal pages */}

@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+// Ensure Firebase is initialized early to avoid getAuth() being called before app init
+import "./firebaseConfig";
 import App from "./App";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 

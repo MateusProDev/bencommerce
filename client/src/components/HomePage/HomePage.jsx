@@ -359,13 +359,13 @@ const HomePage = () => {
 
   const clients = [
     { name: "20Buscar", logo: BuscarLogo },
+    { name: "TransferFortalezaTur", logo: MaiaturLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
-    { name: "Maiatur", logo: MaiaturLogo },
     { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
-    { name: "Maiatur", logo: MaiaturLogo },
+    { name: "TransferFortalezaTur", logo: MaiaturLogo },
   ];
 
   return (
@@ -730,86 +730,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* System Overview Section */}
-      <section className="homepage-system-overview">
-        <div className="homepage-system-container">
-          <h2 className="homepage-system-title">
-            Como funciona nosso sistema integrado
-          </h2>
-
-          <div className="homepage-system-cards">
-            <div className="homepage-system-card">
-              <div className="homepage-system-card-icon">
-                <FaGlobe />
-              </div>
-              <h3>Site Personalizado</h3>
-              <p>
-                Seu site com design exclusivo para apresentar serviços, destinos
-                e pacotes promocionais.
-              </p>
-              <button
-                className="homepage-system-card-button"
-                onClick={() => openContactFunnel("basico")}
-              >
-                Solicitar Site
-              </button>
-            </div>
-
-            <div className="homepage-system-card">
-              <div className="homepage-system-card-icon">
-                <FaUsers />
-              </div>
-              <h3>Dashboard do Proprietário</h3>
-              <p>
-                Controle completo da operação: finanças, relatórios,
-                funcionários e desempenho geral.
-              </p>
-              <button
-                className="homepage-system-card-button"
-                onClick={() => openContactFunnel("completo")}
-              >
-                Ver Demo
-              </button>
-            </div>
-
-            <div className="homepage-system-card">
-              <div className="homepage-system-card-icon">
-                <FaCar />
-              </div>
-              <h3>Portal do Motorista</h3>
-              <p>
-                Aplicativo dedicado para motoristas com agenda de serviços,
-                navegação e gestão de pagamentos.
-              </p>
-              <button
-                className="homepage-system-card-button"
-                onClick={() => openContactFunnel("completo")}
-              >
-                Conhecer
-              </button>
-            </div>
-
-            <div className="homepage-system-card">
-              <div className="homepage-system-card-icon">
-                <FaUmbrellaBeach />
-              </div>
-              <h3>Área do Cliente</h3>
-              <p>
-                Espaço para clientes agendarem serviços, acompanharem reservas e
-                histórico de viagens.
-              </p>
-              <button
-                className="homepage-system-card-button"
-                onClick={() => openContactFunnel("completo")}
-              >
-                Experimentar
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Clients Section */}
       <section className="homepage-clients">
         <div className="homepage-clients-container">
@@ -888,6 +808,18 @@ const HomePage = () => {
                   <span>Engajamento e interação 24/7</span>
                 </div>
               </div>
+              <div className="homepage-social-media-cta-wrapper">
+                <button
+                  className="homepage-social-media-plans-btn"
+                  onClick={() => {
+                    handleCTAClick('Ver Planos de Redes Sociais', 'social_media_plans');
+                    navigate('/planos');
+                  }}
+                  aria-label="Ver Planos de Gerenciamento de Redes"
+                >
+                  <FaRocket className="cta-icon" /> Ver Planos
+                </button>
+              </div>
             </div>
           </div>
           
@@ -905,129 +837,7 @@ const HomePage = () => {
             </button>
           </div> */}
 
-          {/* Planos de Preços */}
-          <div className="social-pricing-section">
-            <div className="homepage-social-media-right">
-              <div className="social-pricing-plans">
-                <div className="social-plan-card basic-plan">
-                  <div className="plan-header">
-                    <h3>Plano Básico</h3>
-                    <div className="plan-price">
-                      <span className="currency">R$</span>
-                      <span className="amount">99,99</span>
-                      <span className="period">/mês</span>
-                    </div>
-                  </div>
-                  <div className="plan-platforms">
-                    <div className="platform-tag instagram">
-                      <FaInstagram />
-                      Instagram
-                    </div>
-                  </div>
-                  <div className="plan-features">
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>15 posts mensais</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Stories personalizados</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Conteúdo visual profissional</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Planejamento de conteúdo</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Engajamento e respostas</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Relatório mensal básico</span>
-                    </div>
-                  </div>
-                  <button 
-                    className="social-plan-btn"
-                    onClick={() => {
-                      handleCTAClick('Solicitar Plano Básico', 'social_media_basic');
-                      handleSocialMediaFunnelOpen("basic", "social_media_basic_card");
-                    }}
-                  >
-                    <FaRocket /> 🌟 Solicitar Plano
-                  </button>
-                </div>
-
-                <div className="social-plan-card premium-plan">
-                  <div className="plan-badge">Mais Completo</div>
-                  <div className="plan-header">
-                    <h3>Plano Premium</h3>
-                    <div className="plan-price">
-                      <span className="currency">R$</span>
-                      <span className="amount">297,90</span>
-                      <span className="period">/mês</span>
-                    </div>
-                  </div>
-                  <div className="plan-platforms">
-                    <div className="platform-tag instagram">
-                      <FaInstagram />
-                      Instagram
-                    </div>
-                    <div className="platform-tag facebook">
-                      <FaFacebookF />
-                      Facebook
-                    </div>
-                  </div>
-                  <div className="plan-features">
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span><strong>Tudo do Plano Básico +</strong></span>
-                    </div>
-                    <div className="feature-item premium">
-                      <FaBolt className="feature-icon" />
-                      <span><strong>Gestão de Tráfego Pago</strong></span>
-                    </div>
-                    <div className="feature-item premium">
-                      <FaBolt className="feature-icon" />
-                      <span>Campanhas Facebook/Instagram Ads</span>
-                    </div>
-                    <div className="feature-item premium">
-                      <FaBolt className="feature-icon" />
-                      <span>Segmentação avançada de público</span>
-                    </div>
-                    <div className="feature-item premium">
-                      <FaBolt className="feature-icon" />
-                      <span>Otimização de conversões</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>25 posts mensais por plataforma</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Relatórios detalhados de ROI</span>
-                    </div>
-                    <div className="feature-item">
-                      <FaCheck className="feature-icon" />
-                      <span>Suporte prioritário</span>
-                    </div>
-                  </div>
-                  <button 
-                    className="social-plan-btn premium"
-                    onClick={() => {
-                      handleCTAClick('Solicitar Plano Premium', 'social_media_premium');
-                      handleSocialMediaFunnelOpen("premium", "social_media_premium_card");
-                    }}
-                  >
-                    <FaBolt /> 🚀 Solicitar Plano
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Planos moved to dedicated Planos page */}
         </div>
       </section>
 
@@ -1067,90 +877,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Plans Section */}
-      <section className="homepage-plans">
-        <div className="homepage-plans-container">
-          <h2 className="homepage-plans-title">
-            Planos para todos os tamanhos de agência
-          </h2>
-          <p className="homepage-plans-subtitle">
-            Escolha a solução ideal para o seu negócio e potencialize suas
-            operações
-          </p>
-
-          <div className="homepage-plans-grid">
-            {plans.map((plan, index) => (
-              <div
-                key={index}
-                className={`homepage-plan-card ${
-                  plan.featured ? "homepage-plan-card-featured" : ""
-                }`}
-              >
-                {plan.featured && (
-                  <div className="homepage-plan-badge">Mais Popular</div>
-                )}
-
-                <div className="homepage-plan-content">
-                  <div
-                    className={`homepage-plan-icon-container ${
-                      plan.featured
-                        ? "homepage-plan-icon-container-featured"
-                        : ""
-                    }`}
-                  >
-                    <span className="homepage-plan-icon">{plan.icon}</span>
-                  </div>
-
-                  <h3
-                    className={`homepage-plan-name ${
-                      plan.featured ? "homepage-plan-name-featured" : ""
-                    }`}
-                  >
-                    {plan.name}
-                  </h3>
-
-                  <div className="homepage-plan-price">
-                    <span
-                      className={`homepage-plan-price-amount ${
-                        plan.featured
-                          ? "homepage-plan-price-amount-featured"
-                          : ""
-                      }`}
-                    >
-                      {plan.price}
-                    </span>
-                    <span className="homepage-plan-price-period">
-                      {plan.period}
-                    </span>
-                  </div>
-
-                  <ul className="homepage-plan-features">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="homepage-plan-feature">
-                        <FaCheck className="homepage-plan-feature-icon" />
-                        <span className="homepage-plan-feature-text">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    className={`homepage-plan-button ${
-                      plan.featured
-                        ? "homepage-plan-button-featured"
-                        : "homepage-plan-button-regular"
-                    }`}
-                    onClick={() => openContactFunnel(plan.name.toLowerCase())}
-                  >
-                    {plan.ctaText}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Plans removed from homepage — use the dedicated /planos page */}
 
       {/* Testimonial Section */}
       <section className="homepage-testimonials">

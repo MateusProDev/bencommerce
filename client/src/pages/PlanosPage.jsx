@@ -8,6 +8,7 @@ import {
   FaRocket, 
   FaStar,
   FaCheck,
+  FaPalette,
   FaWhatsapp,
   FaEnvelope,
   FaCreditCard,
@@ -88,63 +89,63 @@ const PlanosPage = () => {
 
   const funcionalidades = [
     {
-      icon: <FaPlane />,
-      title: "Gestão de Viagens",
-      description: "Sistema completo para organizar roteiros, excursões e pacotes turísticos"
+      icon: <FaPalette />,
+      title: "Conteúdo Visual Profissional",
+      description: "Artes e imagens profissionais otimizadas para feed, stories e Reels"
     },
     {
-      icon: <FaHotel />,
-      title: "Reservas Hoteleiras", 
-      description: "Integração com hotéis, pousadas e controle de hospedagem em tempo real"
-    },
-    {
-      icon: <FaUsers />,
-      title: "CRM de Clientes",
-      description: "Gerencie clientes, histórico de viagens e preferências personalizadas"
-    },
-    {
-      icon: <FaCogs />,
-      title: "Agenda Inteligente",
-      description: "Calendário de eventos, compromissos e agendamento online automatizado"
+      icon: <FaBolt />,
+      title: "Planejamento de Conteúdo",
+      description: "Calendário editorial mensal com pautas, legendas e horários ideais"
     },
     {
       icon: <FaChartLine />,
       title: "Relatórios e Analytics",
-      description: "Dashboards completos com métricas de vendas e performance da agência"
+      description: "Dashboards com métricas de engajamento, alcance e ROI das campanhas"
     },
     {
-      icon: <FaBolt />,
-      title: "App Mobile Nativo",
-      description: "Aplicativo mobile para gestão completa da agência em qualquer lugar"
+      icon: <FaUsers />,
+      title: "Engajamento e Atendimento",
+      description: "Monitoramento e respostas a comentários e mensagens para aumentar relação com clientes"
     },
     {
-      icon: <FaCar />,
-      title: "Roteiros Personalizados",
-      description: "Criação de roteiros únicos com mapas interativos e pontos de interesse"
+      icon: <FaRocket />,
+      title: "Gestão de Tráfego Pago",
+      description: "Criação, segmentação e otimização de campanhas no Facebook e Instagram Ads"
+    },
+    {
+      icon: <FaHome />,
+      title: "Criação de Reels e Vídeo Curto",
+      description: "Produção de vídeos curtos otimizados para conversão e alcance orgânico"
+    },
+    {
+      icon: <FaCogs />,
+      title: "Automação e Integrações",
+      description: "Integrações com ferramentas de CRM, agendamento e remarketing"
     },
     {
       icon: <FaHeadset />,
       title: "Suporte Especializado",
-      description: "Equipe de suporte 24/7 especializada no setor de turismo"
+      description: "Equipe dedicada para suporte e otimização contínua das estratégias"
     }
   ];
 
   const faqs = [
     {
       question: "Posso mudar de plano a qualquer momento?",
-      answer: "Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento."
+      answer: "Sim — você pode subir ou descer de plano quando quiser. Ajustes são aplicados automaticamente."
     },
     {
-      question: "Há período de carência?",
-      answer: "Não, você pode cancelar a qualquer momento sem multas ou taxas adicionais."
+      question: "O que está incluído em todos os planos?",
+      answer: "Planejamento, criação de artes, publicação, monitoramento e relatórios básicos sem custos extras."
     },
     {
-      question: "Os preços incluem hospedagem do sistema?",
-      answer: "Sim, hospedagem, SSL, domínio e suporte técnico estão inclusos no plano."
+      question: "Vocês gerenciam anúncios pagos?",
+      answer: "Sim — no Plano Premium e Business gerenciamos campanhas com otimização contínua."
     },
     {
-      question: "Há taxa de transação nas reservas?",
-      answer: "Não cobramos taxa sobre suas vendas de viagens. Você paga apenas o plano mensal."
+      question: "Como funciona o processo de aprovação das publicações?",
+      answer: "Enviamos um calendário mensal para aprovação. Você pode pedir ajustes antes da publicação."
     }
   ];
 
