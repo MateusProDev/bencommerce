@@ -28,64 +28,60 @@ const PlanosPage = () => {
   const plans = [
     {
       id: 1,
-      name: "Básico",
-      subtitle: "Ideal para agências pequenas",
-      price: billingType === 'mensal' ? 149 : 1490,
-      originalPrice: billingType === 'anual' ? 1788 : null,
+      name: "Plano Básico",
+      subtitle: "Ideal para início e presença econômica",
+      price: billingType === 'mensal' ? 149.9 : Math.round(149.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(149.9 * 12 * 1.2) : null,
       period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaGlobe />,
       color: '#3b82f6',
       popular: false,
       features: [
-        "Site personalizado",
-        "Até 100 clientes",
-        "5 motoristas",
-        "Gestão de reservas básica",
-        "Relatórios simples",
-        "Suporte horário comercial"
+        "Instagram: 8 posts no feed / mês",
+        "8 stories / mês",
+        "Planejamento mensal e artes profissionais",
+        "Engajamento básico (curtidas e respostas)",
+        "Relatório simples mensal",
+        "Aprovação em até 48h"
       ]
     },
     {
       id: 2,
-      name: "Completo",
-      subtitle: "Mais escolhido pelas agências",
-      price: billingType === 'mensal' ? 299 : 2990,
-      originalPrice: billingType === 'anual' ? 3588 : null,
+      name: "Plano Premium",
+      subtitle: "Crescimento com foco em vendas e reservas",
+      price: billingType === 'mensal' ? 297.9 : Math.round(297.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(297.9 * 12 * 1.15) : null,
       period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaUsers />,
       color: '#06b6d4',
       popular: true,
       features: [
-        "Site premium personalizado",
-        "Clientes ilimitados",
-        "Motoristas ilimitados",
-        "Sistema de reservas avançado",
-        "Dashboard completo",
-        "Gestão financeira integrada",
-        "Integração com pagamentos",
-        "Suporte prioritário",
-        "7 dias grátis para teste"
+        "Instagram + Facebook: 12 posts no feed / mês",
+        "12 stories / mês",
+        "Gestão de Tráfego Pago (setup e otimizações)",
+        "Relatório detalhado mensal com insights",
+        "Suporte prioritário (resposta em 24–48h)",
+        "2 variações de criativo por campanha"
       ]
     },
     {
       id: 3,
-      name: "Enterprise",
-      subtitle: "Para grandes agências",
-      price: null,
-      period: '',
+      name: "Plano Business",
+      subtitle: "Completo: escala e conversão",
+      price: billingType === 'mensal' ? 497.9 : Math.round(497.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(497.9 * 12 * 1.1) : null,
+      period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaChartLine />,
       color: '#8b5cf6',
       popular: false,
-      customPrice: "Sob consulta",
       features: [
-        "Solução personalizada",
-        "Múltiplas agências",
-        "Relatórios avançados personalizados",
-        "API completa",
-        "Integrações específicas",
-        "Suporte 24/7 dedicado",
-        "Treinamento da equipe",
-        "Consultoria especializada"
+        "Instagram + Facebook + Google Meu Negócio",
+        "12 posts feed/mês + 4 Reels curtos/mês",
+        "Até 20 stories/mês",
+        "Campanhas avançadas e remarketing",
+        "Copywriting persuasivo e landing pages simples",
+        "Monitoramento diário e testes A/B",
+        "Relatório semanal + reunião quinzenal"
       ]
     }
   ];
