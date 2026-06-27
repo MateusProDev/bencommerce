@@ -806,7 +806,7 @@ const HomePage = () => {
               <div className="homepage-stat-icon">
                 <FaRocket />
               </div>
-              <div className="homepage-stat-number">3+</div>
+              <div className="homepage-stat-number">4+</div>
               <div className="homepage-stat-label">Anos de Mercado</div>
             </div>
             <div className="homepage-stat-card">

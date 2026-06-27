@@ -32,7 +32,7 @@ import './LeadsManager.css';
 import '../Dashboard/Dashboard.premium.css';
 
 const LeadsManager = () => {
-  const [activeTab, setActiveTab] = useState('leads'); // 'leads' ou 'services'
+  const [activeTab, setActiveTab] = useState('leads');
   const [leads, setLeads] = useState([]);
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,6 @@ const LeadsManager = () => {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [soundEnabled, setSoundEnabled] = useState(false);
   
-  // Services state
   const [services, setServices] = useState([]);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
@@ -63,7 +62,6 @@ const LeadsManager = () => {
   });
 
   useEffect(() => {
-    // Configurar listener em tempo real para leads
     const leadsQuery = query(
       collection(db, 'leads'),
       orderBy('createdAt', 'desc')
@@ -79,12 +77,10 @@ const LeadsManager = () => {
           createdAt: doc.data().createdAt?.toDate() || new Date()
         }));
         
-        // Verificar se há novos leads
         if (leads.length > 0 && leadsData.length > leads.length) {
           const newLeads = leadsData.length - leads.length;
           setNewLeadsCount(newLeads);
           
-          // Tocar som de notificação se habilitado
           if (soundEnabled) {
             try {
               const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYdAjih1fPTfC4GM3Lm');
@@ -95,7 +91,6 @@ const LeadsManager = () => {
             }
           }
           
-          // Remover a notificação após 5 segundos
           setTimeout(() => setNewLeadsCount(0), 5000);
         }
         
@@ -111,11 +106,9 @@ const LeadsManager = () => {
       }
     );
 
-    // Cleanup function
     return () => unsubscribe();
-  }, []);
+  }, [soundEnabled, leads.length]);
 
-  // Load services
   useEffect(() => {
     const servicesQuery = query(
       collection(db, 'services'),
@@ -138,9 +131,9 @@ const LeadsManager = () => {
 
   useEffect(() => {
     applyFilters();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leads, filters]);
 
-  // Calcular estatísticas usando useMemo para melhor performance
   const stats = useMemo(() => {
     return {
       total: filteredLeads.length,
@@ -154,17 +147,14 @@ const LeadsManager = () => {
   const applyFilters = () => {
     let filtered = [...leads];
 
-    // Filtro por status
     if (filters.status !== 'todos') {
       filtered = filtered.filter(lead => lead.status === filters.status);
     }
 
-    // Filtro por plano
     if (filters.plan !== 'todos') {
       filtered = filtered.filter(lead => lead.plan === filters.plan);
     }
 
-    // Filtro por busca
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(lead => 
@@ -175,7 +165,6 @@ const LeadsManager = () => {
       );
     }
 
-    // Filtro por data
     if (filters.dateRange !== 'todos') {
       const now = new Date();
       const startDate = new Date();
@@ -209,8 +198,6 @@ const LeadsManager = () => {
         updatedAt: new Date()
       });
       
-      // O listener do onSnapshot atualizará automaticamente os leads
-      // Atualizar apenas o lead selecionado se estiver aberto
       if (selectedLead && selectedLead.id === leadId) {
         setSelectedLead({ ...selectedLead, status: newStatus });
       }
@@ -225,7 +212,6 @@ const LeadsManager = () => {
     
     try {
       await deleteDoc(doc(db, 'leads', leadId));
-      // O listener do onSnapshot atualizará automaticamente os leads
       setIsModalOpen(false);
       setSelectedLead(null);
     } catch (error) {
@@ -248,7 +234,6 @@ const LeadsManager = () => {
     window.open(url);
   };
 
-  // Services functions
   const calculateServicesStats = () => {
     const totalServices = services.length;
     const totalRevenue = services.reduce((sum, s) => sum + (parseFloat(s.chargedAmount) || 0), 0);
@@ -487,7 +472,7 @@ const LeadsManager = () => {
             </div>
           </div>
 
-          {/* Filters */}
+          {/* Filters - APENAS UMA VEZ */}
           <div className="pd-filters-section">
             <div className="filters-grid">
               <div className="pd-filter-group">
@@ -550,181 +535,243 @@ const LeadsManager = () => {
             </div>
           </div>
 
-      {/* Filters */}
-      <div className="pd-filters-section">
-        <div className="filters-grid">
-          <div className="pd-filter-group">
-            <label>
-              <FaSearch /> Buscar
-            </label>
-            <input
-              type="text"
-              placeholder="Nome, email, empresa..."
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            />
+          {/* Leads Table */}
+          <div className="pd-table-container">
+            <table className="pd-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Contato</th>
+                  <th>Empresa</th>
+                  <th>Plano</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLeads.map((lead) => (
+                  <tr key={lead.id}>
+                    <td className="lead-name">
+                      <div className="pd-name-cell">
+                        <strong>{lead.name}</strong>
+                      </div>
+                    </td>
+                    <td className="lead-contact">
+                      <div className="contact-cell">
+                        <div className="pd-contact-item">
+                          <FaEnvelope /> {lead.email}
+                        </div>
+                        <div className="pd-contact-item">
+                          <FaWhatsapp /> {lead.whatsapp}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="lead-company">
+                      {lead.company && (
+                        <div className="pd-company-cell">
+                          <FaBuilding /> {lead.company}
+                        </div>
+                      )}
+                    </td>
+                    <td className="lead-plan">
+                      <span className="pd-plan-badge">
+                        {getPlanName(lead.plan)}
+                      </span>
+                    </td>
+                    <td className="lead-status">
+                      <select
+                        value={lead.status}
+                        onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
+                        className="pd-status-select"
+                        style={{ borderColor: getStatusColor(lead.status) }}
+                      >
+                        <option value="novo">Novo</option>
+                        <option value="contato">Em Contato</option>
+                        <option value="convertido">Convertido</option>
+                        <option value="perdido">Perdido</option>
+                      </select>
+                    </td>
+                    <td className="lead-date">
+                      <div className="pd-lead-date">
+                        {lead.createdAt.toLocaleDateString('pt-BR')}
+                        <br />
+                        <small>{lead.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+                      </div>
+                    </td>
+                    <td className="lead-actions">
+                      <div className="action-buttons">
+                        <button
+                          className="pd-action-btn view"
+                          onClick={() => {
+                            setSelectedLead(lead);
+                            setIsModalOpen(true);
+                          }}
+                          title="Ver detalhes"
+                        >
+                          <FaEye />
+                        </button>
+                        <button
+                          className="pd-action-btn whatsapp"
+                          onClick={() => openWhatsApp(lead.whatsapp, lead.name)}
+                          title="Enviar WhatsApp"
+                        >
+                          <FaWhatsapp />
+                        </button>
+                        <button
+                          className="pd-action-btn email"
+                          onClick={() => openEmail(lead.email, lead.name)}
+                          title="Enviar Email"
+                        >
+                          <FaEnvelope />
+                        </button>
+                        <button
+                          className="pd-action-btn delete"
+                          onClick={() => deleteLead(lead.id)}
+                          title="Excluir"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filteredLeads.length === 0 && (
+              <div className="pd-no-leads">
+                <p>Nenhum lead encontrado com os filtros aplicados.</p>
+              </div>
+            )}
           </div>
-          
-          <div className="pd-filter-group">
-            <label>
-              <FaFilter /> Status
-            </label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+        </>
+      )}
+
+      {activeTab === 'services' && (
+        <div className="pd-services-section">
+          <div className="pd-services-header">
+            <h2>💰 Serviços Realizados</h2>
+            <button 
+              className="pd-btn-primary"
+              onClick={() => {
+                setEditingService(null);
+                resetServiceForm();
+                setShowServiceModal(true);
+              }}
             >
-              <option value="todos">Todos</option>
-              <option value="novo">Novo</option>
-              <option value="contato">Em Contato</option>
-              <option value="convertido">Convertido</option>
-              <option value="perdido">Perdido</option>
-            </select>
+              <FaPlus /> Novo Serviço
+            </button>
           </div>
 
-          <div className="pd-filter-group">
-            <label>
-              <FaStar /> Plano
-            </label>
-            <select
-              value={filters.plan}
-              onChange={(e) => setFilters({ ...filters, plan: e.target.value })}
-            >
-              <option value="todos">Todos</option>
-              <option value="basico">Básico</option>
-              <option value="completo">Completo</option>
-              <option value="enterprise">Enterprise</option>
-            </select>
-          </div>
+          {/* Services Stats */}
+          {(() => {
+            const stats = calculateServicesStats();
+            return (
+              <div className="stats-grid">
+                <div className="pd-stat-card total">
+                  <div className="pd-stat-icon">📊</div>
+                  <div className="stat-content">
+                    <h3>{stats.totalServices}</h3>
+                    <p>Total de Serviços</p>
+                  </div>
+                </div>
+                <div className="pd-stat-card convertido">
+                  <div className="pd-stat-icon">💰</div>
+                  <div className="stat-content">
+                    <h3>{formatCurrency(stats.totalRevenue)}</h3>
+                    <p>Receita Total</p>
+                  </div>
+                </div>
+                <div className="pd-stat-card contato">
+                  <div className="pd-stat-icon">📊</div>
+                  <div className="stat-content">
+                    <h3>{formatCurrency(stats.totalCost)}</h3>
+                    <p>Custo Total</p>
+                  </div>
+                </div>
+                <div className="pd-stat-card novo">
+                  <div className="pd-stat-icon">📈</div>
+                  <div className="stat-content">
+                    <h3>{formatCurrency(stats.totalProfit)}</h3>
+                    <p>Lucro Total</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
-          <div className="pd-filter-group">
-            <label>
-              <FaCalendarAlt /> Período
-            </label>
-            <select
-              value={filters.dateRange}
-              onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-            >
-              <option value="todos">Todos</option>
-              <option value="hoje">Hoje</option>
-              <option value="semana">Última semana</option>
-              <option value="mes">Último mês</option>
-            </select>
+          {/* Services Table */}
+          <div className="pd-table-container">
+            <table className="pd-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Descrição</th>
+                  <th>Valor Cobrado</th>
+                  <th>Valor Custo</th>
+                  <th>Lucro</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {services.map((service) => {
+                  const profit = (parseFloat(service.chargedAmount) || 0) - (parseFloat(service.costAmount) || 0);
+                  return (
+                    <tr key={service.id}>
+                      <td>{service.clientName}</td>
+                      <td><strong>{service.serviceName}</strong></td>
+                      <td>{service.description}</td>
+                      <td>{formatCurrency(service.chargedAmount)}</td>
+                      <td>{formatCurrency(service.costAmount)}</td>
+                      <td style={{ color: profit >= 0 ? '#10b981' : '#ef4444', fontWeight: 'bold' }}>
+                        {formatCurrency(profit)}
+                      </td>
+                      <td>{service.date.toLocaleDateString('pt-BR')}</td>
+                      <td>
+                        <span className={`pd-status-badge ${service.status}`}>
+                          {service.status === 'concluido' ? '✅ Concluído' : 
+                           service.status === 'pendente' ? '⏳ Pendente' : 
+                           service.status === 'cancelado' ? '❌ Cancelado' : service.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            className="pd-action-btn edit"
+                            onClick={() => handleEditService(service)}
+                            title="Editar"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            className="pd-action-btn delete"
+                            onClick={() => handleDeleteService(service.id)}
+                            title="Excluir"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {services.length === 0 && (
+              <div className="pd-no-leads">
+                <p>Nenhum serviço cadastrado ainda.</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Leads Table */}
-      <div className="pd-table-container">
-        <table className="pd-table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Contato</th>
-              <th>Empresa</th>
-              <th>Plano</th>
-              <th>Status</th>
-              <th>Data</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td className="lead-name">
-                  <div className="pd-name-cell">
-                    <strong>{lead.name}</strong>
-                  </div>
-                </td>
-                <td className="lead-contact">
-                  <div className="contact-cell">
-                    <div className="pd-contact-item">
-                      <FaEnvelope /> {lead.email}
-                    </div>
-                    <div className="pd-contact-item">
-                      <FaWhatsapp /> {lead.whatsapp}
-                    </div>
-                  </div>
-                </td>
-                <td className="lead-company">
-                  {lead.company && (
-                    <div className="pd-company-cell">
-                      <FaBuilding /> {lead.company}
-                    </div>
-                  )}
-                </td>
-                <td className="lead-plan">
-                  <span className="pd-plan-badge">
-                    {getPlanName(lead.plan)}
-                  </span>
-                </td>
-                <td className="lead-status">
-                  <select
-                    value={lead.status}
-                    onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                    className="pd-status-select"
-                    style={{ borderColor: getStatusColor(lead.status) }}
-                  >
-                    <option value="novo">Novo</option>
-                    <option value="contato">Em Contato</option>
-                    <option value="convertido">Convertido</option>
-                    <option value="perdido">Perdido</option>
-                  </select>
-                </td>
-                <td className="lead-date">
-                  <div className="pd-lead-date">
-                    {lead.createdAt.toLocaleDateString('pt-BR')}
-                    <br />
-                    <small>{lead.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
-                  </div>
-                </td>
-                <td className="lead-actions">
-                  <div className="action-buttons">
-                    <button
-                      className="pd-action-btn view"
-                      onClick={() => {
-                        setSelectedLead(lead);
-                        setIsModalOpen(true);
-                      }}
-                      title="Ver detalhes"
-                    >
-                      <FaEye />
-                    </button>
-                    <button
-                      className="pd-action-btn whatsapp"
-                      onClick={() => openWhatsApp(lead.whatsapp, lead.name)}
-                      title="Enviar WhatsApp"
-                    >
-                      <FaWhatsapp />
-                    </button>
-                    <button
-                      className="pd-action-btn email"
-                      onClick={() => openEmail(lead.email, lead.name)}
-                      title="Enviar Email"
-                    >
-                      <FaEnvelope />
-                    </button>
-                    <button
-                      className="pd-action-btn delete"
-                      onClick={() => deleteLead(lead.id)}
-                      title="Excluir"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {filteredLeads.length === 0 && (
-          <div className="pd-no-leads">
-            <p>Nenhum lead encontrado com os filtros aplicados.</p>
-          </div>
-        )}
-      </div>
-
-      {/* Modal de Detalhes */}
+      {/* Modal de Detalhes do Lead */}
       {isModalOpen && selectedLead && (
         <div className="pd-modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="pd-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -824,8 +871,147 @@ const LeadsManager = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Serviços */}
+      {showServiceModal && (
+        <div className="pd-modal-overlay" onClick={() => setShowServiceModal(false)}>
+          <div className="pd-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{editingService ? 'Editar Serviço' : 'Novo Serviço'}</h2>
+              <button 
+                className="pd-modal-close"
+                onClick={() => {
+                  setShowServiceModal(false);
+                  setEditingService(null);
+                  resetServiceForm();
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleServiceSubmit}>
+              <div className="modal-body">
+                <div className="pd-form-group">
+                  <label>Nome do Cliente *</label>
+                  <input
+                    type="text"
+                    required
+                    value={serviceFormData.clientName}
+                    onChange={(e) => setServiceFormData({ ...serviceFormData, clientName: e.target.value })}
+                    placeholder="Digite o nome do cliente"
+                  />
+                </div>
+
+                <div className="pd-form-group">
+                  <label>Nome do Serviço *</label>
+                  <input
+                    type="text"
+                    required
+                    value={serviceFormData.serviceName}
+                    onChange={(e) => setServiceFormData({ ...serviceFormData, serviceName: e.target.value })}
+                    placeholder="Digite o nome do serviço"
+                  />
+                </div>
+
+                <div className="pd-form-group">
+                  <label>Descrição</label>
+                  <textarea
+                    value={serviceFormData.description}
+                    onChange={(e) => setServiceFormData({ ...serviceFormData, description: e.target.value })}
+                    placeholder="Descreva o serviço realizado"
+                    rows="3"
+                  />
+                </div>
+
+                <div className="pd-form-row">
+                  <div className="pd-form-group">
+                    <label>Valor Cobrado (R$) *</label>
+                    <input
+                      type="number"
+                      required
+                      step="0.01"
+                      min="0"
+                      value={serviceFormData.chargedAmount}
+                      onChange={(e) => setServiceFormData({ ...serviceFormData, chargedAmount: e.target.value })}
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div className="pd-form-group">
+                    <label>Valor de Custo (R$) *</label>
+                    <input
+                      type="number"
+                      required
+                      step="0.01"
+                      min="0"
+                      value={serviceFormData.costAmount}
+                      onChange={(e) => setServiceFormData({ ...serviceFormData, costAmount: e.target.value })}
+                      placeholder="0,00"
+                    />
+                  </div>
+                </div>
+
+                <div className="pd-form-row">
+                  <div className="pd-form-group">
+                    <label>Data *</label>
+                    <input
+                      type="date"
+                      required
+                      value={serviceFormData.date}
+                      onChange={(e) => setServiceFormData({ ...serviceFormData, date: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="pd-form-group">
+                    <label>Status</label>
+                    <select
+                      value={serviceFormData.status}
+                      onChange={(e) => setServiceFormData({ ...serviceFormData, status: e.target.value })}
+                    >
+                      <option value="concluido">Concluído</option>
+                      <option value="pendente">Pendente</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </div>
+                </div>
+
+                {serviceFormData.chargedAmount && serviceFormData.costAmount && (
+                  <div className="pd-profit-preview">
+                    <strong>Lucro Estimado:</strong> 
+                    {formatCurrency(
+                      (parseFloat(serviceFormData.chargedAmount) || 0) - 
+                      (parseFloat(serviceFormData.costAmount) || 0)
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="pd-modal-actions">
+                <button
+                  type="button"
+                  className="pd-modal-btn cancel"
+                  onClick={() => {
+                    setShowServiceModal(false);
+                    setEditingService(null);
+                    resetServiceForm();
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="pd-modal-btn submit"
+                >
+                  {editingService ? 'Atualizar' : 'Cadastrar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default LeadsManager;
+export default LeadsManager; 
