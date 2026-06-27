@@ -27,87 +27,87 @@ const SolucoesPage = () => {
 
   const solucoes = [
     {
-      icon: <FaPlane />,
-      title: "Gestão de Viagens",
-      description: "Sistema completo para organizar e gerenciar todos os tipos de viagens e roteiros.",
+      icon: <FaGlobe />,
+      title: "Gestão de Tráfego Facebook/Instagram",
+      description: "Campanhas otimizadas para atingir turistas interessados nos seus destinos.",
       features: [
-        "Catálogo de destinos personalizável",
-        "Montagem de roteiros inteligente",
-        "Gestão de reservas em tempo real",
-        "Controle de disponibilidade automático",
-        "Integração com fornecedores"
+        "Segmentação avançada de público",
+        "Criativos de alta conversão",
+        "Otimização contínua de lances",
+        "Remarketing para conversões",
+        "Anúncios em Stories e Feed"
       ],
       color: "#3b82f6"
     },
     {
-      icon: <FaHotel />,
-      title: "Reservas de Hospedagem",
-      description: "Integração com hotéis e pousadas para reservas automáticas e controle de ocupação.",
+      icon: <FaChartLine />,
+      title: "Gestão de Tráfego Google Ads",
+      description: "Capture clientes no momento exato em que buscam por destinos turísticos.",
       features: [
-        "Sistema de reservas online",
-        "Check-in/Check-out digital",
-        "Controle de quartos e ocupação",
-        "Integração hoteleira completa",
-        "Gestão de tarifas dinâmicas"
+        "Palavras-chave estratégicas",
+        "Anúncios de pesquisa e display",
+        "Google Meu Negócio otimizado",
+        "Maximização de ROI",
+        "Campanhas de remarketing"
       ],
       color: "#10b981"
     },
     {
-      icon: <FaCalendarAlt />,
-      title: "Agenda Inteligente",
-      description: "Organize excursões, eventos e compromissos com calendário interativo.",
+      icon: <FaUsers />,
+      title: "Remarketing Multi-plataforma",
+      description: "Reconquiste visitantes que já demonstraram interesse nos seus pacotes.",
       features: [
-        "Calendário de eventos interativo",
-        "Agendamento online 24/7",
-        "Lembretes automáticos",
-        "Sincronização multi-dispositivo",
-        "Notificações personalizadas"
+        "Públicos personalizados",
+        "Remarketing dinâmico",
+        "Funis de conversão",
+        "Aumento de taxa de conversão",
+        "Cross-selling inteligente"
       ],
       color: "#f59e0b"
     },
     {
-      icon: <FaUsers />,
-      title: "CRM de Clientes",
-      description: "Gerencie todos os seus clientes e histórico de viagens em um só lugar.",
+      icon: <FaCamera />,
+      title: "Criativos de Alta Conversão",
+      description: "Artes e vídeos profissionais otimizados para maximizar cliques e conversões.",
       features: [
-        "Base de dados completa de clientes",
-        "Histórico de viagens detalhado",
-        "Segmentação avançada",
-        "Campanhas de marketing direcionadas",
-        "Análise de comportamento do cliente"
+        "Design orientado à conversão",
+        "A/B testing de criativos",
+        "Vídeos para anúncios",
+        "Landing pages otimizadas",
+        "Copywriting persuasivo"
       ],
       color: "#8b5cf6"
     },
     {
-      icon: <FaChartLine />,
-      title: "Relatórios e Analytics",
-      description: "Acompanhe o desempenho da sua agência com relatórios detalhados.",
+      icon: <FaFileInvoiceDollar />,
+      title: "Análise de ROI e Performance",
+      description: "Acompanhe o desempenho das campanhas com relatórios detalhados.",
       features: [
-        "Dashboard executivo em tempo real",
-        "Relatórios de vendas detalhados",
-        "Análise de ROI por campanha",
-        "Métricas de satisfação do cliente",
-        "Previsões e tendências de mercado"
+        "Dashboard em tempo real",
+        "Relatórios de CPC, CTR e ROI",
+        "Análise de conversão por campanha",
+        "Métricas de custo por aquisição",
+        "Otimização baseada em dados"
       ],
       color: "#ef4444"
     },
     {
-      icon: <FaMobile />,
-      title: "App Mobile",
-      description: "Aplicativo mobile para gestão completa da sua agência em qualquer lugar.",
+      icon: <FaHeadset />,
+      title: "Suporte Especializado",
+      description: "Equipe dedicada com expertise em tráfego pago para turismo.",
       features: [
-        "Gestão móvel completa",
-        "Notificações push",
-        "Acesso offline limitado",
-        "Sincronização automática",
-        "Interface otimizada para mobile"
+        "Suporte prioritário 24h-48h",
+        "Consultoria estratégica",
+        "Otimização contínua",
+        "Reuniões mensais",
+        "Ajustes proativos"
       ],
       color: "#06b6d4"
     }
   ];
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent("Olá! Gostaria de conhecer melhor as soluções para agência de turismo.");
+    const message = encodeURIComponent("Olá! Gostaria de conhecer melhor as soluções de gestão de tráfego pago para turismo.");
     window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
   };
 
@@ -126,10 +126,10 @@ const SolucoesPage = () => {
         </button>
         
         <div className="solucoes-header-content">
-          <h1>Soluções Completas para Agências de Turismo</h1>
+          <h1>Soluções de Tráfego Pago para Turismo</h1>
           <p>
-            Transforme sua agência com nossa plataforma integrada. 
-            Gerencie clientes, reservas, viagens e muito mais em um só lugar.
+            Maximize suas vendas e reservas com estratégias de anúncios otimizadas. 
+            Transforme visitantes em clientes com nossa expertise em gestão de tráfego.
           </p>
         </div>
       </section>
@@ -137,10 +137,10 @@ const SolucoesPage = () => {
       {/* Main Content */}
       <main className="solucoes-main">
         <div className="solucoes-container">
-          <h2 className="section-title">Nossas Soluções</h2>
+          <h2 className="section-title">Nossas Soluções de Tráfego</h2>
           <p className="section-subtitle">
-            Cada módulo foi desenvolvido especificamente para as necessidades 
-            do mercado de turismo brasileiro
+            Cada solução foi desenvolvida especificamente para maximizar 
+            conversões e ROI de agências de turismo
           </p>
           
           {/* Solutions Grid */}
@@ -166,10 +166,10 @@ const SolucoesPage = () => {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2>Pronto para revolucionar sua agência?</h2>
+          <h2>Pronto para aumentar suas conversões?</h2>
           <p>
-            Converse com nossos especialistas e descubra como nossa plataforma 
-            pode transformar seu negócio de turismo.
+            Converse com nossos especialistas e descubra como nossas estratégias 
+            de tráfego pago podem transformar suas vendas.
           </p>
           <div className="cta-buttons">
             <button className="cta-primary" onClick={() => navigate('/contato')}>

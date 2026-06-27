@@ -1,33 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { FaInstagram, FaFacebookF } from "react-icons/fa";
 import {
   FaGlobe,
   FaUsers,
-  FaCar,
   FaChartLine,
-  FaCreditCard,
   FaBars,
   FaWhatsapp,
   FaCheck,
-  FaPlane,
-  FaHotel,
-  FaUmbrellaBeach,
   FaRocket,
   FaStar,
   FaShieldAlt,
   FaBolt,
-  FaHeart,
   FaHome,
   FaCogs,
   FaTags,
   FaEnvelope,
   FaPalette,
 } from "react-icons/fa";
-import { 
-  HiSparkles, 
-  HiLightningBolt, 
-  HiTrendingUp 
-} from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
 import useSocialMediaFunnel from "../../hooks/useSocialMediaFunnel";
@@ -38,7 +26,10 @@ import TurviaSemFundoLogo from "../../assets/TurviaSemFundo.png";
 import BuscarLogo from "../../assets/20buscar.png";
 import LisboaLogo from "../../assets/lisboa.png";
 import VcTurLogo from "../../assets/VcturLogo.png";
-import MaiaturLogo from "../../assets/maiaturlogo.png";
+import DineiLogo from "../../assets/logodinei.webp";
+import NetoLogo from "../../assets/logoneto.jpeg";
+import TransferLogo from "../../assets/logotransfer.webp";
+import PasseioLegalLogo from "../../assets/logopasseiolegal.png";
 import AvaliacaoUm from "../../assets/avaliacaoum.jpeg";
 import AvaliacaoDois from "../../assets/avaliacaodois.jpeg";
 import { trackEvents, pageView } from "../../utils/analytics";
@@ -50,14 +41,12 @@ const HomePage = () => {
   const { 
     isOpen: isSocialMediaOpen, 
     selectedPlan, 
-    openSocialMediaFunnel, 
     closeSocialMediaFunnel, 
     submitLead 
   } = useSocialMediaFunnel();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeService, setActiveService] = useState(1); // Card featured por padrão (índice 1)
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [typewriterText, setTypewriterText] = useState('');
@@ -216,10 +205,6 @@ const HomePage = () => {
     openContactFunnel(type);
   };
 
-  const handleSocialMediaFunnelOpen = (plan, location) => {
-    trackEvents.contactFormSubmit(`Social Media ${plan} - ${location}`);
-    openSocialMediaFunnel(plan);
-  };
 
   const handleWhatsAppClick = (location) => {
     trackEvents.whatsappClick(location);
@@ -263,117 +248,70 @@ const HomePage = () => {
     trackEvents.ctaClick(ctaText, location);
   };
 
+  const features = [
+    {
+      icon: <FaGlobe />,
+      title: "Campanhas Otimizadas",
+      description:
+        "Criamos e gerenciamos campanhas de anúncios focadas em conversão, segmentando o público certo para maximizar seu ROI",
+    },
+    {
+      icon: <FaCogs />,
+      title: "Segmentação Avançada",
+      description:
+        "Utilizamos dados e comportamentos para atingir turistas com alto potencial de conversão nos seus pacotes",
+    },
+    {
+      icon: <FaUsers />,
+      title: "Remarketing Inteligente",
+      description:
+        "Reconquistamos visitantes que já demonstraram interesse, aumentando significativamente sua taxa de conversão",
+    },
+    {
+      icon: <FaChartLine />,
+      title: "Análise de Dados",
+      description:
+        "Monitoramento constante com relatórios detalhados de métricas como CPC, CTR, ROI e conversões para otimização contínua",
+    },
+    {
+      icon: <FaRocket />,
+      title: "Resultados Comprovados",
+      description:
+        "Estratégias testadas e validadas no mercado de turismo para garantir aumento real de vendas e reservas",
+    },
+  ];
+
   // Auto-rotate features every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
-
-  const features = [
-    {
-      icon: <FaGlobe />,
-      title: "Desenvolvimento Web Especializado",
-      description:
-        "Criamos sites únicos para agências de turismo com foco em conversão e experiência do usuário, otimizados para o mercado turístico",
-    },
-    {
-      icon: <FaCogs />,
-      title: "Integração Completa",
-      description:
-        "Desenvolvemos sistemas que integram site, gestão de clientes, reservas e pagamentos em uma única plataforma eficiente",
-    },
-    {
-      icon: <FaUsers />,
-      title: "Estratégia Digital",
-      description:
-        "Cuidamos da presença digital completa da sua agência: redes sociais, identidade visual e marketing digital especializado",
-    },
-    {
-      icon: <FaChartLine />,
-      title: "Análise e Otimização",
-      description:
-        "Monitoramos e otimizamos constantemente o desempenho digital da sua agência com relatórios detalhados e insights valiosos",
-    },
-    {
-      icon: <FaRocket />,
-      title: "Suporte Especializado",
-      description:
-        "Equipe dedicada com expertise em turismo para garantir que sua agência tenha sempre o melhor suporte técnico e estratégico",
-    },
-  ];
-
-  const plans = [
-    {
-      name: "Básico",
-      price: "R$149",
-      period: "/mês",
-      icon: <FaGlobe />,
-      features: [
-        "Site personalizado",
-        "Até 300 reservas/mês",
-        "5 motoristas",
-        "Gestão de reservas",
-        "Relatórios simples",
-        "Suporte horário comercial",
-      ],
-      ctaText: "Vamos Começar",
-      featured: false,
-    },
-    {
-      name: "Completo",
-      price: "R$299",
-      period: "/mês",
-      icon: <FaUsers />,
-      features: [
-        "Site premium personalizado",
-        "Reservas ilimitadas",
-        "Motoristas ilimitados",
-        "Dashboard completo",
-        "Gestão financeira integrada",
-        "Suporte prioritário",
-        "14 dias grátis",
-      ],
-      ctaText: "Agendar Demonstração",
-      featured: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Sob consulta",
-      period: "",
-      icon: <FaChartLine />,
-      features: [
-        "Solução personalizada",
-        "Múltiplas agências",
-        "Relatórios avançados personalizados",
-        "Integrações específicas",
-        "Suporte 24/7 dedicado",
-        "Treinamento da equipe",
-        "Consultoria especializada",
-      ],
-      ctaText: "Vamos Conversar",
-      featured: false,
-    },
-  ];
+  }, [features.length]);
 
   const clients = [
     { name: "20Buscar", logo: BuscarLogo },
-    { name: "TransferFortalezaTur", logo: MaiaturLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
+    { name: "Dinei Tur", logo: DineiLogo },
+    { name: "Neto Beach Park", logo: NetoLogo },
+    { name: "Transfer Fortaleza Tur", logo: TransferLogo },
+    { name: "PasseioLegal", logo: PasseioLegalLogo },
     { name: "20Buscar", logo: BuscarLogo },
     { name: "Lisboatur", logo: LisboaLogo },
     { name: "VcTur", logo: VcTurLogo },
-    { name: "TransferFortalezaTur", logo: MaiaturLogo },
+    { name: "Dinei Tur", logo: DineiLogo },
+    { name: "Neto Beach Park", logo: NetoLogo },
+    { name: "Transfer Fortaleza Tur", logo: TransferLogo },
+    { name: "PasseioLegal", logo: PasseioLegalLogo },
   ];
 
   return (
     <>
       <SEO 
-        title="Turvia - Soluções Digitais para Agências de Turismo | Sistema de Gestão 3em1"
-        description="Sites personalizados, sistemas completos de reservas, gerenciamento de redes sociais e identidade visual. Transforme sua agência de turismo com soluções digitais completas."
-        keywords="sistema para agência de turismo, site para turismo, gestão agência de viagens, reservas online turismo, CRM turismo, dashboard agência turismo, sistema 3em1 turismo, gerenciamento redes sociais turismo"
+        title="Turvia - Gestão de Tráfego Pago para Agências de Turismo | Maximize Conversões"
+        description="Especialistas em gestão de tráfego pago para agências de turismo. Campanhas otimizadas no Facebook, Instagram e Google Ads para maximizar vendas e reservas."
+        keywords="gestão de tráfego pago turismo, anúncios facebook instagram turismo, google ads turismo, tráfego pago agência viagens, marketing digital turismo, conversão turismo, remarketing turismo"
         url="/"
       />
       
@@ -544,11 +482,11 @@ const HomePage = () => {
 
         <div className="homepage-hero-content">
           <h1 className="homepage-hero-title">
-            Especialistas em Soluções Digitais para Agências de Turismo
+            Especialistas em Gestão de Tráfego Pago para Agências de Turismo
           </h1>
           <p className="homepage-hero-subtitle">
-            Sites personalizados, sistemas completos, redes sociais e identidade visual. 
-            Tudo para sua agência de turismo conquistar mais clientes online.
+            Maximize suas vendas e reservas com campanhas de anúncios otimizadas. 
+            Transforme visitantes em clientes com estratégias de tráfego pago comprovadas.
           </p>
           <div className="homepage-hero-buttons">
             <button
@@ -578,10 +516,10 @@ const HomePage = () => {
         <div className="turvia-services-container">
           <div className="turvia-services-header">
             <h2 className="turvia-services-title">
-              Soluções Completas para Agências de Turismo
+              Nossas Soluções de Tráfego Pago
             </h2>
             <p className="turvia-services-subtitle">
-              Somos especialistas em transformar agências de turismo com soluções digitais completas e personalizadas
+              Estratégias personalizadas para maximizar conversões e ROI da sua agência de turismo
             </p>
           </div>
 
@@ -591,15 +529,15 @@ const HomePage = () => {
                 <div className="turvia-service-icon">
                   <FaGlobe />
                 </div>
-                <h3 className="turvia-service-title">Sites Personalizados</h3>
+                <h3 className="turvia-service-title">Gestão de Tráfego Facebook/Instagram</h3>
                 <p className="turvia-service-description">
-                  Criamos sites únicos e responsivos que representam a identidade da sua agência e convertem visitantes em clientes.
+                  Campanhas otimizadas para atingir turistas interessados nos seus destinos e pacotes.
                 </p>
                 <ul className="turvia-service-features">
-                  <li>Design exclusivo e responsivo</li>
-                  <li>SEO otimizado para turismo</li>
-                  <li>Integração com redes sociais</li>
-                  <li>Sistema de reservas integrado</li>
+                  <li>Segmentação avançada de público</li>
+                  <li>Criativos de alta conversão</li>
+                  <li>Otimização contínua de lances</li>
+                  <li>Remarketing para conversões</li>
                 </ul>
               </div>
 
@@ -608,15 +546,15 @@ const HomePage = () => {
                 <div className="turvia-service-icon">
                   <FaCogs />
                 </div>
-                <h3 className="turvia-service-title">Sistema Completo 3em1</h3>
+                <h3 className="turvia-service-title">Gestão de Tráfego Google Ads</h3>
                 <p className="turvia-service-description">
-                  Plataforma completa que integra site, gestão de clientes e sistema de reservas em uma única solução.
+                  Capture clientes no momento exato em que buscam por destinos turísticos.
                 </p>
                 <ul className="turvia-service-features">
-                  <li>Site + Gestão + Reservas</li>
-                  <li>Dashboard inteligente</li>
-                  <li>Controle financeiro</li>
-                  <li>Relatórios avançados</li>
+                  <li>Palavras-chave estratégicas</li>
+                  <li>Anúncios de pesquisa e display</li>
+                  <li>Google Meu Negócio otimizado</li>
+                  <li>Maximização de ROI</li>
                 </ul>
               </div>
 
@@ -624,15 +562,15 @@ const HomePage = () => {
                 <div className="turvia-service-icon">
                   <FaUsers />
                 </div>
-                <h3 className="turvia-service-title">Gerenciamento de Redes Sociais</h3>
+                <h3 className="turvia-service-title">Remarketing Multi-plataforma</h3>
                 <p className="turvia-service-description">
-                  Cuidamos das suas redes sociais com conteúdo profissional e estratégias que atraem turistas.
+                  Reconquiste visitantes que já demonstraram interesse nos seus pacotes turísticos.
                 </p>
                 <ul className="turvia-service-features">
-                  <li>Conteúdo visual profissional</li>
-                  <li>Campanhas direcionadas</li>
-                  <li>Relatórios de performance</li>
-                  <li>Engajamento 24/7</li>
+                  <li>Públicos personalizados</li>
+                  <li>Remarketing dinâmico</li>
+                  <li>Funis de conversão</li>
+                  <li>Aumento de taxa de conversão</li>
                 </ul>
               </div>
 
@@ -640,15 +578,15 @@ const HomePage = () => {
                 <div className="turvia-service-icon">
                   <FaPalette />
                 </div>
-                <h3 className="turvia-service-title">Identidade Visual</h3>
+                <h3 className="turvia-service-title">Criativos de Alta Conversão</h3>
                 <p className="turvia-service-description">
-                  Desenvolvemos a identidade visual completa da sua agência, desde logo até materiais promocionais.
+                  Artes e vídeos profissionais otimizados para maximizar cliques e conversões.
                 </p>
                 <ul className="turvia-service-features">
-                  <li>Logo e marca profissional</li>
-                  <li>Materiais gráficos</li>
-                  <li>Identidade digital</li>
-                  <li>Manual da marca</li>
+                  <li>Design orientado à conversão</li>
+                  <li>A/B testing de criativos</li>
+                  <li>Vídeos para anúncios</li>
+                  <li>Landing pages otimizadas</li>
                 </ul>
               </div>
             </div>
@@ -686,7 +624,7 @@ const HomePage = () => {
       <section className="homepage-features">
         <div className="homepage-features-container">
           <h2 className="homepage-features-title">
-            Como Transformamos Sua Agência Digitalmente
+            Como Aumentamos Suas Conversões
           </h2>
 
           <div className="homepage-features-tabs">
@@ -774,48 +712,67 @@ const HomePage = () => {
               ))}
             </div>
           </div>
+
+          <div className="homepage-clients-row">
+            <div className="homepage-clients-track">
+              {[...clients, ...clients].map((client, index) => (
+                <div key={index} className="homepage-client-slide">
+                  <div className="homepage-client-card">
+                    <div className="homepage-client-logo-container">
+                      <img
+                        src={client.logo}
+                        alt={client.name}
+                        className="homepage-client-logo"
+                      />
+                    </div>
+                    <p className="homepage-client-name">{client.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Social Media Management Section */}
+      {/* Traffic Management Section */}
       <section className="homepage-social-media">
         <div className="homepage-social-media-container">
           <div className="homepage-social-media-content">
             <div className="homepage-social-media-left">
               <h2 className="homepage-social-media-title">
                 <FaRocket className="title-icon" />
-                Gerenciamento de Redes Sociais!
+                Gestão de Tráfego Pago Profissional!
               </h2>
               <p className="homepage-social-media-subtitle">
-                Deixe que nossa equipe especializada cuide das redes sociais da sua agência 
+                Deixe que nossa equipe especializada maximize suas campanhas de anúncios 
                 enquanto você foca no que faz de melhor: atender seus clientes.
               </p>
               <div className="homepage-social-media-benefits">
                 <div className="benefit-item">
                   <FaCheck className="benefit-icon" />
-                  <span>Conteúdo visual profissional dos destinos</span>
+                  <span>Campanhas otimizadas para conversão</span>
                 </div>
                 <div className="benefit-item">
                   <FaCheck className="benefit-icon" />
-                  <span>Campanhas direcionadas para seu público</span>
+                  <span>Segmentação avançada de público-alvo</span>
                 </div>
                 <div className="benefit-item">
                   <FaCheck className="benefit-icon" />
-                  <span>Relatórios detalhados de performance</span>
+                  <span>Relatórios detalhados de ROI e performance</span>
                 </div>
                 <div className="benefit-item">
                   <FaCheck className="benefit-icon" />
-                  <span>Engajamento e interação 24/7</span>
+                  <span>Otimização contínua 24/7</span>
                 </div>
               </div>
               <div className="homepage-social-media-cta-wrapper">
                 <button
                   className="homepage-social-media-plans-btn"
                   onClick={() => {
-                    handleCTAClick('Ver Planos de Redes Sociais', 'social_media_plans');
+                    handleCTAClick('Ver Planos de Tráfego Pago', 'traffic_plans');
                     navigate('/planos');
                   }}
-                  aria-label="Ver Planos de Gerenciamento de Redes"
+                  aria-label="Ver Planos de Gestão de Tráfego"
                 >
                   <FaRocket className="cta-icon" /> Ver Planos
                 </button>
@@ -850,7 +807,7 @@ const HomePage = () => {
                 <FaRocket />
               </div>
               <div className="homepage-stat-number">3+</div>
-              <div className="homepage-stat-label">Anos de Experiência</div>
+              <div className="homepage-stat-label">Anos de Mercado</div>
             </div>
             <div className="homepage-stat-card">
               <div className="homepage-stat-icon">

@@ -1605,30 +1605,35 @@ section, footer {
 
 .homepage-clients-track {
   display: flex;
-  width: calc(250px * 14);
+  width: calc(180px * 14);
   animation: homepage-scroll 40s linear infinite;
 }
 
 .homepage-clients-track-reverse {
   display: flex;
-  width: calc(250px * 14);
+  width: calc(180px * 14);
   animation: homepage-scroll-reverse 40s linear infinite;
 }
 
 .homepage-client-slide {
-  width: 250px;
+  width: 180px;
   flex-shrink: 0;
-  padding: 0 0.625rem;
+  padding: 0 0.5rem;
 }
 
 .homepage-client-card {
   background-color: var(--white);
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-  padding: 1.5rem;
+  padding: 1rem;
   transition: all 0.3s ease;
   transform: translateZ(0);
   border: 1px solid var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .homepage-client-card:hover {
@@ -1638,14 +1643,14 @@ section, footer {
 }
 
 .homepage-client-logo-container {
-  width: 6rem;
-  height: 6rem;
+  width: 3.5rem;
+  height: 3.5rem;
   background-color: var(--white);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   margin-left: auto;
   margin-right: auto;
   overflow: hidden;
@@ -1653,8 +1658,8 @@ section, footer {
 }
 
 .homepage-client-logo {
-  width: 4rem;
-  height: 4rem;
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: contain;
 }
 
@@ -1662,6 +1667,8 @@ section, footer {
   text-align: center;
   font-weight: 500;
   color: var(--primary-blue);
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 /* Stats Section */

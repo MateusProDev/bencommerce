@@ -93,11 +93,13 @@ const AdminLogin = () => {
   const handleSetupAdmins = async () => {
     setSetupLoading(true);
     try {
-      await setupInitialAdmin();
-      alert('Admins configurados com sucesso! Agora você pode fazer login.');
+      const result = await setupInitialAdmin('admin123');
+      if (result.success) {
+        alert(`Admins configurados com sucesso!\n\nFirestore:\n- Adicionados: ${result.addedCount}\n- Já existiam: ${result.existingCount}\n\nFirebase Auth:\n- Usuários criados: ${result.userCreatedCount}\n\nAgora você pode fazer login com:\nEmail: mateusprodev@gmail.com\nSenha: admin123`);
+      }
     } catch (error) {
       console.error('Erro ao configurar admins:', error);
-      alert('Erro ao configurar admins. Verifique o console.');
+      alert(`Erro ao configurar admins:\n\n${error.message}\n\nEm desenvolvimento local, configure as variáveis de ambiente REACT_APP_FIREBASE_* ou use a versão de produção.`);
     } finally {
       setSetupLoading(false);
     }

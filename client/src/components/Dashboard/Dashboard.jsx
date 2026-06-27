@@ -36,7 +36,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { doc, getDoc, collection, getDocs, updateDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import PlanoUpgrade from "../PlanoUpgrade/PlanoUpgrade";
-import "./Dashboard.css";
+import "./Dashboard.premium.css";
 import EditHeader from "../Admin/EditHeader/EditHeader";
 import EditBanner from "../Admin/EditBanner/EditBanner";
 import EditFooter from "../Admin/EditFooter/EditFooter";
@@ -46,6 +46,7 @@ import LojinhaPreview from "../LojinhaPreview/LojinhaPreview";
 import DashboardHome from "./DashboardHome";
 import PaymentsSettings from "../PaymentsSettings/PaymentsSettings"; // <-- 1. Importe o novo componente
 import SocialMediaLeadsReport from "./SocialMediaLeadsReport"; // Importe do componente de leads de redes sociais
+import ServicesManager from "../ServicesManager/ServicesManager"; // Importe do componente de serviços
 
 const Dashboard = ({ user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -222,6 +223,7 @@ const Dashboard = ({ user }) => {
     { text: "Editar Rodapé", icon: <EditIcon />, allowedPlans: ["free", "plus", "premium"] }, // Usando EditIcon
     { text: "Gerenciar Estoque", icon: <InventoryIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Leads Redes Sociais", icon: <AssessmentIcon />, allowedPlans: ["free", "plus", "premium"] },
+    { text: "Serviços", icon: <AssessmentIcon />, allowedPlans: ["free", "plus", "premium"] },
     { text: "Registrar Venda", icon: <PointOfSaleIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Relatórios de Vendas", icon: <AssessmentIcon />, allowedPlans: ["plus", "premium"] },
     { text: "Configurar WhatsApp", icon: <WhatsAppIcon />, allowedPlans: ["free", "plus", "premium"] },
@@ -306,6 +308,8 @@ const Dashboard = ({ user }) => {
         );
       case "Leads Redes Sociais":
         return <SocialMediaLeadsReport currentUser={currentUser} />;
+      case "Serviços":
+        return <ServicesManager currentUser={currentUser} />;
       case "Relatórios de Vendas":
         return <SalesReports currentUser={currentUser} />;
       case "Configurar WhatsApp":
@@ -355,43 +359,44 @@ const Dashboard = ({ user }) => {
   const filteredMenuItems = menuItems.filter((item) => item.allowedPlans.includes(userPlan));
 
   const drawerContent = (
-    <div className="admin-loja-drawer-container">
-      <Toolbar className="admin-loja-drawer-header">
-        <Typography variant="h6" noWrap>
+    <div className="pd-sidebar">
+      <div className="pd-sidebar-header">
+        <h2 className="pd-sidebar-title">
           {storeData?.nome || headerTitle || "Minha Loja"}
-        </Typography>
-      </Toolbar>
-      <List className="admin-loja-menu-list">
+        </h2>
+      </div>
+      <div className="pd-sidebar-menu">
         {filteredMenuItems.map((item, index) => (
-          <ListItem
-            button
+          <div
             key={index}
+            className={`pd-menu-item ${selectedSection === item.text ? 'pd-active' : ''}`}
             onClick={() => {
               setSelectedSection(item.text);
               setMobileOpen(false);
             }}
-            className={selectedSection === item.text ? "admin-loja-active" : ""}
           >
-            <ListItemIcon className="admin-loja-menu-icon">{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
+            <span className="pd-menu-icon">{item.icon}</span>
+            <span>{item.text}</span>
+          </div>
         ))}
-      </List>
-      <div className="admin-loja-logout-button" onClick={handleLogout}>
-        <LogoutIcon sx={{ mr: 1 }} />
-        Sair
+      </div>
+      <div className="pd-sidebar-footer">
+        <button className="pd-logout-btn" onClick={handleLogout}>
+          <LogoutIcon /> Sair
+        </button>
       </div>
     </div>
   );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <div className="pd-dashboard-container">
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: (theme) => theme.palette.primary.main || "#4a6bff",
+          backgroundColor: "transparent",
+          backdropFilter: "blur(20px)",
           display: { sm: "none" },
         }}
       >
@@ -401,11 +406,11 @@ const Dashboard = ({ user }) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, color: "#fff" }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1, color: "#fff" }}>
             {storeData?.nome || headerTitle || "Minha Loja"}
           </Typography>
         </Toolbar>
@@ -413,12 +418,15 @@ const Dashboard = ({ user }) => {
       <Drawer
         variant="permanent"
         sx={{
-          width: 260,
+          width: 280,
           flexShrink: 0,
           display: { xs: "none", sm: "block" },
           "& .MuiDrawer-paper": {
-            width: 260,
+            width: 280,
             boxSizing: "border-box",
+            backgroundColor: "transparent",
+            border: "none",
+            boxShadow: "none",
           },
         }}
         open
@@ -432,24 +440,20 @@ const Dashboard = ({ user }) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": { width: 260 },
+          "& .MuiDrawer-paper": { 
+            width: 280,
+            backgroundColor: "transparent",
+            border: "none",
+            boxShadow: "none",
+          },
         }}
       >
         {drawerContent}
       </Drawer>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - 260px)` },
-          ml: { sm: "260px" },
-          mt: { xs: "56px", sm: 0 },
-        }}
-      >
+      <div className="pd-main-content">
         {renderContent()}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

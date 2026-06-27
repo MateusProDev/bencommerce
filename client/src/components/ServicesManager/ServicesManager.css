@@ -1,0 +1,66 @@
+/* ServicesManager - Premium Style */
+.pd-text-success {
+  color: var(--pd-accent-green);
+}
+
+.pd-text-danger {
+  color: var(--pd-accent-red);
+}
+
+.pd-filter-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--pd-text-primary);
+}
+
+.pd-input,
+.pd-select {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  background: var(--pd-glass-bg);
+  border: 1px solid var(--pd-glass-border);
+  border-radius: 12px;
+  color: var(--pd-text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.pd-input::placeholder {
+  color: var(--pd-text-muted);
+}
+
+.pd-input:focus,
+.pd-select:focus {
+  outline: none;
+  border-color: var(--pd-accent-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), 0 4px 20px rgba(139, 92, 246, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pd-select option {
+  background: var(--pd-bg-secondary);
+  color: var(--pd-text-primary);
+}
+
+.pd-detail-item {
+  margin-bottom: 1.5rem;
+}
+
+.pd-detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.pd-detail-item strong {
+  color: var(--pd-text-primary);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+textarea.pd-input {
+  resize: vertical;
+  min-height: 80px;
+}

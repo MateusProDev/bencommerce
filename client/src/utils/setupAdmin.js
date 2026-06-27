@@ -1,16 +1,26 @@
 // Script para configurar emails admin no Firestore
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { db, auth } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-export const setupInitialAdmin = async () => {
+export const setupInitialAdmin = async (password = 'admin123') => {
   try {
+    // Verificar se o Firebase está configurado corretamente
+    if (!db || !auth) {
+      throw new Error('Firebase não configurado. Configure as variáveis de ambiente REACT_APP_FIREBASE_*');
+    }
+
     const adminEmails = [
       'mateoferreira0812@gmail.com', // Seu email principal
       'mateusprodev@gmail.com'       // Email secundário
     ];
 
+    let addedCount = 0;
+    let existingCount = 0;
+    let userCreatedCount = 0;
+
     for (const email of adminEmails) {
-      // Verificar se o email já existe
+      // Verificar se o email já existe no Firestore
       const existingQuery = query(
         collection(db, 'admin_emails'),
         where('email', '==', email.toLowerCase())
@@ -19,7 +29,7 @@ export const setupInitialAdmin = async () => {
       const existingDocs = await getDocs(existingQuery);
       
       if (existingDocs.empty) {
-        // Adicionar novo email admin
+        // Adicionar novo email admin no Firestore
         await addDoc(collection(db, 'admin_emails'), {
           email: email.toLowerCase(),
           active: true,
@@ -27,15 +37,32 @@ export const setupInitialAdmin = async () => {
           createdBy: 'system'
         });
         
-        console.log(`Email admin adicionado: ${email}`);
+        console.log(`Email admin adicionado no Firestore: ${email}`);
+        addedCount++;
       } else {
-        console.log(`Email admin já existe: ${email}`);
+        console.log(`Email admin já existe no Firestore: ${email}`);
+        existingCount++;
+      }
+
+      // Criar usuário no Firebase Auth (se não existir)
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        console.log(`Usuário Firebase Auth criado: ${email}`);
+        userCreatedCount++;
+      } catch (authError) {
+        if (authError.code === 'auth/email-already-in-use') {
+          console.log(`Usuário Firebase Auth já existe: ${email}`);
+        } else {
+          console.error(`Erro ao criar usuário Firebase Auth para ${email}:`, authError.message);
+        }
       }
     }
     
     console.log('Configuração de admins concluída!');
+    return { success: true, addedCount, existingCount, userCreatedCount };
   } catch (error) {
     console.error('Erro ao configurar admins:', error);
+    throw error;
   }
 };
 

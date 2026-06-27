@@ -1,50 +1,102 @@
-/* src/Lojinha/AdminLoja/AdminLoja.css */
+/* Modern Dashboard - Glassmorphism Design */
 
 :root {
-  --primary-color: #27ae60;
-  --primary-dark: #219150;
-  --primary-light: #eafaf1;
-  --secondary-color: #16a085;
-  --danger-color: #e74c3c;
-  --danger-dark: #c0392b;
-  --menu-bg: #eafaf1;
-  --menu-active: #d4f5e9;
-  --menu-border: #27ae60;
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  --dark-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-purple: #a855f7;
+  --accent-pink: #ec4899;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
 }
 
 .admin-loja-drawer-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--menu-bg) !important;
+  background: var(--dark-gradient) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-loja-drawer-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  animation: patternMove 20s linear infinite;
+  z-index: 0;
+}
+
+@keyframes patternMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-60px); }
 }
 
 .admin-loja-drawer-header {
-  padding: 1rem;
-  background-color: var(--primary-color) !important;
-  color: white !important;
+  padding: 1.5rem 1rem;
+  background: var(--primary-gradient) !important;
+  color: var(--text-primary) !important;
   text-align: center;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  font-size: 1.1rem;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  font-size: 1.25rem;
+  border-radius: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .admin-loja-menu-list {
-  padding-top: 1rem;
+  padding-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .admin-loja-menu-icon {
-  color: var(--primary-dark) !important;
+  color: var(--accent-purple) !important;
   min-width: 40px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.3));
 }
 
 .admin-loja-active {
-  background-color: var(--menu-active) !important;
-  font-weight: bold;
-  border-left: 4px solid var(--menu-border) !important;
-  color: var(--primary-dark) !important;
+  background: var(--glass-bg) !important;
+  font-weight: 700;
+  border-left: 4px solid var(--accent-purple) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 12px 12px 0;
+  margin-right: 8px;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+  transform: translateX(4px);
+  transition: all 0.3s ease;
+}
+
+.admin-loja-active .admin-loja-menu-icon {
+  color: var(--accent-pink) !important;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.6));
 }
 
 .admin-loja-logout-button {
@@ -52,53 +104,131 @@
   height: 50px;
   margin: 1rem;
   padding: 0.75rem 1rem;
-  background-color: var(--danger-color) !important;
-  color: white !important;
-  border-radius: 6px;
+  background: var(--danger-gradient) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease;
-  border: none;
-  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid var(--glass-border);
+  font-weight: 700;
   font-size: 1rem;
   position: absolute;
   bottom: 0;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .admin-loja-logout-button:hover {
-  background-color: var(--danger-dark) !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(238, 90, 36, 0.6);
+  background: linear-gradient(135deg, #ff6b6b 0%, #c0392b 100%) !important;
 }
 
 .admin-loja-main {
-  background-color: #fff !important;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
   padding: 2rem;
   overflow-y: auto;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0;
   min-height: 80vh;
+  position: relative;
+}
+
+.admin-loja-main::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 260px;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M40 40c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm-16 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm32 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm-16-16c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm0 32c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  animation: mainPattern 30s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes mainPattern {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-80px); }
 }
 
 .admin-loja-dashboard {
   flex-grow: 1;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-/* Responsividade */
+/* Responsividade Moderna */
 @media (max-width: 900px) {
   .admin-loja-main {
-    padding: 1rem !important;
+    padding: 1.5rem !important;
+  }
+  
+  .admin-loja-drawer-header {
+    font-size: 1.1rem;
+    padding: 1.25rem 0.75rem;
   }
 }
 
 @media (max-width: 768px) {
   .MuiAppBar-root {
+    background: var(--dark-gradient) !important;
+    backdrop-filter: blur(20px);
     padding: 0 10px !important;
+    border-bottom: 1px solid var(--glass-border);
   }
+  
+  .MuiAppBar-root .MuiTypography-root {
+    color: var(--text-primary) !important;
+    font-weight: 700;
+  }
+  
   .MuiIconButton-root {
     right: 10px !important;
+    color: var(--text-primary) !important;
   }
+  
   .admin-loja-main {
-    padding: 0.7rem !important;
+    padding: 1rem !important;
+  }
+  
+  .admin-loja-logout-button {
+    width: 90%;
+    margin: 0.75rem auto;
   }
 }
+
+/* Animações adicionais */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-loja-menu-list > div {
+  animation: fadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+.admin-loja-menu-list > div:nth-child(1) { animation-delay: 0.1s; }
+.admin-loja-menu-list > div:nth-child(2) { animation-delay: 0.2s; }
+.admin-loja-menu-list > div:nth-child(3) { animation-delay: 0.3s; }
+.admin-loja-menu-list > div:nth-child(4) { animation-delay: 0.4s; }
+.admin-loja-menu-list > div:nth-child(5) { animation-delay: 0.5s; }
+.admin-loja-menu-list > div:nth-child(6) { animation-delay: 0.6s; }
+.admin-loja-menu-list > div:nth-child(7) { animation-delay: 0.7s; }
+.admin-loja-menu-list > div:nth-child(8) { animation-delay: 0.8s; }
+.admin-loja-menu-list > div:nth-child(9) { animation-delay: 0.9s; }
+.admin-loja-menu-list > div:nth-child(10) { animation-delay: 1s; }

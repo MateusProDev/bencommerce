@@ -29,104 +29,102 @@ const PlanosPage = () => {
   const plans = [
     {
       id: 1,
-      name: "Plano Básico",
-      subtitle: "Ideal para início e presença econômica",
-      price: billingType === 'mensal' ? 149.9 : Math.round(149.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(149.9 * 12 * 1.2) : null,
+      name: "Gestão de Tráfego Básico",
+      subtitle: "Ideal para começar com anúncios pagos",
+      price: billingType === 'mensal' ? 297.9 : Math.round(297.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(297.9 * 12 * 1.2) : null,
       period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaGlobe />,
       color: '#3b82f6',
       popular: false,
       features: [
-        "Instagram: 8 posts no feed / mês",
-        "8 stories / mês",
-        "Planejamento mensal e artes profissionais",
-        "Engajamento básico (curtidas e respostas)",
-        "Relatório simples mensal",
-        "Aprovação em até 48h"
+        "Configuração de campanhas no Facebook/Instagram Ads",
+        "Criação de criativos para anúncios",
+        "Segmentação de público básica",
+        "Otimização semanal de campanhas",
+        "Relatório mensal de performance",
+        "Suporte por e-mail"
       ]
     },
     {
       id: 2,
-      name: "Plano Premium",
-      subtitle: "Crescimento com foco em vendas e reservas",
-      price: billingType === 'mensal' ? 297.9 : Math.round(297.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(297.9 * 12 * 1.15) : null,
+      name: "Gestão de Tráfego Premium",
+      subtitle: "Maximize resultados com estratégias avançadas",
+      price: billingType === 'mensal' ? 497.9 : Math.round(497.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(497.9 * 12 * 1.15) : null,
       period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaUsers />,
       color: '#06b6d4',
       popular: true,
       features: [
-        "Instagram + Facebook: 12 posts no feed / mês",
-        "12 stories / mês",
-        "Gestão de Tráfego Pago (setup e otimizações)",
-        "Relatório detalhado mensal com insights",
-        "Suporte prioritário (resposta em 24–48h)",
-        "2 variações de criativo por campanha"
+        "Tudo do plano básico",
+        "Campanhas em múltiplas plataformas (Facebook, Instagram, Google)",
+        "Segmentação avançada de público",
+        "Otimização diária de campanhas",
+        "Relatório mensal com insights estratégicos",
+        "Suporte prioritário 24h-48h",
+        "A/B testing de anúncios",
+        "Estratégias de remarketing"
       ]
     },
     {
       id: 3,
-      name: "Plano Business",
-      subtitle: "Completo: escala e conversão",
-      price: billingType === 'mensal' ? 497.9 : Math.round(497.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(497.9 * 12 * 1.1) : null,
+      name: "Gestão de Tráfego Business",
+      subtitle: "Escala máxima com equipe dedicada",
+      price: billingType === 'mensal' ? 997.9 : Math.round(997.9 * 12),
+      originalPrice: billingType === 'anual' ? Math.round(997.9 * 12 * 1.1) : null,
       period: billingType === 'mensal' ? '/mês' : '/ano',
       icon: <FaChartLine />,
       color: '#8b5cf6',
       popular: false,
       features: [
-        "Instagram + Facebook + Google Meu Negócio",
-        "12 posts feed/mês + 4 Reels curtos/mês",
-        "Até 20 stories/mês",
-        "Campanhas avançadas e remarketing",
-        "Copywriting persuasivo e landing pages simples",
-        "Monitoramento diário e testes A/B",
-        "Relatório semanal + reunião quinzenal"
+        "Tudo do plano premium",
+        "Campanhas avançadas de remarketing multi-plataforma",
+        "Copywriting profissional para anúncios",
+        "Desenvolvedor dedicado para landing pages",
+        "Monitoramento diário em tempo real",
+        "Testes A/B avançados (criativos, público, oferta)",
+        "Reunião mensal estratégica",
+        "Consultoria de crescimento dedicada"
       ]
     }
   ];
 
   const funcionalidades = [
     {
-      icon: <FaPalette />,
-      title: "Conteúdo Visual Profissional",
-      description: "Artes e imagens profissionais otimizadas para feed, stories e Reels"
-    },
-    {
-      icon: <FaBolt />,
-      title: "Planejamento de Conteúdo",
-      description: "Calendário editorial mensal com pautas, legendas e horários ideais"
+      icon: <FaRocket />,
+      title: "Gestão de Tráfego Pago",
+      description: "Criação, segmentação e otimização de campanhas no Facebook, Instagram e Google Ads"
     },
     {
       icon: <FaChartLine />,
       title: "Relatórios e Analytics",
-      description: "Dashboards com métricas de engajamento, alcance e ROI das campanhas"
+      description: "Dashboards com métricas de ROI, CPC, CTR e conversão das campanhas"
+    },
+    {
+      icon: <FaPalette />,
+      title: "Criativos para Anúncios",
+      description: "Artes e imagens profissionais otimizadas para alta conversão em anúncios"
+    },
+    {
+      icon: <FaBolt />,
+      title: "Otimização Contínua",
+      description: "Ajustes constantes em lances, segmentações e criativos para maximizar resultados"
     },
     {
       icon: <FaUsers />,
-      title: "Engajamento e Atendimento",
-      description: "Monitoramento e respostas a comentários e mensagens para aumentar relação com clientes"
-    },
-    {
-      icon: <FaRocket />,
-      title: "Gestão de Tráfego Pago",
-      description: "Criação, segmentação e otimização de campanhas no Facebook e Instagram Ads"
-    },
-    {
-      icon: <FaHome />,
-      title: "Criação de Reels e Vídeo Curto",
-      description: "Produção de vídeos curtos otimizados para conversão e alcance orgânico"
+      title: "Segmentação Avançada",
+      description: "Públicos personalizados, lookalike e remarketing para atingir clientes qualificados"
     },
     {
       icon: <FaCogs />,
-      title: "Automação e Integrações",
-      description: "Integrações com ferramentas de CRM, agendamento e remarketing"
+      title: "A/B Testing",
+      description: "Testes contínuos de criativos, ofertas e públicos para encontrar a melhor combinação"
     },
     {
       icon: <FaHeadset />,
       title: "Suporte Especializado",
-      description: "Equipe dedicada para suporte e otimização contínua das estratégias"
+      description: "Equipe dedicada com expertise em tráfego pago para turismo"
     }
   ];
 
@@ -137,11 +135,7 @@ const PlanosPage = () => {
     },
     {
       question: "O que está incluído em todos os planos?",
-      answer: "Planejamento, criação de artes, publicação, monitoramento e relatórios básicos sem custos extras."
-    },
-    {
-      question: "Vocês gerenciam anúncios pagos?",
-      answer: "Sim — no Plano Premium e Business gerenciamos campanhas com otimização contínua."
+      answer: "Configuração de campanhas, criação de criativos, otimização, relatórios e suporte especializado."
     },
     {
       question: "Como funciona o processo de aprovação das publicações?",
@@ -175,8 +169,8 @@ const PlanosPage = () => {
         </button>
         
         <div className="planos-header-content">
-          <h1>Planos para Agências de Turismo</h1>
-          <p>Escolha o plano ideal para o tamanho da sua agência e comece a transformar seu negócio hoje mesmo</p>
+          <h1>Gestão de Tráfego Pago para Agências de Turismo</h1>
+          <p>Especialistas em anúncios pagos para maximizar suas vendas e reservas</p>
           
           {/* Billing Toggle */}
           <div className="billing-toggle">

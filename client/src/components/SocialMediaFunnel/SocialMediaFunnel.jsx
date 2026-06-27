@@ -114,7 +114,7 @@ const SocialMediaFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
       },
       {
         title: "Seus Objetivos",
-        subtitle: "Qual é o seu principal objetivo com as redes sociais?",
+        subtitle: "Qual é o seu principal objetivo com tráfego pago?",
         fields: [
           { 
             name: "plan", 
@@ -124,8 +124,9 @@ const SocialMediaFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
             required: true,
             options: [
               { value: "", label: "Selecione um plano", disabled: true },
-              { value: "basico", label: "Plano Básico - R$ 99,99/mês" },
-              { value: "premium", label: "Plano Premium - R$ 197,99/mês" }
+              { value: "basico", label: "Gestão de Tráfego Básico - R$ 297,90/mês" },
+              { value: "premium", label: "Gestão de Tráfego Premium - R$ 497,90/mês" },
+              { value: "business", label: "Gestão de Tráfego Business - R$ 997,90/mês" }
             ] 
           },
           { 
@@ -356,9 +357,11 @@ const SocialMediaFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
   const getPlanName = (planValue) => {
     switch (planValue) {
       case 'basico':
-        return 'Plano Básico - R$ 99,99/mês';
+        return 'Gestão de Tráfego Básico - R$ 297,90/mês';
       case 'premium':
-        return 'Plano Premium - R$ 197,99/mês';
+        return 'Gestão de Tráfego Premium - R$ 497,90/mês';
+      case 'business':
+        return 'Gestão de Tráfego Business - R$ 997,90/mês';
       default:
         return 'Não informado';
     }
@@ -476,11 +479,11 @@ const SocialMediaFunnel = ({ isOpen, onClose, initialPlan = '' }) => {
           <h2>Solicitação Enviada com Sucesso!</h2>
           <p className="success-message">
             Obrigado pelo interesse, <strong>{formData.name}</strong>! 
-            Nossa equipe especializada em marketing digital para turismo entrará em contato em até 24 horas.
+            Nossa equipe especializada em tráfego pago para turismo entrará em contato em até 24 horas.
           </p>
           <div className="success-details">
             <p><strong>Resumo da sua solicitação:</strong></p>
-            <p>📱 Serviço: <strong>Gerenciamento de Redes Sociais</strong></p>
+            <p>📱 Serviço: <strong>Gestão de Tráfego Pago</strong></p>
             <p>📋 Plano: <strong>{getPlanName(formData.plan)}</strong></p>
             {formData.company && <p>🏢 Empresa: <strong>{formData.company}</strong></p>}
             {formData.mainGoal && <p>🎯 Objetivo: <strong>{formData.mainGoal.replace('_', ' ')}</strong></p>}

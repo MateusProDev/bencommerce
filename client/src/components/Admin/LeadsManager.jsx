@@ -4,6 +4,7 @@ import {
   doc, 
   updateDoc, 
   deleteDoc, 
+  addDoc,
   query, 
   orderBy,
   where,
@@ -22,12 +23,16 @@ import {
   FaDownload,
   FaSearch,
   FaStar,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaPlus,
+  FaMoneyBillWave
 } from 'react-icons/fa';
 import Loading from '../Loading';
 import './LeadsManager.css';
+import '../Dashboard/Dashboard.premium.css';
 
 const LeadsManager = () => {
+  const [activeTab, setActiveTab] = useState('leads'); // 'leads' ou 'services'
   const [leads, setLeads] = useState([]);
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +47,20 @@ const LeadsManager = () => {
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [soundEnabled, setSoundEnabled] = useState(false);
+  
+  // Services state
+  const [services, setServices] = useState([]);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [serviceFormData, setServiceFormData] = useState({
+    clientName: '',
+    serviceName: '',
+    description: '',
+    chargedAmount: '',
+    costAmount: '',
+    date: new Date().toISOString().split('T')[0],
+    status: 'concluido'
+  });
 
   useEffect(() => {
     // Configurar listener em tempo real para leads
@@ -93,6 +112,27 @@ const LeadsManager = () => {
     );
 
     // Cleanup function
+    return () => unsubscribe();
+  }, []);
+
+  // Load services
+  useEffect(() => {
+    const servicesQuery = query(
+      collection(db, 'services'),
+      orderBy('date', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(servicesQuery, (snapshot) => {
+      const servicesList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date ? new Date(doc.data().date) : new Date()
+      }));
+      setServices(servicesList);
+    }, (error) => {
+      console.error('Erro ao carregar serviços:', error);
+    });
+
     return () => unsubscribe();
   }, []);
 
@@ -208,6 +248,92 @@ const LeadsManager = () => {
     window.open(url);
   };
 
+  // Services functions
+  const calculateServicesStats = () => {
+    const totalServices = services.length;
+    const totalRevenue = services.reduce((sum, s) => sum + (parseFloat(s.chargedAmount) || 0), 0);
+    const totalCost = services.reduce((sum, s) => sum + (parseFloat(s.costAmount) || 0), 0);
+    const totalProfit = totalRevenue - totalCost;
+
+    return { totalServices, totalRevenue, totalCost, totalProfit };
+  };
+
+  const handleServiceSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const serviceData = {
+        ...serviceFormData,
+        chargedAmount: parseFloat(serviceFormData.chargedAmount) || 0,
+        costAmount: parseFloat(serviceFormData.costAmount) || 0,
+        profit: (parseFloat(serviceFormData.chargedAmount) || 0) - (parseFloat(serviceFormData.costAmount) || 0),
+        date: new Date(serviceFormData.date),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      if (editingService) {
+        await updateDoc(doc(db, 'services', editingService.id), {
+          ...serviceData,
+          updatedAt: new Date()
+        });
+      } else {
+        await addDoc(collection(db, 'services'), serviceData);
+      }
+
+      setShowServiceModal(false);
+      setEditingService(null);
+      resetServiceForm();
+    } catch (error) {
+      console.error('Erro ao salvar serviço:', error);
+      alert('Erro ao salvar serviço. Tente novamente.');
+    }
+  };
+
+  const handleDeleteService = async (serviceId) => {
+    if (!window.confirm('Tem certeza que deseja excluir este serviço?')) return;
+
+    try {
+      await deleteDoc(doc(db, 'services', serviceId));
+    } catch (error) {
+      console.error('Erro ao excluir serviço:', error);
+      alert('Erro ao excluir serviço. Tente novamente.');
+    }
+  };
+
+  const handleEditService = (service) => {
+    setEditingService(service);
+    setServiceFormData({
+      clientName: service.clientName,
+      serviceName: service.serviceName,
+      description: service.description,
+      chargedAmount: service.chargedAmount,
+      costAmount: service.costAmount,
+      date: service.date.toISOString().split('T')[0],
+      status: service.status
+    });
+    setShowServiceModal(true);
+  };
+
+  const resetServiceForm = () => {
+    setServiceFormData({
+      clientName: '',
+      serviceName: '',
+      description: '',
+      chargedAmount: '',
+      costAmount: '',
+      date: new Date().toISOString().split('T')[0],
+      status: 'concluido'
+    });
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
   const exportToCSV = () => {
     const headers = ['Nome', 'Email', 'WhatsApp', 'Empresa', 'Plano', 'Funcionários', 'Sistema Atual', 'Status', 'Data'];
     const csvData = filteredLeads.map(lead => [
@@ -264,87 +390,170 @@ const LeadsManager = () => {
 
   if (loading) {
     return (
-      <div className="leads-loading">
-        <Loading text="Carregando leads..." size="large" />
+      <div className="pd-leads-manager">
+        <div className="pd-flex pd-flex-center" style={{ minHeight: '50vh' }}>
+          <Loading text="Carregando leads..." size="large" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="leads-manager">
-      <div className="leads-header">
+    <div className="pd-leads-manager">
+      <div className="pd-leads-header">
         <div className="header-title">
-          <h1>Gerenciamento de Leads</h1>
-          <div className="realtime-indicator">
-            <div className="pulse-dot"></div>
+          <h1>Gerenciamento</h1>
+          <div className="pd-realtime-indicator">
+            <div className="pd-pulse-dot"></div>
             <span>Tempo Real</span>
           </div>
           {newLeadsCount > 0 && (
-            <div className="new-leads-notification">
+            <div className="pd-new-leads-notification">
               🔔 {newLeadsCount} novo{newLeadsCount > 1 ? 's' : ''} lead{newLeadsCount > 1 ? 's' : ''}!
             </div>
           )}
         </div>
         <div className="leads-actions">
-          <div className="last-update">
+          <div className="pd-last-update">
             Última atualização: {lastUpdate.toLocaleTimeString()}
           </div>
           <button 
-            className={`sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}
+            className={`pd-sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}
             onClick={() => setSoundEnabled(!soundEnabled)}
             title={soundEnabled ? 'Desativar notificações sonoras' : 'Ativar notificações sonoras'}
           >
             {soundEnabled ? '🔊' : '🔇'}
           </button>
-          <button className="export-btn" onClick={exportToCSV}>
+          <button className="pd-export-btn" onClick={exportToCSV}>
             <FaDownload /> Exportar CSV
           </button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card total">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>{stats.total}</h3>
-            <p>Total de Leads</p>
-          </div>
-        </div>
-        <div className="stat-card novo">
-          <div className="stat-icon">🆕</div>
-          <div className="stat-content">
-            <h3>{stats.novo}</h3>
-            <p>Novos</p>
-          </div>
-        </div>
-        <div className="stat-card contato">
-          <div className="stat-icon">💬</div>
-          <div className="stat-content">
-            <h3>{stats.contato}</h3>
-            <p>Em Contato</p>
-          </div>
-        </div>
-        <div className="stat-card convertido">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.convertido}</h3>
-            <p>Convertidos</p>
-          </div>
-        </div>
-        <div className="stat-card perdido">
-          <div className="stat-icon">❌</div>
-          <div className="stat-content">
-            <h3>{stats.perdido}</h3>
-            <p>Perdidos</p>
-          </div>
-        </div>
+      {/* Tabs */}
+      <div className="pd-tabs pd-mb-4">
+        <button 
+          className={`pd-tab ${activeTab === 'leads' ? 'pd-tab-active' : ''}`}
+          onClick={() => setActiveTab('leads')}
+        >
+          📋 Leads
+        </button>
+        <button 
+          className={`pd-tab ${activeTab === 'services' ? 'pd-tab-active' : ''}`}
+          onClick={() => setActiveTab('services')}
+        >
+          💰 Serviços
+        </button>
       </div>
 
+      {activeTab === 'leads' && (
+        <>
+          {/* Stats Cards - Leads */}
+          <div className="stats-grid">
+            <div className="pd-stat-card total">
+              <div className="pd-stat-icon">📊</div>
+              <div className="stat-content">
+                <h3>{stats.total}</h3>
+                <p>Total de Leads</p>
+              </div>
+            </div>
+            <div className="pd-stat-card novo">
+              <div className="pd-stat-icon">🆕</div>
+              <div className="stat-content">
+                <h3>{stats.novo}</h3>
+                <p>Novos</p>
+              </div>
+            </div>
+            <div className="pd-stat-card contato">
+              <div className="pd-stat-icon">💬</div>
+              <div className="stat-content">
+                <h3>{stats.contato}</h3>
+                <p>Em Contato</p>
+              </div>
+            </div>
+            <div className="pd-stat-card convertido">
+              <div className="pd-stat-icon">✅</div>
+              <div className="stat-content">
+                <h3>{stats.convertido}</h3>
+                <p>Convertidos</p>
+              </div>
+            </div>
+            <div className="pd-stat-card perdido">
+              <div className="pd-stat-icon">❌</div>
+              <div className="stat-content">
+                <h3>{stats.perdido}</h3>
+                <p>Perdidos</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="pd-filters-section">
+            <div className="filters-grid">
+              <div className="pd-filter-group">
+                <label>
+                  <FaSearch /> Buscar
+                </label>
+                <input
+                  type="text"
+                  placeholder="Nome, email, empresa..."
+                  value={filters.search}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                />
+              </div>
+              
+              <div className="pd-filter-group">
+                <label>
+                  <FaFilter /> Status
+                </label>
+                <select
+                  value={filters.status}
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                >
+                  <option value="todos">Todos</option>
+                  <option value="novo">Novo</option>
+                  <option value="contato">Em Contato</option>
+                  <option value="convertido">Convertido</option>
+                  <option value="perdido">Perdido</option>
+                </select>
+              </div>
+
+              <div className="pd-filter-group">
+                <label>
+                  <FaStar /> Plano
+                </label>
+                <select
+                  value={filters.plan}
+                  onChange={(e) => setFilters({ ...filters, plan: e.target.value })}
+                >
+                  <option value="todos">Todos</option>
+                  <option value="basico">Básico</option>
+                  <option value="completo">Completo</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+              </div>
+
+              <div className="pd-filter-group">
+                <label>
+                  <FaCalendarAlt /> Período
+                </label>
+                <select
+                  value={filters.dateRange}
+                  onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
+                >
+                  <option value="todos">Todos</option>
+                  <option value="hoje">Hoje</option>
+                  <option value="semana">Última semana</option>
+                  <option value="mes">Último mês</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
       {/* Filters */}
-      <div className="filters-section">
+      <div className="pd-filters-section">
         <div className="filters-grid">
-          <div className="filter-group">
+          <div className="pd-filter-group">
             <label>
               <FaSearch /> Buscar
             </label>
@@ -356,7 +565,7 @@ const LeadsManager = () => {
             />
           </div>
           
-          <div className="filter-group">
+          <div className="pd-filter-group">
             <label>
               <FaFilter /> Status
             </label>
@@ -372,7 +581,7 @@ const LeadsManager = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className="pd-filter-group">
             <label>
               <FaStar /> Plano
             </label>
@@ -387,7 +596,7 @@ const LeadsManager = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className="pd-filter-group">
             <label>
               <FaCalendarAlt /> Período
             </label>
@@ -405,8 +614,8 @@ const LeadsManager = () => {
       </div>
 
       {/* Leads Table */}
-      <div className="leads-table-container">
-        <table className="leads-table">
+      <div className="pd-table-container">
+        <table className="pd-table">
           <thead>
             <tr>
               <th>Nome</th>
@@ -422,29 +631,29 @@ const LeadsManager = () => {
             {filteredLeads.map((lead) => (
               <tr key={lead.id}>
                 <td className="lead-name">
-                  <div className="name-cell">
+                  <div className="pd-name-cell">
                     <strong>{lead.name}</strong>
                   </div>
                 </td>
                 <td className="lead-contact">
                   <div className="contact-cell">
-                    <div className="contact-item">
+                    <div className="pd-contact-item">
                       <FaEnvelope /> {lead.email}
                     </div>
-                    <div className="contact-item">
+                    <div className="pd-contact-item">
                       <FaWhatsapp /> {lead.whatsapp}
                     </div>
                   </div>
                 </td>
                 <td className="lead-company">
                   {lead.company && (
-                    <div className="company-cell">
+                    <div className="pd-company-cell">
                       <FaBuilding /> {lead.company}
                     </div>
                   )}
                 </td>
                 <td className="lead-plan">
-                  <span className="plan-badge">
+                  <span className="pd-plan-badge">
                     {getPlanName(lead.plan)}
                   </span>
                 </td>
@@ -452,7 +661,7 @@ const LeadsManager = () => {
                   <select
                     value={lead.status}
                     onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                    className="status-select"
+                    className="pd-status-select"
                     style={{ borderColor: getStatusColor(lead.status) }}
                   >
                     <option value="novo">Novo</option>
@@ -462,14 +671,16 @@ const LeadsManager = () => {
                   </select>
                 </td>
                 <td className="lead-date">
-                  {lead.createdAt.toLocaleDateString('pt-BR')}
-                  <br />
-                  <small>{lead.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+                  <div className="pd-lead-date">
+                    {lead.createdAt.toLocaleDateString('pt-BR')}
+                    <br />
+                    <small>{lead.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</small>
+                  </div>
                 </td>
                 <td className="lead-actions">
                   <div className="action-buttons">
                     <button
-                      className="action-btn view"
+                      className="pd-action-btn view"
                       onClick={() => {
                         setSelectedLead(lead);
                         setIsModalOpen(true);
@@ -479,21 +690,21 @@ const LeadsManager = () => {
                       <FaEye />
                     </button>
                     <button
-                      className="action-btn whatsapp"
+                      className="pd-action-btn whatsapp"
                       onClick={() => openWhatsApp(lead.whatsapp, lead.name)}
                       title="Enviar WhatsApp"
                     >
                       <FaWhatsapp />
                     </button>
                     <button
-                      className="action-btn email"
+                      className="pd-action-btn email"
                       onClick={() => openEmail(lead.email, lead.name)}
                       title="Enviar Email"
                     >
                       <FaEnvelope />
                     </button>
                     <button
-                      className="action-btn delete"
+                      className="pd-action-btn delete"
                       onClick={() => deleteLead(lead.id)}
                       title="Excluir"
                     >
@@ -507,7 +718,7 @@ const LeadsManager = () => {
         </table>
 
         {filteredLeads.length === 0 && (
-          <div className="no-leads">
+          <div className="pd-no-leads">
             <p>Nenhum lead encontrado com os filtros aplicados.</p>
           </div>
         )}
@@ -515,12 +726,12 @@ const LeadsManager = () => {
 
       {/* Modal de Detalhes */}
       {isModalOpen && selectedLead && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="pd-modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="pd-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Detalhes do Lead</h2>
               <button 
-                className="modal-close"
+                className="pd-modal-close"
                 onClick={() => setIsModalOpen(false)}
               >
                 ×
@@ -529,44 +740,44 @@ const LeadsManager = () => {
             
             <div className="modal-body">
               <div className="lead-details-grid">
-                <div className="detail-section">
+                <div className="pd-detail-section">
                   <h3>Informações Pessoais</h3>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>Nome:</strong> {selectedLead.name}
                   </div>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>Email:</strong> {selectedLead.email}
                   </div>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>WhatsApp:</strong> {selectedLead.whatsapp}
                   </div>
                   {selectedLead.company && (
-                    <div className="detail-item">
+                    <div className="pd-detail-item">
                       <strong>Empresa:</strong> {selectedLead.company}
                     </div>
                   )}
                 </div>
 
-                <div className="detail-section">
+                <div className="pd-detail-section">
                   <h3>Informações do Negócio</h3>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>Plano de Interesse:</strong> {getPlanName(selectedLead.plan)}
                   </div>
                   {selectedLead.employees && (
-                    <div className="detail-item">
+                    <div className="pd-detail-item">
                       <strong>Funcionários:</strong> {selectedLead.employees}
                     </div>
                   )}
                   {selectedLead.currentSystem && (
-                    <div className="detail-item">
+                    <div className="pd-detail-item">
                       <strong>Sistema Atual:</strong> {selectedLead.currentSystem}
                     </div>
                   )}
                 </div>
 
-                <div className="detail-section">
+                <div className="pd-detail-section">
                   <h3>Status e Data</h3>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>Status:</strong> 
                     <span 
                       className="status-badge"
@@ -575,35 +786,35 @@ const LeadsManager = () => {
                       {getStatusLabel(selectedLead.status)}
                     </span>
                   </div>
-                  <div className="detail-item">
+                  <div className="pd-detail-item">
                     <strong>Data de Cadastro:</strong> {selectedLead.createdAt.toLocaleString('pt-BR')}
                   </div>
                   {selectedLead.updatedAt && (
-                    <div className="detail-item">
+                    <div className="pd-detail-item">
                       <strong>Última Atualização:</strong> {selectedLead.updatedAt.toLocaleString('pt-BR')}
                     </div>
                   )}
                 </div>
 
                 {selectedLead.message && (
-                  <div className="detail-section full-width">
+                  <div className="pd-detail-section full-width">
                     <h3>Mensagem</h3>
-                    <div className="message-content">
+                    <div className="pd-message-content">
                       {selectedLead.message}
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="modal-actions">
+              <div className="pd-modal-actions">
                 <button
-                  className="modal-btn whatsapp"
+                  className="pd-modal-btn whatsapp"
                   onClick={() => openWhatsApp(selectedLead.whatsapp, selectedLead.name)}
                 >
                   <FaWhatsapp /> Contatar via WhatsApp
                 </button>
                 <button
-                  className="modal-btn email"
+                  className="pd-modal-btn email"
                   onClick={() => openEmail(selectedLead.email, selectedLead.name)}
                 >
                   <FaEnvelope /> Enviar Email
