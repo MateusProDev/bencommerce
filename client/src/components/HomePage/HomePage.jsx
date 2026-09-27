@@ -6,7 +6,6 @@ import {
   FaBars,
   FaWhatsapp,
   FaCheck,
-  FaRocket,
   FaStar,
   FaShieldAlt,
   FaBolt,
@@ -15,6 +14,8 @@ import {
   FaTags,
   FaEnvelope,
   FaPalette,
+  FaTimes,
+  FaArrowRight,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import useContactFunnel from "../../hooks/useContactFunnel";
@@ -35,259 +36,145 @@ import AvaliacaoDois from "../../assets/avaliacaodois.jpeg";
 import { trackEvents, pageView } from "../../utils/analytics";
 import "./HomePage.css";
 
+const WHATSAPP_URL = "https://wa.me/5585991470709";
+
+const PLAN_TEASER = [
+  {
+    name: "Básico",
+    tag: "Ideal para começar com anúncios pagos",
+    price: "297,90",
+    featured: false,
+    items: [
+      "Campanhas no Facebook/Instagram Ads",
+      "Criação de criativos para anúncios",
+      "Otimização semanal de campanhas",
+      "Relatório mensal de performance",
+    ],
+  },
+  {
+    name: "Premium",
+    tag: "Maximize resultados com estratégias avançadas",
+    price: "497,90",
+    featured: true,
+    items: [
+      "Tudo do plano Básico",
+      "Campanhas em Facebook, Instagram e Google",
+      "Otimização diária de campanhas",
+      "A/B testing e remarketing",
+    ],
+  },
+  {
+    name: "Business",
+    tag: "Escala máxima com equipe dedicada",
+    price: "997,90",
+    featured: false,
+    items: [
+      "Tudo do plano Premium",
+      "Remarketing multi-plataforma avançado",
+      "Copywriting profissional para anúncios",
+      "Reunião mensal estratégica",
+    ],
+  },
+];
+
+const FAQ_ITEMS = [
+  {
+    q: "Preciso de contrato longo para começar?",
+    a: "Não. Você começa com uma demonstração gratuita, sem compromisso, e só segue se fizer sentido para a sua agência.",
+  },
+  {
+    q: "Em quanto tempo vejo resultado nas campanhas?",
+    a: "A estrutura das campanhas fica no ar na primeira semana. Os primeiros ajustes de performance normalmente aparecem entre a segunda e a quarta semana, com otimização contínua a partir daí.",
+  },
+  {
+    q: "Vocês atendem agências de qualquer região do Brasil?",
+    a: "Sim. O atendimento é remoto, com reuniões online, e já atendemos agências de diferentes estados.",
+  },
+  {
+    q: "Quem cuida do orçamento de mídia?",
+    a: "O valor investido em anúncios é pago diretamente por você às plataformas (Meta e Google). A Turvia cuida da gestão, dos criativos e da otimização.",
+  },
+  {
+    q: "Posso trocar de plano depois?",
+    a: "Pode, a qualquer momento. Subir ou descer de plano é automático e você não fica preso a um nível.",
+  },
+];
+
 const HomePage = () => {
   const navigate = useNavigate();
   const { openContactFunnel } = useContactFunnel();
-  const { 
-    isOpen: isSocialMediaOpen, 
-    selectedPlan, 
-    closeSocialMediaFunnel, 
-    submitLead 
+  const {
+    isOpen: isSocialMediaOpen,
+    selectedPlan,
+    closeSocialMediaFunnel,
+    submitLead,
   } = useSocialMediaFunnel();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [activeService, setActiveService] = useState(1); // Card featured por padrão (índice 1)
-  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [typewriterText, setTypewriterText] = useState('');
-  const [activeReview, setActiveReview] = useState(0);
 
-  // Imagens das avaliações
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState(0);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
+  const [typewriterText, setTypewriterText] = useState("");
+  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
+
+  const companyName = "Turvia";
   const reviewImages = [AvaliacaoUm, AvaliacaoDois];
 
-  // Nome da empresa para efeito typewriter
-  const companyName = "Turvia";
+  /* Loader curto: espera longa custa conversão de tráfego pago */
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Efeito typewriter em loop contínuo
+  /* Efeito máquina de escrever no loader */
   useEffect(() => {
     let timeout;
-    
     if (typewriterText.length < companyName.length) {
-      // Digitando o nome
       timeout = setTimeout(() => {
         setTypewriterText(companyName.slice(0, typewriterText.length + 1));
-      }, 150); // 150ms por caractere
-    } else {
-      // Nome completo - espera e depois apaga para repetir
-      timeout = setTimeout(() => {
-        setTypewriterText(''); // Apaga e reinicia
-      }, 1500); // Pausa 1.5s com nome completo
+      }, 130);
     }
-
     return () => clearTimeout(timeout);
   }, [typewriterText, companyName]);
 
-  // Auto-finalizar loading após algumas repetições
+  /* Navbar com estado ao rolar */
   useEffect(() => {
-    const loadingTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 4000); // 4 segundos de animação loop
-
-    return () => clearTimeout(loadingTimer);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Google Analytics - Page View
+  /* Google Analytics */
   useEffect(() => {
     pageView(window.location.pathname + window.location.search);
   }, []);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-    trackEvents.menuClick('mobile_menu_toggle');
-  };
-
-  // Função para navegar pelos serviços no carousel
-  const scrollToService = (index) => {
-    const track = document.querySelector('.turvia-services-track');
-    if (track) {
-      const card = track.children[index];
-      if (card) {
-        const trackRect = track.getBoundingClientRect();
-        const cardRect = card.getBoundingClientRect();
-        const scrollLeft = card.offsetLeft - (trackRect.width / 2) + (cardRect.width / 2);
-        
-        track.scrollTo({
-          left: Math.max(0, scrollLeft),
-          behavior: 'smooth'
-        });
-        setActiveService(index);
-      }
-    }
-  };
-
-  // Detectar qual card está no centro durante o scroll
-  useEffect(() => {
-    const track = document.querySelector('.turvia-services-track');
-    if (!track) return;
-
-    const handleScroll = () => {
-      const trackRect = track.getBoundingClientRect();
-      const centerX = trackRect.left + trackRect.width / 2;
-      let closestIndex = 0;
-      let closestDistance = Infinity;
-
-      Array.from(track.children).forEach((card, index) => {
-        if (card.classList.contains('scroll-indicator')) return; // Skip indicators
-        
-        const cardRect = card.getBoundingClientRect();
-        const cardCenterX = cardRect.left + cardRect.width / 2;
-        const distance = Math.abs(centerX - cardCenterX);
-        
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      if (closestIndex !== activeService) {
-        setActiveService(closestIndex);
-      }
-    };
-
-    track.addEventListener('scroll', handleScroll);
-    // Initial check
-    handleScroll();
-
-    return () => {
-      track.removeEventListener('scroll', handleScroll);
-    };
-  }, [activeService]);
-
-  // Carrossel automático de avaliações
+  /* Carrossel automático de avaliações */
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveReview((prev) => (prev + 1) % reviewImages.length);
-    }, 5000); // Troca a cada 5 segundos
-
+      setReviewIndex((prev) => (prev + 1) % reviewImages.length);
+    }, 6000);
     return () => clearInterval(interval);
   }, [reviewImages.length]);
 
-  // Suporte a gestos de toque (swipe) para o carrossel de avaliações
-  useEffect(() => {
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    const handleTouchStart = (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    };
-
-    const handleTouchEnd = (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    };
-
-    const handleSwipe = () => {
-      const swipeThreshold = 50;
-      if (touchStartX - touchEndX > swipeThreshold) {
-        // Swipe left - próxima imagem
-        setActiveReview((prev) => (prev + 1) % reviewImages.length);
-      } else if (touchEndX - touchStartX > swipeThreshold) {
-        // Swipe right - imagem anterior
-        setActiveReview((prev) => (prev - 1 + reviewImages.length) % reviewImages.length);
-      }
-    };
-
-    const carousel = document.querySelector('.homepage-reviews-carousel');
-    if (carousel) {
-      carousel.addEventListener('touchstart', handleTouchStart);
-      carousel.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-        carousel.removeEventListener('touchstart', handleTouchStart);
-        carousel.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, [reviewImages.length]);
-
-  // Funções auxiliares para tracking
-  const handleContactFunnelOpen = (type, location) => {
-    trackEvents.contactFormSubmit(`${type} - ${location}`);
-    openContactFunnel(type);
-  };
-
-
-  const handleWhatsAppClick = (location) => {
-    trackEvents.whatsappClick(location);
-    if (location === 'floating') {
-      setWhatsappModalOpen(true);
-    } else {
-      window.open('https://wa.me/5585991470709', '_blank');
-    }
-  };
-
-  const whatsappServices = [
+  const reviews = [
     {
-      title: "Site Personalizado",
-      icon: "🌐",
-      message: "Olá! Gostaria de saber mais sobre criação de site personalizado para minha agência de turismo. Podem me ajudar com mais informações sobre preços e funcionalidades?"
+      img: AvaliacaoUm,
+      name: "Agência parceira",
+      role: "Passeios e transfers",
+      quote:
+        "Estruturaram nossas campanhas do zero e as reservas passaram a chegar com muito mais previsibilidade. O acompanhamento é próximo.",
     },
     {
-      title: "Sistema Completo",
-      icon: "⚙️",
-      message: "Olá! Tenho interesse no sistema completo 3em1 para agência de turismo. Gostaria de saber mais sobre as funcionalidades, preços e como funciona a implementação."
-    },
-    {
-      title: "Gerenciamento de Redes Sociais",
-      icon: "📱",
-      message: "Olá! Preciso de ajuda com gerenciamento de redes sociais para minha agência de turismo. Podem me explicar como funciona o serviço e os valores?"
-    },
-    {
-      title: "Criação de Identidade Visual",
-      icon: "🎨",
-      message: "Olá! Gostaria de criar uma identidade visual profissional para minha agência de turismo. Podem me mostrar portfólio e orçamento?"
-    }
-  ];
-
-  const handleWhatsAppServiceClick = (service) => {
-    const message = encodeURIComponent(service.message);
-    window.open(`https://wa.me/5585991470709?text=${message}`, '_blank');
-    setWhatsappModalOpen(false);
-  };
-
-  const handleCTAClick = (ctaText, location) => {
-    trackEvents.ctaClick(ctaText, location);
-  };
-
-  const features = [
-    {
-      icon: <FaGlobe />,
-      title: "Campanhas Otimizadas",
-      description:
-        "Criamos e gerenciamos campanhas de anúncios focadas em conversão, segmentando o público certo para maximizar seu ROI",
-    },
-    {
-      icon: <FaCogs />,
-      title: "Segmentação Avançada",
-      description:
-        "Utilizamos dados e comportamentos para atingir turistas com alto potencial de conversão nos seus pacotes",
-    },
-    {
-      icon: <FaUsers />,
-      title: "Remarketing Inteligente",
-      description:
-        "Reconquistamos visitantes que já demonstraram interesse, aumentando significativamente sua taxa de conversão",
-    },
-    {
-      icon: <FaChartLine />,
-      title: "Análise de Dados",
-      description:
-        "Monitoramento constante com relatórios detalhados de métricas como CPC, CTR, ROI e conversões para otimização contínua",
-    },
-    {
-      icon: <FaRocket />,
-      title: "Resultados Comprovados",
-      description:
-        "Estratégias testadas e validadas no mercado de turismo para garantir aumento real de vendas e reservas",
+      img: AvaliacaoDois,
+      name: "Agência parceira",
+      role: "Receptivo turístico",
+      quote:
+        "Antes a gente anunciava no escuro. Agora sabemos quanto custa cada reserva e onde vale investir mais.",
     },
   ];
-
-  // Auto-rotate features every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [features.length]);
 
   const clients = [
     { name: "20Buscar", logo: BuscarLogo },
@@ -297,34 +184,154 @@ const HomePage = () => {
     { name: "Neto Beach Park", logo: NetoLogo },
     { name: "Transfer Fortaleza Tur", logo: TransferLogo },
     { name: "PasseioLegal", logo: PasseioLegalLogo },
-    { name: "20Buscar", logo: BuscarLogo },
-    { name: "Lisboatur", logo: LisboaLogo },
-    { name: "VcTur", logo: VcTurLogo },
-    { name: "Dinei Tur", logo: DineiLogo },
-    { name: "Neto Beach Park", logo: NetoLogo },
-    { name: "Transfer Fortaleza Tur", logo: TransferLogo },
-    { name: "PasseioLegal", logo: PasseioLegalLogo },
   ];
+
+  const services = [
+    {
+      icon: <FaGlobe />,
+      title: "Tráfego Facebook e Instagram",
+      description:
+        "Campanhas otimizadas para atingir turistas que já buscam os seus destinos e pacotes.",
+      features: [
+        "Segmentação avançada de público",
+        "Criativos de alta conversão",
+        "Remarketing para conversões",
+      ],
+    },
+    {
+      icon: <FaChartLine />,
+      title: "Tráfego no Google Ads",
+      description:
+        "Capture o cliente no momento exato em que ele pesquisa pelo destino que você vende.",
+      features: [
+        "Palavras-chave estratégicas",
+        "Anúncios de pesquisa e display",
+        "Maximização de ROI",
+      ],
+      featured: true,
+    },
+    {
+      icon: <FaUsers />,
+      title: "Remarketing Multi-plataforma",
+      description:
+        "Reconquiste quem já demonstrou interesse nos seus pacotes e não fechou a compra.",
+      features: [
+        "Públicos personalizados",
+        "Funil de conversão",
+        "Aumento da taxa de conversão",
+      ],
+    },
+    {
+      icon: <FaPalette />,
+      title: "Criativos de Alta Conversão",
+      description:
+        "Artes e vídeos profissionais pensados para maximizar cliques e reservas.",
+      features: [
+        "Design orientado à conversão",
+        "A/B testing de criativos",
+        "Landing pages otimizadas",
+      ],
+    },
+  ];
+
+  const steps = [
+    {
+      title: "Diagnóstico gratuito",
+      text: "Entendemos sua agência, seus destinos e o que já foi testado em anúncios até agora.",
+    },
+    {
+      title: "Estruturação das campanhas",
+      text: "Montamos contas, públicos, criativos e o rastreamento de conversão antes de subir verba.",
+    },
+    {
+      title: "Otimização contínua",
+      text: "Acompanhamos CPC, CTR, ROI e custo por reserva, ajustando o que não está performando.",
+    },
+    {
+      title: "Relatórios e escala",
+      text: "Você recebe relatórios claros e ampliamos o investimento no que comprovadamente vende.",
+    },
+  ];
+
+  const stats = [
+    { value: "4+", label: "Anos de mercado" },
+    { value: "100%", label: "Projetos entregues" },
+    { value: "24/7", label: "Suporte disponível" },
+    { value: "5.0", label: "Avaliação média" },
+  ];
+
+  const handleWhatsAppClick = (location) => {
+    trackEvents.whatsappClick(location);
+    if (location === "floating") {
+      setWhatsappModalOpen(true);
+    } else {
+      window.open(WHATSAPP_URL, "_blank");
+    }
+  };
+
+  const whatsappServices = [
+    {
+      title: "Quero uma demonstração",
+      icon: "📅",
+      message:
+        "Olá! Gostaria de agendar uma demonstração gratuita da gestão de tráfego pago da Turvia.",
+    },
+    {
+      title: "Quero entender os planos",
+      icon: "💬",
+      message:
+        "Olá! Gostaria de entender qual plano da Turvia faz mais sentido para a minha agência de turismo.",
+    },
+    {
+      title: "Quero falar com um especialista",
+      icon: "🎯",
+      message:
+        "Olá! Gostaria de falar com um especialista sobre gestão de tráfego pago para a minha agência.",
+    },
+  ];
+
+  const handleWhatsAppServiceClick = (service) => {
+    const message = encodeURIComponent(service.message);
+    window.open(`${WHATSAPP_URL}?text=${message}`, "_blank");
+    setWhatsappModalOpen(false);
+  };
+
+  const goToDemo = (origin) => {
+    trackEvents.ctaClick("Agendar demonstração", origin);
+    openContactFunnel("completo");
+  };
+
+  const goToPlans = (origin) => {
+    trackEvents.ctaClick("Ver planos", origin);
+    navigate("/planos");
+  };
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setMobileMenuOpen(false);
+  };
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Turvia - Gestão de Tráfego Pago para Agências de Turismo | Maximize Conversões"
         description="Especialistas em gestão de tráfego pago para agências de turismo. Campanhas otimizadas no Facebook, Instagram e Google Ads para maximizar vendas e reservas."
         keywords="gestão de tráfego pago turismo, anúncios facebook instagram turismo, google ads turismo, tráfego pago agência viagens, marketing digital turismo, conversão turismo, remarketing turismo"
         url="/"
       />
-      
-      {/* Loading Screen */}
-      {isLoading && (
-        <div className="loading-overlay">
+
+      {showLoader && (
+        <div className="loading-overlay" role="status" aria-live="polite">
           <div className="loading-content">
             <div className="typewriter-container">
               <h1 className="typewriter-text">
                 {typewriterText}
                 <span className="cursor">|</span>
               </h1>
-              <p className="loading-subtitle">Plataforma para agências de turismo</p>
+              <p className="loading-subtitle">
+                Gestão de tráfego pago para agências de turismo
+              </p>
             </div>
             <div className="loading-dots">
               <div className="dot"></div>
@@ -332,829 +339,611 @@ const HomePage = () => {
               <div className="dot"></div>
             </div>
           </div>
-          <div className="loading-background">
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-          </div>
         </div>
       )}
 
-      <div className="homepage-container">{/* Navbar */}
-      <nav className="homepage-navbar">
-        <div
-          className="homepage-navbar-logo"
-          onClick={() => navigate("/")}
-          title="Turvia — Para agências de Turismo"
-        >
-          <img
-            className="homepage-navbar-logo-img"
-            src={TurviaSemFundoLogo}
-            alt="Logo Turvia"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
-        {/* Menu Desktop */}
-        <ul
-          className="homepage-nav-links"
-          style={{ listStyleType: "none", paddingLeft: 0 }}
-        >
-          <li className="homepage-nav-link" onClick={() => navigate("/")}>
-            Início
-          </li>
-          <li
-            className="homepage-nav-link"
-            onClick={() => navigate("/solucoes")}
+      <div className="homepage-container">
+        {/* ================= NAVBAR ================= */}
+        <nav className={`homepage-navbar${scrolled ? " scrolled" : ""}`}>
+          <div
+            className="homepage-navbar-logo"
+            onClick={() => navigate("/")}
+            title="Turvia — Para agências de Turismo"
           >
-            Soluções
-          </li>
-          <li className="homepage-nav-link" onClick={() => navigate("/planos")}>
-            Planos
-          </li>
-          <li className="homepage-nav-link" onClick={() => openContactFunnel()}>
-            Contato
-          </li>
-          <li 
-            className="homepage-nav-whatsapp"
-            onClick={() => window.open('https://wa.me/5585991470709', '_blank')}
-            title="Fale conosco no WhatsApp"
-          >
-            <FaWhatsapp />
-            +55 85 99147-0709
-          </li>
-          <li
-            className="homepage-nav-button"
-            onClick={() => openContactFunnel("completo")}
-          >
-            Demonstração
-          </li>
-        </ul>
-        {/* Botão do menu mobile */}
-        <button
-          className="homepage-mobile-menu-button toggle-button"
-          onClick={toggleMobileMenu}
-        >
-          <FaBars className="homepage-mobile-menu-icon" />
-        </button>
-        {/* Menu Mobile */}
-        {mobileMenuOpen && (
-          <div className="homepage-mobile-menu">
-            <ul
-              className="homepage-mobile-menu-list"
-              style={{ listStyleType: "none", paddingLeft: 0 }}
-            >
-              <li
-                className="homepage-mobile-menu-item"
-                onClick={() => {
-                  navigate("/");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaHome />
-                Início
-              </li>
-              <li
-                className="homepage-mobile-menu-item"
-                onClick={() => {
-                  navigate("/solucoes");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaCogs />
-                Soluções
-              </li>
-              <li
-                className="homepage-mobile-menu-item"
-                onClick={() => {
-                  navigate("/planos");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaTags />
-                Planos
-              </li>
-              <li
-                className="homepage-mobile-menu-item"
-                onClick={() => {
-                  openContactFunnel();
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaEnvelope />
-                Contato
-              </li>
-              <li
-                className="homepage-mobile-menu-whatsapp"
-                onClick={() => {
-                  window.open('https://wa.me/5585991470709', '_blank');
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaWhatsapp />
-                WhatsApp
-              </li>
-              <li
-                className="homepage-mobile-menu-button teste-toggle"
-                onClick={() => {
-                  openContactFunnel("completo");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <FaRocket />
-                Demonstração
-              </li>
-            </ul>
+            <img
+              className="homepage-navbar-logo-img"
+              src={TurviaSemFundoLogo}
+              alt="Logo Turvia"
+              loading="eager"
+              decoding="async"
+            />
           </div>
-        )}
-      </nav>
 
-      {/* Hero Section */}
-      <section className="homepage-hero">
-        <div className="homepage-hero-background">
-          <div className="homepage-hero-overlay"></div>
-          <div className="homepage-hero-blob homepage-hero-blob-1"></div>
-          <div className="homepage-hero-blob homepage-hero-blob-2"></div>
-          <div className="homepage-hero-blob homepage-hero-blob-3"></div>
-        </div>
+          <ul
+            className="homepage-nav-links"
+            style={{ listStyleType: "none", paddingLeft: 0 }}
+          >
+            <li className="homepage-nav-link" onClick={() => navigate("/")}>
+              Início
+            </li>
+            <li className="homepage-nav-link" onClick={() => scrollToSection("solucoes")}>
+              Soluções
+            </li>
+            <li className="homepage-nav-link" onClick={() => goToPlans("navbar")}>
+              Planos
+            </li>
+            <li className="homepage-nav-link" onClick={() => scrollToSection("faq")}>
+              Dúvidas
+            </li>
+            <li
+              className="homepage-nav-whatsapp"
+              onClick={() => handleWhatsAppClick("navbar")}
+              title="Fale conosco no WhatsApp"
+            >
+              <FaWhatsapp />
+              +55 85 99147-0709
+            </li>
+            <li className="homepage-nav-button" onClick={() => goToDemo("navbar")}>
+              Demonstração
+            </li>
+          </ul>
 
-        <div className="homepage-hero-content">
-          <h1 className="homepage-hero-title">
-            Especialistas em Gestão de Tráfego Pago para Agências de Turismo
-          </h1>
-          <p className="homepage-hero-subtitle">
-            Maximize suas vendas e reservas com campanhas de anúncios otimizadas. 
-            Transforme visitantes em clientes com estratégias de tráfego pago comprovadas.
-          </p>
-          <div className="homepage-hero-buttons">
-            <button
-              onClick={() => {
-                handleCTAClick('Vamos Trabalhar Juntos', 'hero');
-                handleContactFunnelOpen("completo", "hero_primary");
-              }}
-              className="homepage-hero-primary-button"
-            >
-              Vamos Trabalhar Juntos
-            </button>
-            <button
-              onClick={() => {
-                handleCTAClick('Ver Nossos Serviços', 'hero');
-                handleContactFunnelOpen("completo", "hero_secondary");
-              }}
-              className="homepage-hero-secondary-button"
-            >
-              Ver Nossos Serviços
-            </button>
+          <button
+            className="homepage-mobile-menu-button toggle-button"
+            onClick={() => {
+              setMobileMenuOpen(!mobileMenuOpen);
+              trackEvents.menuClick("mobile_menu_toggle");
+            }}
+            aria-label="Abrir menu"
+          >
+            {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+
+          {mobileMenuOpen && (
+            <div className="homepage-mobile-menu">
+              <ul
+                className="homepage-mobile-menu-list"
+                style={{ listStyleType: "none", paddingLeft: 0 }}
+              >
+                <li
+                  className="homepage-mobile-menu-item"
+                  onClick={() => {
+                    navigate("/");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FaHome /> Início
+                </li>
+                <li
+                  className="homepage-mobile-menu-item"
+                  onClick={() => scrollToSection("solucoes")}
+                >
+                  <FaCogs /> Soluções
+                </li>
+                <li
+                  className="homepage-mobile-menu-item"
+                  onClick={() => {
+                    navigate("/planos");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FaTags /> Planos
+                </li>
+                <li
+                  className="homepage-mobile-menu-item"
+                  onClick={() => scrollToSection("faq")}
+                >
+                  <FaEnvelope /> Dúvidas
+                </li>
+                <li
+                  className="homepage-mobile-menu-whatsapp"
+                  onClick={() => {
+                    handleWhatsAppClick("mobile_menu");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FaWhatsapp /> Falar no WhatsApp
+                </li>
+              </ul>
+            </div>
+          )}
+        </nav>
+
+        {/* ================= HERO ================= */}
+        <section className="turvia-hero" id="inicio">
+          <div className="turvia-shell">
+            <div className="turvia-hero-inner">
+              <div className="turvia-hero-copy">
+                <span className="turvia-hero-badge">
+                  <span className="dot-live"></span>
+                  Mais de 4 anos gerindo tráfego para agências de turismo
+                </span>
+
+                <h1 className="turvia-hero-title">
+                  Sua agência vende mais quando anuncia para{" "}
+                  <span className="highlight">a pessoa certa</span>
+                </h1>
+
+                <p className="turvia-hero-subtitle">
+                  Gestão de tráfego pago no Facebook, Instagram e Google Ads para
+                  agências de turismo que querem previsibilidade de reservas — não
+                  só cliques.
+                </p>
+
+                <div className="turvia-hero-actions">
+                  <button className="turvia-btn-primary" onClick={() => goToDemo("hero")}>
+                    Agendar demonstração gratuita
+                  </button>
+                  <button
+                    className="turvia-btn-ghost"
+                    onClick={() => scrollToSection("como-funciona")}
+                  >
+                    Ver como funciona
+                  </button>
+                </div>
+
+                <div className="turvia-hero-trust">
+                  <span>
+                    <FaCheck /> Sem compromisso
+                  </span>
+                  <span>
+                    <FaShieldAlt /> Sem fidelidade
+                  </span>
+                  <span>
+                    <FaBolt /> Campanhas no ar em 7 dias
+                  </span>
+                </div>
+              </div>
+
+              <aside className="turvia-hero-card">
+                <p className="turvia-hero-card-price">Planos a partir de</p>
+                <div className="turvia-hero-card-value">
+                  <strong>R$ 297,90</strong>
+                  <span>/mês</span>
+                </div>
+
+                <ul className="turvia-hero-card-list">
+                  <li>
+                    <FaCheck /> Campanhas geridas de ponta a ponta
+                  </li>
+                  <li>
+                    <FaCheck /> Criativos e copywriting inclusos
+                  </li>
+                  <li>
+                    <FaCheck /> Relatório de ROI, CPC e conversões
+                  </li>
+                </ul>
+
+                <button
+                  className="turvia-hero-card-cta"
+                  onClick={() => goToPlans("hero_card")}
+                >
+                  Comparar os planos
+                </button>
+                <p className="turvia-hero-card-note">
+                  Você vê o que cada plano entrega antes de decidir.
+                </p>
+              </aside>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Turvia Agency Services Section */}
-      <section className="turvia-services-section">
-        <div className="turvia-services-container">
-          <div className="turvia-services-header">
-            <h2 className="turvia-services-title">
-              Nossas Soluções de Tráfego Pago
-            </h2>
-            <p className="turvia-services-subtitle">
-              Estratégias personalizadas para maximizar conversões e ROI da sua agência de turismo
+        {/* ================= PROVA SOCIAL ================= */}
+        <section className="turvia-proof" aria-label="Agências que confiam na Turvia">
+          <div className="turvia-shell">
+            <p className="turvia-proof-label">Agências que confiam na Turvia</p>
+            <div className="turvia-proof-marquee">
+              <div className="turvia-proof-track">
+                {[...clients, ...clients].map((client, index) => (
+                  <img
+                    key={`${client.name}-${index}`}
+                    className="turvia-proof-logo"
+                    src={client.logo}
+                    alt={client.name}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= SOLUÇÕES ================= */}
+        <section className="turvia-section" id="solucoes">
+          <div className="turvia-shell">
+            <header className="turvia-section-head">
+              <span className="turvia-eyebrow">Nossas soluções</span>
+              <h2 className="turvia-section-title">Tráfego pago feito para o turismo</h2>
+              <p className="turvia-section-sub">
+                Estratégias desenhadas para o comportamento de quem compra viagem:
+                pesquisa, compara e decide rápido quando o anúncio certo aparece.
+              </p>
+            </header>
+
+            <div className="turvia-services-grid">
+              {services.map((service) => (
+                <article
+                  className={`turvia-service-card${
+                    service.featured ? " is-featured" : ""
+                  }`}
+                  key={service.title}
+                >
+                  {service.featured && (
+                    <span className="turvia-service-badge">Mais procurado</span>
+                  )}
+                  <div className="turvia-service-icon">{service.icon}</div>
+                  <h3 className="turvia-service-title">{service.title}</h3>
+                  <p className="turvia-service-description">{service.description}</p>
+                  <ul className="turvia-service-features">
+                    {service.features.map((feature) => (
+                      <li key={feature}>
+                        <FaCheck /> {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    className="turvia-service-link"
+                    onClick={() => goToDemo(service.title)}
+                  >
+                    Quero saber mais <FaArrowRight />
+                  </button>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= COMO FUNCIONA ================= */}
+        <section className="turvia-section turvia-section--alt" id="como-funciona">
+          <div className="turvia-shell">
+            <header className="turvia-section-head">
+              <span className="turvia-eyebrow">Como funciona</span>
+              <h2 className="turvia-section-title">
+                Do diagnóstico à escala, em quatro passos
+              </h2>
+              <p className="turvia-section-sub">
+                Sem enrolação e sem promessa vaga: você acompanha cada etapa e vê
+                os números que importam para a sua agência.
+              </p>
+            </header>
+
+            <div className="turvia-steps">
+              {steps.map((step, index) => (
+                <article className="turvia-step" key={step.title}>
+                  <div className="turvia-step-num">{index + 1}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="turvia-stats" style={{ marginTop: "2.5rem" }}>
+              {stats.map((stat) => (
+                <div className="turvia-stat" key={stat.label}>
+                  <strong>{stat.value}</strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= PLANOS ================= */}
+        <section className="turvia-section" id="planos-home">
+          <div className="turvia-shell">
+            <header className="turvia-section-head">
+              <span className="turvia-eyebrow">Planos</span>
+              <h2 className="turvia-section-title">
+                Escolha o tamanho do seu próximo mês
+              </h2>
+              <p className="turvia-section-sub">
+                Preço fechado, escopo claro e sem surpresa na fatura. Você pode
+                mudar de plano quando quiser.
+              </p>
+            </header>
+
+            <div className="turvia-plans">
+              {PLAN_TEASER.map((plan) => (
+                <article
+                  className={`turvia-plan${plan.featured ? " is-featured" : ""}`}
+                  key={plan.name}
+                >
+                  {plan.featured && <span className="turvia-plan-flag">Mais popular</span>}
+                  <h3 className="turvia-plan-name">{plan.name}</h3>
+                  <p className="turvia-plan-tag">{plan.tag}</p>
+                  <div className="turvia-plan-price">
+                    <strong>R$ {plan.price}</strong>
+                    <span>/mês</span>
+                  </div>
+                  <ul className="turvia-plan-list">
+                    {plan.items.map((item) => (
+                      <li key={item}>
+                        <FaCheck /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    className="turvia-plan-btn"
+                    onClick={() => goToPlans(`plan_${plan.name}`)}
+                  >
+                    Escolher {plan.name}
+                  </button>
+                </article>
+              ))}
+            </div>
+
+            <p className="turvia-plans-foot">
+              Precisa de algo sob medida?{" "}
+              <button onClick={() => goToDemo("plans_foot")}>
+                Fale com um especialista
+              </button>
             </p>
           </div>
+        </section>
 
-          <div className="turvia-services-carousel">
-            <div className="turvia-services-track">
-              <div className={`turvia-service-card ${activeService === 0 ? 'center-active' : ''}`}>
-                <div className="turvia-service-icon">
-                  <FaGlobe />
-                </div>
-                <h3 className="turvia-service-title">Gestão de Tráfego Facebook/Instagram</h3>
-                <p className="turvia-service-description">
-                  Campanhas otimizadas para atingir turistas interessados nos seus destinos e pacotes.
-                </p>
-                <ul className="turvia-service-features">
-                  <li>Segmentação avançada de público</li>
-                  <li>Criativos de alta conversão</li>
-                  <li>Otimização contínua de lances</li>
-                  <li>Remarketing para conversões</li>
-                </ul>
-              </div>
-
-              <div className={`turvia-service-card featured ${activeService === 1 ? 'center-active' : ''}`}>
-                <div className="turvia-service-badge">Mais Popular</div>
-                <div className="turvia-service-icon">
-                  <FaCogs />
-                </div>
-                <h3 className="turvia-service-title">Gestão de Tráfego Google Ads</h3>
-                <p className="turvia-service-description">
-                  Capture clientes no momento exato em que buscam por destinos turísticos.
-                </p>
-                <ul className="turvia-service-features">
-                  <li>Palavras-chave estratégicas</li>
-                  <li>Anúncios de pesquisa e display</li>
-                  <li>Google Meu Negócio otimizado</li>
-                  <li>Maximização de ROI</li>
-                </ul>
-              </div>
-
-              <div className={`turvia-service-card ${activeService === 2 ? 'center-active' : ''}`}>
-                <div className="turvia-service-icon">
-                  <FaUsers />
-                </div>
-                <h3 className="turvia-service-title">Remarketing Multi-plataforma</h3>
-                <p className="turvia-service-description">
-                  Reconquiste visitantes que já demonstraram interesse nos seus pacotes turísticos.
-                </p>
-                <ul className="turvia-service-features">
-                  <li>Públicos personalizados</li>
-                  <li>Remarketing dinâmico</li>
-                  <li>Funis de conversão</li>
-                  <li>Aumento de taxa de conversão</li>
-                </ul>
-              </div>
-
-              <div className={`turvia-service-card ${activeService === 3 ? 'center-active' : ''}`}>
-                <div className="turvia-service-icon">
-                  <FaPalette />
-                </div>
-                <h3 className="turvia-service-title">Criativos de Alta Conversão</h3>
-                <p className="turvia-service-description">
-                  Artes e vídeos profissionais otimizados para maximizar cliques e conversões.
-                </p>
-                <ul className="turvia-service-features">
-                  <li>Design orientado à conversão</li>
-                  <li>A/B testing de criativos</li>
-                  <li>Vídeos para anúncios</li>
-                  <li>Landing pages otimizadas</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="turvia-services-scroll-indicators">
-              {[0, 1, 2, 3].map((index) => (
-                <div
-                  key={index}
-                  className={`scroll-indicator ${activeService === index ? 'active' : ''}`}
-                  onClick={() => scrollToService(index)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Ir para serviço ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="turvia-services-cta">
-            <button
-              onClick={() => {
-                handleCTAClick('Vamos Conversar Sobre Seu Projeto', 'services');
-                handleContactFunnelOpen("completo", "services_cta");
-              }}
-              className="turvia-services-cta-button"
-            >
-              <FaRocket />
-              Vamos Conversar Sobre Seu Projeto
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="homepage-features">
-        <div className="homepage-features-container">
-          <h2 className="homepage-features-title">
-            Como Aumentamos Suas Conversões
-          </h2>
-
-          <div className="homepage-features-tabs">
-            {features.map((feature, index) => (
-              <button
-                key={index}
-                className={`homepage-features-tab ${
-                  activeFeature === index
-                    ? "homepage-features-tab-active"
-                    : "homepage-features-tab-inactive"
-                }`}
-                onClick={() => setActiveFeature(index)}
-              >
-                {feature.title}
-              </button>
-            ))}
-          </div>
-
-          <div className="homepage-feature-card">
-            <div className="homepage-feature-content">
-              <div className="homepage-feature-icon-container">
-                <div className="homepage-feature-icon">
-                  {features[activeFeature].icon}
-                </div>
-              </div>
-              <div className="homepage-feature-text">
-                <h3 className="homepage-feature-name">
-                  {features[activeFeature].title}
-                </h3>
-                <p className="homepage-feature-description">
-                  {features[activeFeature].description}
-                </p>
-                <button
-                  className="homepage-feature-button"
-                  onClick={() => openContactFunnel("completo")}
-                >
-                  Vamos Conversar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Clients Section */}
-      <section className="homepage-clients">
-        <div className="homepage-clients-container">
-          <h2 className="homepage-clients-title">
-            Agências que confiam na Turvia
-          </h2>
-
-          <div className="homepage-clients-row">
-            <div className="homepage-clients-track">
-              {[...clients, ...clients].map((client, index) => (
-                <div key={index} className="homepage-client-slide">
-                  <div className="homepage-client-card">
-                    <div className="homepage-client-logo-container">
-                      <img
-                        src={client.logo}
-                        alt={client.name}
-                        className="homepage-client-logo"
-                      />
-                    </div>
-                    <p className="homepage-client-name">{client.name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="homepage-clients-row">
-            <div className="homepage-clients-track homepage-clients-track-reverse">
-              {[...clients.reverse(), ...clients].map((client, index) => (
-                <div key={index} className="homepage-client-slide">
-                  <div className="homepage-client-card">
-                    <div className="homepage-client-logo-container">
-                      <img
-                        src={client.logo}
-                        alt={client.name}
-                        className="homepage-client-logo"
-                      />
-                    </div>
-                    <p className="homepage-client-name">{client.name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="homepage-clients-row">
-            <div className="homepage-clients-track">
-              {[...clients, ...clients].map((client, index) => (
-                <div key={index} className="homepage-client-slide">
-                  <div className="homepage-client-card">
-                    <div className="homepage-client-logo-container">
-                      <img
-                        src={client.logo}
-                        alt={client.name}
-                        className="homepage-client-logo"
-                      />
-                    </div>
-                    <p className="homepage-client-name">{client.name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Traffic Management Section */}
-      <section className="homepage-social-media">
-        <div className="homepage-social-media-container">
-          <div className="homepage-social-media-content">
-            <div className="homepage-social-media-left">
-              <h2 className="homepage-social-media-title">
-                <FaRocket className="title-icon" />
-                Gestão de Tráfego Pago Profissional!
+        {/* ================= AVALIAÇÕES ================= */}
+        <section className="turvia-section turvia-section--alt" id="avaliacoes">
+          <div className="turvia-shell">
+            <header className="turvia-section-head">
+              <span className="turvia-eyebrow">Prova social</span>
+              <h2 className="turvia-section-title">
+                O que dizem as agências parceiras
               </h2>
-              <p className="homepage-social-media-subtitle">
-                Deixe que nossa equipe especializada maximize suas campanhas de anúncios 
-                enquanto você foca no que faz de melhor: atender seus clientes.
-              </p>
-              <div className="homepage-social-media-benefits">
-                <div className="benefit-item">
-                  <FaCheck className="benefit-icon" />
-                  <span>Campanhas otimizadas para conversão</span>
-                </div>
-                <div className="benefit-item">
-                  <FaCheck className="benefit-icon" />
-                  <span>Segmentação avançada de público-alvo</span>
-                </div>
-                <div className="benefit-item">
-                  <FaCheck className="benefit-icon" />
-                  <span>Relatórios detalhados de ROI e performance</span>
-                </div>
-                <div className="benefit-item">
-                  <FaCheck className="benefit-icon" />
-                  <span>Otimização contínua 24/7</span>
-                </div>
-              </div>
-              <div className="homepage-social-media-cta-wrapper">
-                <button
-                  className="homepage-social-media-plans-btn"
-                  onClick={() => {
-                    handleCTAClick('Ver Planos de Tráfego Pago', 'traffic_plans');
-                    navigate('/planos');
-                  }}
-                  aria-label="Ver Planos de Gestão de Tráfego"
+            </header>
+
+            <div className="turvia-reviews">
+              {reviews.map((review, index) => (
+                <article
+                  className="turvia-review"
+                  key={review.quote}
+                  style={{ display: reviewIndex === index ? "block" : "none" }}
                 >
-                  <FaRocket className="cta-icon" /> Ver Planos
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {/* CTA Central acima dos planos
-          <div className="social-media-cta-section">
-            <button
-              onClick={() => {
-                handleCTAClick('Impulsionar Redes Sociais', 'social_media');
-                handleSocialMediaFunnelOpen("", "social_media_cta");
-              }}
-              className="homepage-social-media-cta central"
-            >
-              <FaBolt className="cta-icon" />
-              🚀 Impulsionar Redes Sociais!
-            </button>
-          </div> */}
-
-          {/* Planos moved to dedicated Planos page */}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="homepage-stats">
-        <div className="homepage-stats-container">
-          <div className="homepage-stats-grid">
-            <div className="homepage-stat-card">
-              <div className="homepage-stat-icon">
-                <FaRocket />
-              </div>
-              <div className="homepage-stat-number">4+</div>
-              <div className="homepage-stat-label">Anos de Mercado</div>
-            </div>
-            <div className="homepage-stat-card">
-              <div className="homepage-stat-icon">
-                <FaShieldAlt />
-              </div>
-              <div className="homepage-stat-number">100%</div>
-              <div className="homepage-stat-label">Projetos Entregues</div>
-            </div>
-            <div className="homepage-stat-card">
-              <div className="homepage-stat-icon">
-                <FaBolt />
-              </div>
-              <div className="homepage-stat-number">24/7</div>
-              <div className="homepage-stat-label">Suporte Disponível</div>
-            </div>
-            <div className="homepage-stat-card">
-              <div className="homepage-stat-icon">
-                <FaStar />
-              </div>
-              <div className="homepage-stat-number">5.0</div>
-              <div className="homepage-stat-label">Avaliação Média</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Plans removed from homepage — use the dedicated /planos page */}
-
-      {/* Testimonial Section */}
-      <section className="homepage-testimonials">
-        <div className="homepage-testimonials-container">
-          <h2 className="homepage-testimonials-title">
-            O que nossos clientes dizem
-          </h2>
-
-          <div className="homepage-reviews-carousel">
-            <div className="homepage-reviews-track" style={{ transform: `translateX(-${activeReview * 100}%)` }}>
-              {reviewImages.map((image, index) => (
-                <div key={index} className="homepage-review-slide">
-                  <img src={image} alt={`Avaliação ${index + 1}`} className="homepage-review-image" />
-                </div>
+                  <div className="turvia-review-stars" aria-label="5 de 5 estrelas">
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <FaStar key={i} />
+                    ))}
+                  </div>
+                  <p className="turvia-review-quote">“{review.quote}”</p>
+                  <div className="turvia-review-author">
+                    <img
+                      className="turvia-review-avatar"
+                      src={review.img}
+                      alt={`Avaliação de ${review.name}`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div>
+                      <strong>{review.name}</strong>
+                      <span>{review.role}</span>
+                    </div>
+                  </div>
+                </article>
               ))}
             </div>
-            
-            {/* Indicadores */}
-            <div className="homepage-reviews-indicators">
+
+            <div className="turvia-reviews-nav">
               {reviewImages.map((_, index) => (
                 <button
                   key={index}
-                  className={`homepage-review-indicator ${activeReview === index ? 'active' : ''}`}
-                  onClick={() => setActiveReview(index)}
+                  className={`turvia-reviews-dot${
+                    reviewIndex === index ? " active" : ""
+                  }`}
+                  onClick={() => setReviewIndex(index)}
                   aria-label={`Ver avaliação ${index + 1}`}
                 />
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="homepage-cta">
-        <div className="homepage-cta-background">
-          <div className="homepage-cta-blob homepage-cta-blob-1"></div>
-          <div className="homepage-cta-blob homepage-cta-blob-2"></div>
-        </div>
+        {/* ================= FAQ ================= */}
+        <section className="turvia-section" id="faq">
+          <div className="turvia-shell">
+            <header className="turvia-section-head">
+              <span className="turvia-eyebrow">Dúvidas frequentes</span>
+              <h2 className="turvia-section-title">Antes de você decidir</h2>
+            </header>
 
-        <div className="homepage-cta-content">
-          <h2 className="homepage-cta-title">
-            Pronto para modernizar sua agência?
-          </h2>
-          <p className="homepage-cta-text">
-            Agende uma demonstração gratuita e descubra como nosso sistema pode
-            transformar sua operação. Sem compromisso e adaptado às suas
-            necessidades.
-          </p>
-          <button
-            onClick={() => openContactFunnel("completo")}
-            className="homepage-cta-button"
-          >
-            Agendar Demonstração
-          </button>
-          <p className="homepage-cta-subtext">
-            Junte-se às agências que já estão modernizando sua operação com
-            nossa plataforma.
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="homepage-footer">
-        <div className="homepage-footer-container">
-          <div className="homepage-footer-brand-section">
-            <div className="homepage-footer-brand">
-              <img
-                className="homepage-footer-brand-img"
-                src={TurviaLogo}
-                alt="Logo Turvia"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <p className="homepage-footer-description">
-              Soluções tecnológicas completas para agências de turismo. Sites
-              personalizados e sistema de gestão integrado.
-            </p>
-            <div className="homepage-footer-social">
-              <a
-                href="https://www.facebook.com/profile.php?id=61560019764963"
-                className="homepage-footer-social-link"
-              >
-                <span className="sr-only">Facebook</span>
-                <svg
-                  className="homepage-footer-social-icon"
-                  viewBox="0 0 24 24"
+            <div className="turvia-faq">
+              {FAQ_ITEMS.map((item, index) => (
+                <article
+                  className={`turvia-faq-item${openFaq === index ? " open" : ""}`}
+                  key={item.q}
                 >
-                  <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
-                </svg>
-              </a>
-              <a
-                href="https://www.instagram.com/Turvia_oficial/"
-                className="homepage-footer-social-link"
-              >
-                <span className="sr-only">Instagram</span>
-                <svg
-                  className="homepage-footer-social-icon"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </a>
-              <a href="#!" className="homepage-footer-social-link">
-                <span className="sr-only">Twitter</span>
-                <svg
-                  className="homepage-footer-social-icon"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          <div className="homepage-footer-links-section">
-            <h3 className="homepage-footer-title">Links Rápidos</h3>
-            <ul
-              className="homepage-footer-links"
-              style={{ listStyleType: "none", paddingLeft: 0 }}
-            >
-              <li>
-                <a href="/sobre" className="homepage-footer-link">
-                  Sobre nós
-                </a>
-              </li>
-              <li>
-                <a href="/solucoes" className="homepage-footer-link">
-                  Soluções
-                </a>
-              </li>
-              <li>
-                <a href="/planos" className="homepage-footer-link">
-                  Planos
-                </a>
-              </li>
-              <li>
-                <a href="/blog" className="homepage-footer-link">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="/parceiro" className="homepage-footer-link">
-                  Seja um Parceiro
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="homepage-footer-support-section">
-            <h3 className="homepage-footer-title">Suporte</h3>
-            <ul
-              className="homepage-footer-links"
-              style={{ listStyleType: "none", paddingLeft: 0 }}
-            >
-              
-              <li>
-                <a href="/tutoriais" className="homepage-footer-link">
-                  Tutoriais
-                </a>
-              </li>
-              <li>
-                <a href="/faq" className="homepage-footer-link">
-                  FAQ
-                </a>
-              </li>
-              <li>
-                <a href="/contato" className="homepage-footer-link">
-                  Contato
-                </a>
-              </li>
-              <li>
-                <a href="/status" className="homepage-footer-link">
-                  Status do Sistema
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="homepage-footer-contact-section">
-            <h3 className="homepage-footer-title">Contato</h3>
-            <ul
-              className="homepage-footer-contact"
-              style={{ listStyleType: "none", paddingLeft: 0 }}
-            >
-              <li className="homepage-footer-contact-item">
-                <svg
-                  className="homepage-footer-contact-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                <a href="mailto:contato@turvia.com.br" className="homepage-footer-contact-text">
-                  contato@turvia.com.br
-                </a>
-              </li>
-              <li className="homepage-footer-contact-item">
-                <svg
-                  className="homepage-footer-contact-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  ></path>
-                </svg>
-                <span className="homepage-footer-contact-text">
-                  (11) 85 9 9147-0709
-                </span>
-              </li>
-              <li className="homepage-footer-contact-item">
-                <svg
-                  className="homepage-footer-contact-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  ></path>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  ></path>
-                </svg>
-                <span className="homepage-footer-contact-text">
-                  Fortaleza
-                  <br />
-                  CE
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="homepage-footer-bottom">
-          <p className="homepage-footer-copyright">
-            © 2025 Turvia. Todos os direitos reservados.<br />
-            CNPJ: 62.470.016/0001-15
-          </p>
-          <div className="homepage-footer-legal">
-            <a href="/termos" className="homepage-footer-legal-link">
-              Termos de Uso
-            </a>
-            <a href="/privacidade" className="homepage-footer-legal-link">
-              Privacidade
-            </a>
-            <a href="/cookies" className="homepage-footer-legal-link">
-              Cookies
-            </a>
-          </div>
-        </div>
-      </footer>
-
-      {/* Social Media Funnel Modal */}
-      <SocialMediaFunnel 
-        isOpen={isSocialMediaOpen}
-        onClose={closeSocialMediaFunnel}
-        onSubmit={submitLead}
-        initialPlan={selectedPlan}
-      />
-
-      {/* Botão Flutuante WhatsApp */}
-      <div 
-        className="whatsapp-floating-button"
-        onClick={() => handleWhatsAppClick('floating')}
-        title="Fale conosco no WhatsApp"
-      >
-        <FaWhatsapp />
-      </div>
-
-        {/* WhatsApp Services Modal */}
-        {whatsappModalOpen && (
-          <div className="whatsapp-modal-overlay" onClick={() => setWhatsappModalOpen(false)}>
-            <div className="whatsapp-modal" onClick={e => e.stopPropagation()}>
-              <div className="whatsapp-modal-header">
-                <h3>Sobre qual assunto você deseja falar?</h3>
-                <button 
-                  className="whatsapp-modal-close"
-                  onClick={() => setWhatsappModalOpen(false)}
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="whatsapp-modal-services">
-                {whatsappServices.map((service, index) => (
                   <button
-                    key={index}
-                    className="whatsapp-service-option"
+                    className="turvia-faq-q"
+                    onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
+                    aria-expanded={openFaq === index}
+                  >
+                    {item.q}
+                    <FaTimes />
+                  </button>
+                  {openFaq === index && <div className="turvia-faq-a">{item.a}</div>}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= CTA FINAL ================= */}
+        <section className="turvia-final-cta">
+          <div className="turvia-shell">
+            <h2>Pronto para ter previsibilidade de reservas?</h2>
+            <p>
+              Agende uma demonstração gratuita e veja exatamente onde o seu
+              investimento em anúncios está deixando dinheiro na mesa.
+            </p>
+            <div className="turvia-final-cta-actions">
+              <button className="turvia-btn-primary" onClick={() => goToDemo("final_cta")}>
+                Agendar demonstração gratuita
+              </button>
+              <button
+                className="turvia-btn-ghost"
+                onClick={() => handleWhatsAppClick("final_cta")}
+              >
+                <FaWhatsapp /> Falar no WhatsApp
+              </button>
+            </div>
+            <p className="turvia-final-cta-note">
+              Atendimento remoto para todo o Brasil · Sem compromisso
+            </p>
+          </div>
+        </section>
+
+        {/* ================= RODAPÉ ================= */}
+        <footer className="turvia-footer">
+          <div className="turvia-shell">
+            <div className="turvia-footer-grid">
+              <div className="turvia-footer-brand">
+                <img src={TurviaLogo} alt="Turvia" loading="lazy" decoding="async" />
+                <p>
+                  Gestão de tráfego pago e tecnologia para agências de turismo.
+                  Estratégia, criativos e otimização para transformar visitantes em
+                  reservas.
+                </p>
+                <div className="turvia-footer-social">
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61560019764963"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook da Turvia"
+                  >
+                    <i className="fab fa-facebook-f"></i>
+                  </a>
+                  <a
+                    href="https://www.instagram.com/Turvia_oficial/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram da Turvia"
+                  >
+                    <i className="fab fa-instagram"></i>
+                  </a>
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="WhatsApp da Turvia"
+                  >
+                    <i className="fab fa-whatsapp"></i>
+                  </a>
+                </div>
+              </div>
+
+              <div className="turvia-footer-col">
+                <h4>Links rápidos</h4>
+                <ul>
+                  <li onClick={() => navigate("/sobre")}>Sobre nós</li>
+                  <li onClick={() => navigate("/solucoes")}>Soluções</li>
+                  <li onClick={() => navigate("/planos")}>Planos</li>
+                  <li onClick={() => navigate("/blog")}>Blog</li>
+                  <li onClick={() => navigate("/parceiro")}>Seja um parceiro</li>
+                </ul>
+              </div>
+
+              <div className="turvia-footer-col">
+                <h4>Suporte</h4>
+                <ul>
+                  <li onClick={() => navigate("/tutoriais")}>Tutoriais</li>
+                  <li onClick={() => navigate("/faq")}>FAQ</li>
+                  <li onClick={() => openContactFunnel()}>Contato</li>
+                  <li onClick={() => navigate("/status")}>Status do sistema</li>
+                </ul>
+              </div>
+
+              <div className="turvia-footer-col">
+                <h4>Contato</h4>
+                <ul>
+                  <li>
+                    <a href="mailto:contato@turvia.com.br">contato@turvia.com.br</a>
+                  </li>
+                  <li>
+                    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+                      +55 85 99147-0709
+                    </a>
+                  </li>
+                  <li>Fortaleza — CE</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="turvia-footer-legal">
+              <p className="turvia-footer-copy">
+                © {new Date().getFullYear()} Turvia Tecnologia — CNPJ
+                62.470.016/0001-15. Todos os direitos reservados. É proibida a
+                reprodução total ou parcial deste site, do conteúdo e das marcas
+                aqui apresentadas sem autorização prévia por escrito.
+              </p>
+              <div className="turvia-footer-legalrow">
+                <a onClick={() => navigate("/termos")}>Termos de Uso</a>
+                <a onClick={() => navigate("/privacidade")}>Política de Privacidade</a>
+                <a onClick={() => navigate("/cookies")}>Cookies</a>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        {/* CTA fixo no mobile */}
+        <div className="turvia-mobile-cta">
+          <button className="mc-primary" onClick={() => goToDemo("mobile_bar")}>
+            Agendar demonstração
+          </button>
+          <button
+            className="mc-secondary"
+            onClick={() => handleWhatsAppClick("mobile_bar")}
+          >
+            WhatsApp
+          </button>
+        </div>
+
+        {/* WhatsApp flutuante */}
+        <button
+          className="turvia-whatsapp-float"
+          onClick={() => handleWhatsAppClick("floating")}
+          aria-label="Fale conosco no WhatsApp"
+          title="Fale conosco no WhatsApp"
+        >
+          <FaWhatsapp />
+        </button>
+
+        {/* Modal WhatsApp */}
+        {whatsappModalOpen && (
+          <div
+            className="whatsapp-modal-overlay"
+            onClick={() => setWhatsappModalOpen(false)}
+          >
+            <div className="whatsapp-modal" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="whatsapp-modal-close"
+                onClick={() => setWhatsappModalOpen(false)}
+                aria-label="Fechar"
+              >
+                <FaTimes />
+              </button>
+              <h3 className="whatsapp-modal-title">Como podemos ajudar?</h3>
+              <div className="whatsapp-modal-services">
+                {whatsappServices.map((service) => (
+                  <button
+                    key={service.title}
+                    className="whatsapp-modal-service"
                     onClick={() => handleWhatsAppServiceClick(service)}
                   >
-                    <span className="whatsapp-service-icon">{service.icon}</span>
-                    <span className="whatsapp-service-title">{service.title}</span>
-                    <FaWhatsapp className="whatsapp-service-arrow" />
+                    <span className="whatsapp-modal-icon">{service.icon}</span>
+                    <span>{service.title}</span>
                   </button>
                 ))}
               </div>
             </div>
           </div>
         )}
-    </div>
+
+        <SocialMediaFunnel
+          isOpen={isSocialMediaOpen}
+          onClose={closeSocialMediaFunnel}
+          onSubmit={submitLead}
+          plan={selectedPlan}
+        />
+      </div>
     </>
   );
 };
