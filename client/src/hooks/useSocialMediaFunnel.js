@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
+import {
+  buildWhatsAppUrl,
+  buildLeadWhatsAppMessage,
+} from '../utils/leadPlans';
 
 const useSocialMediaFunnel = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [waUrl, setWaUrl] = useState('');
 
   const openSocialMediaFunnel = (plan = '') => {
     setSelectedPlan(plan);
@@ -16,6 +21,7 @@ const useSocialMediaFunnel = () => {
   const closeSocialMediaFunnel = () => {
     setIsOpen(false);
     setSelectedPlan('');
+    setWaUrl('');
   };
 
   const submitLead = async (leadData) => {
@@ -23,30 +29,32 @@ const useSocialMediaFunnel = () => {
       const leadWithTimestamp = {
         ...leadData,
         plan: selectedPlan || leadData.plan,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
         status: 'novo',
-        source: 'social_media_form'
+        source: 'social_media_form',
+        channel: 'whatsapp',
+        type: 'social_media',
       };
 
-      await addDoc(collection(db, 'socialMediaLeads'), leadWithTimestamp);
-      
-      // Fechar o modal após sucesso
-      closeSocialMediaFunnel();
-      
-      // Retornar sucesso
-      return { success: true };
+      // 1) Registro no painel.
+      await addDoc(collection(db, 'social_media_leads'), leadWithTimestamp);
+
+      // 2) Conversa no WhatsApp, já com todo o contexto do lead.
+      const url = buildWhatsAppUrl(buildLeadWhatsAppMessage(leadWithTimestamp));
+      setWaUrl(url);
+
+      return { success: true, whatsappUrl: url };
     } catch (error) {
       console.error('Erro ao salvar lead de redes sociais:', error);
       return { success: false, error: error.message };
     }
   };
 
-  // Manter função original para compatibilidade com navegação
+  // Mantida para compatibilidade com navegação
   const navigateToSocialMedia = (plan = '') => {
     if (plan) {
-      navigate(`/redes-sociais/${plan}`, { 
-        state: { selectedPlan: plan } 
-      });
+      navigate(`/redes-sociais/${plan}`, { state: { selectedPlan: plan } });
     } else {
       navigate('/redes-sociais');
     }
@@ -55,12 +63,12 @@ const useSocialMediaFunnel = () => {
   return {
     isOpen,
     selectedPlan,
+    waUrl,
     openSocialMediaFunnel,
     closeSocialMediaFunnel,
     submitLead,
-    navigateToSocialMedia
+    navigateToSocialMedia,
   };
 };
 
-// Exportar como padrão também para compatibilidade
 export default useSocialMediaFunnel;
