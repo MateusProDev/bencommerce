@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   collection, 
   query, 
@@ -22,6 +22,7 @@ import {
   FaEye,
   FaSignOutAlt
 } from 'react-icons/fa';
+import { getPlanName, normalizePlan } from '../../utils/leadPlans';
 import './ContactsDashboard.css';
 
 const ContactsDashboard = () => {
@@ -34,7 +35,6 @@ const ContactsDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Query para leads normais
     const leadsQuery = query(
       collection(db, 'leads'),
       orderBy('createdAt', 'desc')
@@ -55,7 +55,6 @@ const ContactsDashboard = () => {
       }
     );
 
-    // Query para leads das redes sociais
     const socialMediaQuery = query(
       collection(db, 'social_media_leads'),
       orderBy('createdAt', 'desc')
@@ -85,7 +84,6 @@ const ContactsDashboard = () => {
     };
   }, []);
 
-  // Filtrar leads por período
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const startDate = new Date();
@@ -113,7 +111,6 @@ const ContactsDashboard = () => {
     return leads.filter(lead => lead.createdAt >= startDate);
   }, [leads, selectedPeriod]);
 
-  // Filtrar leads das redes sociais por período
   const filteredSocialMediaLeads = useMemo(() => {
     const now = new Date();
     const startDate = new Date();
@@ -141,10 +138,8 @@ const ContactsDashboard = () => {
     return socialMediaLeads.filter(lead => lead.createdAt >= startDate);
   }, [socialMediaLeads, selectedPeriod]);
 
-  // Combinar todos os leads para estatísticas
   const allLeads = [...filteredLeads, ...filteredSocialMediaLeads];
 
-  // Estatísticas gerais
   const stats = useMemo(() => {
     return {
       total: allLeads.length,
@@ -155,32 +150,27 @@ const ContactsDashboard = () => {
     };
   }, [allLeads]);
 
-  // Análise por planos
   const planStats = useMemo(() => {
     const planCount = {};
     
-    // Contar planos dos leads normais
     filteredLeads.forEach(lead => {
-      const plan = lead.plan || 'nao_informado';
+      const plan = normalizePlan(lead.plan) || 'nao_informado';
       planCount[plan] = (planCount[plan] || 0) + 1;
     });
     
-    // Contar planos dos leads das redes sociais
     filteredSocialMediaLeads.forEach(lead => {
-      const plan = lead.plan || 'nao_informado';
+      const plan = normalizePlan(lead.plan) || 'nao_informado';
       planCount[plan] = (planCount[plan] || 0) + 1;
     });
     
     return planCount;
   }, [filteredLeads, filteredSocialMediaLeads]);
 
-  // Taxa de conversão
   const conversionRate = useMemo(() => {
     if (stats.total === 0) return 0;
     return ((stats.convertidos / stats.total) * 100).toFixed(1);
   }, [stats]);
 
-  // Leads por dia (últimos 7 dias)
   const leadsByDay = useMemo(() => {
     const last7Days = [];
     const now = new Date();
@@ -193,7 +183,6 @@ const ContactsDashboard = () => {
       const nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
       
-      // Contar leads normais + leads de redes sociais
       const normalLeads = leads.filter(lead => 
         lead.createdAt >= date && lead.createdAt < nextDay
       ).length;
@@ -212,15 +201,6 @@ const ContactsDashboard = () => {
     
     return last7Days;
   }, [leads, socialMediaLeads]);
-
-  const getPlanName = (plan) => {
-    switch (plan) {
-      case 'basico': return 'Básico';
-      case 'completo': return 'Completo';
-      case 'enterprise': return 'Enterprise';
-      default: return 'Não informado';
-    }
-  };
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -266,7 +246,6 @@ const ContactsDashboard = () => {
 
   return (
     <div className="contacts-dashboard">
-      {/* Header */}
       <div className="dashboard-header">
         <div className="header-content">
           <div className="header-logo">
@@ -302,7 +281,6 @@ const ContactsDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card total">
           <div className="stat-icon">
@@ -355,9 +333,7 @@ const ContactsDashboard = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="charts-section">
-        {/* Leads por dia */}
         <div className="chart-card">
           <div className="chart-header">
             <h3><FaCalendarAlt /> Leads por Dia (Últimos 7 dias)</h3>
@@ -381,7 +357,6 @@ const ContactsDashboard = () => {
           </div>
         </div>
 
-        {/* Planos mais procurados */}
         <div className="chart-card">
           <div className="chart-header">
             <h3><FaStar /> Planos Mais Procurados</h3>
@@ -402,8 +377,8 @@ const ContactsDashboard = () => {
                       style={{ 
                         width: `${(count / stats.total) * 100}%`,
                         backgroundColor: 
-                          plan === 'completo' ? '#10b981' :
-                          plan === 'enterprise' ? '#8b5cf6' :
+                          plan === 'normal' ? '#10b981' :
+                          plan === 'personalizado' ? '#8b5cf6' :
                           plan === 'basico' ? '#3b82f6' : '#6b7280'
                       }}
                     ></div>
@@ -452,7 +427,7 @@ const ContactsDashboard = () => {
                     )}
                   </td>
                   <td className="lead-plan">
-                    <span className={`plan-badge ${lead.plan}`}>
+                    <span className={`plan-badge ${normalizePlan(lead.plan) || 'nao_informado'}`}>
                       {getPlanName(lead.plan)}
                     </span>
                   </td>
@@ -526,8 +501,8 @@ const ContactsDashboard = () => {
                     )}
                   </td>
                   <td className="lead-plan">
-                    <span className={`plan-badge ${lead.plan}`}>
-                      {lead.plan === 'basic' ? 'Básico' : lead.plan === 'premium' ? 'Premium' : getPlanName(lead.plan)}
+                    <span className={`plan-badge ${normalizePlan(lead.plan) || 'nao_informado'}`}>
+                      {getPlanName(lead.plan)}
                     </span>
                   </td>
                   <td className="lead-status">
@@ -563,7 +538,6 @@ const ContactsDashboard = () => {
         </div>
       </div>
 
-      {/* Modal de Detalhes */}
       {isModalOpen && selectedLead && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
