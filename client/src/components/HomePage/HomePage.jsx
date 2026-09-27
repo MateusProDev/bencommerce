@@ -34,15 +34,16 @@ import PasseioLegalLogo from "../../assets/logopasseiolegal.png";
 import AvaliacaoUm from "../../assets/avaliacaoum.jpeg";
 import AvaliacaoDois from "../../assets/avaliacaodois.jpeg";
 import { trackEvents, pageView } from "../../utils/analytics";
+import { WHATSAPP_NUMBER, buildWhatsAppUrl } from "../../utils/leadPlans";
 import "./HomePage.css";
 
-const WHATSAPP_URL = "https://wa.me/5585991470709";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 const PLAN_TEASER = [
   {
     name: "Básico",
     tag: "Ideal para começar com anúncios pagos",
-    price: "297,90",
+    price: "500",
     featured: false,
     items: [
       "Campanhas no Facebook/Instagram Ads",
@@ -52,9 +53,9 @@ const PLAN_TEASER = [
     ],
   },
   {
-    name: "Premium",
+    name: "Normal",
     tag: "Maximize resultados com estratégias avançadas",
-    price: "497,90",
+    price: "800",
     featured: true,
     items: [
       "Tudo do plano Básico",
@@ -64,12 +65,13 @@ const PLAN_TEASER = [
     ],
   },
   {
-    name: "Business",
-    tag: "Escala máxima com equipe dedicada",
-    price: "997,90",
+    name: "Personalizado",
+    tag: "Projeto sob medida para a sua operação",
+    price: null,
+    priceLabel: "Sob consulta",
     featured: false,
     items: [
-      "Tudo do plano Premium",
+      "Tudo do plano Normal",
       "Remarketing multi-plataforma avançado",
       "Copywriting profissional para anúncios",
       "Reunião mensal estratégica",
@@ -87,8 +89,12 @@ const FAQ_ITEMS = [
     a: "A estrutura das campanhas fica no ar na primeira semana. Os primeiros ajustes de performance normalmente aparecem entre a segunda e a quarta semana, com otimização contínua a partir daí.",
   },
   {
-    q: "Vocês atendem agências de qualquer região do Brasil?",
-    a: "Sim. O atendimento é remoto, com reuniões online, e já atendemos agências de diferentes estados.",
+    q: "O que muda entre o Básico e o Normal?",
+    a: "O Básico cobre Facebook e Instagram com otimização semanal. O Normal inclui Google Ads, otimização diária, testes A/B e remarketing — é o plano de quem quer escalar com previsibilidade.",
+  },
+  {
+    q: "Como funciona o plano Personalizado?",
+    a: "O valor é definido sob consulta, porque o escopo varia bastante: agências com múltiplas unidades, operações sazonais ou necessidade de landing pages dedicadas. Nesse caso montamos uma proposta específica.",
   },
   {
     q: "Quem cuida do orçamento de mídia?",
@@ -277,22 +283,27 @@ const HomePage = () => {
         "Olá! Gostaria de agendar uma demonstração gratuita da gestão de tráfego pago da Turvia.",
     },
     {
-      title: "Quero entender os planos",
+      title: "Quero o plano Básico",
       icon: "💬",
       message:
-        "Olá! Gostaria de entender qual plano da Turvia faz mais sentido para a minha agência de turismo.",
+        "Olá! Tenho interesse no plano Básico (R$ 500/mês) de gestão de tráfego pago. Pode me explicar como funciona?",
     },
     {
-      title: "Quero falar com um especialista",
+      title: "Quero o plano Normal",
+      icon: "🚀",
+      message:
+        "Olá! Tenho interesse no plano Normal (R$ 800/mês) de gestão de tráfego pago. Pode me explicar como funciona?",
+    },
+    {
+      title: "Quero um plano Personalizado",
       icon: "🎯",
       message:
-        "Olá! Gostaria de falar com um especialista sobre gestão de tráfego pago para a minha agência.",
+        "Olá! Gostaria de um orçamento para o plano Personalizado de gestão de tráfego pago, com escopo sob medida.",
     },
   ];
 
   const handleWhatsAppServiceClick = (service) => {
-    const message = encodeURIComponent(service.message);
-    window.open(`${WHATSAPP_URL}?text=${message}`, "_blank");
+    window.open(buildWhatsAppUrl(service.message), "_blank");
     setWhatsappModalOpen(false);
   };
 
@@ -316,7 +327,7 @@ const HomePage = () => {
     <>
       <SEO
         title="Turvia - Gestão de Tráfego Pago para Agências de Turismo | Maximize Conversões"
-        description="Especialistas em gestão de tráfego pago para agências de turismo. Campanhas otimizadas no Facebook, Instagram e Google Ads para maximizar vendas e reservas."
+        description="Especialistas em gestão de tráfego pago para agências de turismo. Campanhas otimizadas no Facebook, Instagram e Google Ads para maximizar vendas e reservas. Planos a partir de R$ 500/mês."
         keywords="gestão de tráfego pago turismo, anúncios facebook instagram turismo, google ads turismo, tráfego pago agência viagens, marketing digital turismo, conversão turismo, remarketing turismo"
         url="/"
       />
@@ -498,7 +509,7 @@ const HomePage = () => {
               <aside className="turvia-hero-card">
                 <p className="turvia-hero-card-price">Planos a partir de</p>
                 <div className="turvia-hero-card-value">
-                  <strong>R$ 297,90</strong>
+                  <strong>R$ 500</strong>
                   <span>/mês</span>
                 </div>
 
@@ -653,8 +664,14 @@ const HomePage = () => {
                   <h3 className="turvia-plan-name">{plan.name}</h3>
                   <p className="turvia-plan-tag">{plan.tag}</p>
                   <div className="turvia-plan-price">
-                    <strong>R$ {plan.price}</strong>
-                    <span>/mês</span>
+                    {plan.price ? (
+                      <>
+                        <strong>R$ {plan.price}</strong>
+                        <span>/mês</span>
+                      </>
+                    ) : (
+                      <strong className="is-consult">{plan.priceLabel}</strong>
+                    )}
                   </div>
                   <ul className="turvia-plan-list">
                     {plan.items.map((item) => (
@@ -667,7 +684,7 @@ const HomePage = () => {
                     className="turvia-plan-btn"
                     onClick={() => goToPlans(`plan_${plan.name}`)}
                   >
-                    Escolher {plan.name}
+                    {plan.price ? `Escolher ${plan.name}` : "Falar sobre o projeto"}
                   </button>
                 </article>
               ))}
@@ -941,7 +958,7 @@ const HomePage = () => {
           isOpen={isSocialMediaOpen}
           onClose={closeSocialMediaFunnel}
           onSubmit={submitLead}
-          plan={selectedPlan}
+          initialPlan={selectedPlan}
         />
       </div>
     </>
