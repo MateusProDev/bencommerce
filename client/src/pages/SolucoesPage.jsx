@@ -1,25 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FaPlane, 
-  FaHotel, 
-  FaCalendarAlt, 
-  FaUsers, 
-  FaChartLine, 
-  FaMobile,
-  FaGlobe,
-  FaCreditCard,
+import {
+  FaChartLine,
+  FaUsers,
+  FaPalette,
   FaHeadset,
   FaRocket,
-  FaCheckCircle,
   FaArrowRight,
   FaHome,
-  FaMapMarkedAlt,
   FaCamera,
   FaFileInvoiceDollar,
   FaWhatsapp,
-  FaEnvelope
+  FaEnvelope,
+  FaGlobe
 } from 'react-icons/fa';
+import { buildWhatsAppUrl } from '../utils/leadPlans';
 import './SolucoesPage.css';
 
 const SolucoesPage = () => {
@@ -107,8 +102,12 @@ const SolucoesPage = () => {
   ];
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent("Olá! Gostaria de conhecer melhor as soluções de gestão de tráfego pago para turismo.");
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    window.open(
+      buildWhatsAppUrl(
+        "Olá! Gostaria de conhecer melhor as soluções de gestão de tráfego pago para turismo."
+      ),
+      '_blank'
+    );
   };
 
   return (
@@ -120,15 +119,15 @@ const SolucoesPage = () => {
           <div className="solucoes-header-blob solucoes-header-blob-2"></div>
           <div className="solucoes-header-blob solucoes-header-blob-3"></div>
         </div>
-        
+
         <button className="back-button" onClick={() => navigate('/')}>
           <FaHome /> Voltar ao Início
         </button>
-        
+
         <div className="solucoes-header-content">
           <h1>Soluções de Tráfego Pago para Turismo</h1>
           <p>
-            Maximize suas vendas e reservas com estratégias de anúncios otimizadas. 
+            Maximize suas vendas e reservas com estratégias de anúncios otimizadas.
             Transforme visitantes em clientes com nossa expertise em gestão de tráfego.
           </p>
         </div>
@@ -139,10 +138,10 @@ const SolucoesPage = () => {
         <div className="solucoes-container">
           <h2 className="section-title">Nossas Soluções de Tráfego</h2>
           <p className="section-subtitle">
-            Cada solução foi desenvolvida especificamente para maximizar 
+            Cada solução foi desenvolvida especificamente para maximizar
             conversões e ROI de agências de turismo
           </p>
-          
+
           {/* Solutions Grid */}
           <div className="solucoes-grid">
             {solucoes.map((solucao, index) => (
@@ -168,7 +167,7 @@ const SolucoesPage = () => {
         <div className="cta-content">
           <h2>Pronto para aumentar suas conversões?</h2>
           <p>
-            Converse com nossos especialistas e descubra como nossas estratégias 
+            Converse com nossos especialistas e descubra como nossas estratégias
             de tráfego pago podem transformar suas vendas.
           </p>
           <div className="cta-buttons">

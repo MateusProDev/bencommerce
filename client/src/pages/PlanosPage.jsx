@@ -1,39 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FaHome, 
-  FaGlobe, 
-  FaUsers, 
-  FaChartLine, 
-  FaRocket, 
+import {
+  FaHome,
+  FaGlobe,
+  FaUsers,
+  FaChartLine,
+  FaRocket,
   FaStar,
   FaCheck,
   FaPalette,
   FaWhatsapp,
   FaEnvelope,
-  FaCreditCard,
-  FaCar,
   FaBolt,
-  FaShieldAlt,
   FaHeadset,
-  FaCogs,
-  FaPlane,
-  FaHotel
+  FaCogs
 } from 'react-icons/fa';
+import { buildWhatsAppUrl } from '../utils/leadPlans';
 import './PlanosPage.css';
 
 const PlanosPage = () => {
   const navigate = useNavigate();
   const [billingType, setBillingType] = useState('mensal');
 
+  /* Preços em número para permitir o cálculo do plano anual. */
   const plans = [
     {
-      id: 1,
-      name: "Gestão de Tráfego Básico",
+      id: 'basico',
+      name: "Básico",
       subtitle: "Ideal para começar com anúncios pagos",
-      price: billingType === 'mensal' ? 297.9 : Math.round(297.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(297.9 * 12 * 1.2) : null,
-      period: billingType === 'mensal' ? '/mês' : '/ano',
+      monthly: 500,
       icon: <FaGlobe />,
       color: '#3b82f6',
       popular: false,
@@ -47,17 +42,15 @@ const PlanosPage = () => {
       ]
     },
     {
-      id: 2,
-      name: "Gestão de Tráfego Premium",
+      id: 'normal',
+      name: "Normal",
       subtitle: "Maximize resultados com estratégias avançadas",
-      price: billingType === 'mensal' ? 497.9 : Math.round(497.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(497.9 * 12 * 1.15) : null,
-      period: billingType === 'mensal' ? '/mês' : '/ano',
+      monthly: 800,
       icon: <FaUsers />,
       color: '#06b6d4',
       popular: true,
       features: [
-        "Tudo do plano básico",
+        "Tudo do plano Básico",
         "Campanhas em múltiplas plataformas (Facebook, Instagram, Google)",
         "Segmentação avançada de público",
         "Otimização diária de campanhas",
@@ -68,17 +61,16 @@ const PlanosPage = () => {
       ]
     },
     {
-      id: 3,
-      name: "Gestão de Tráfego Business",
-      subtitle: "Escala máxima com equipe dedicada",
-      price: billingType === 'mensal' ? 997.9 : Math.round(997.9 * 12),
-      originalPrice: billingType === 'anual' ? Math.round(997.9 * 12 * 1.1) : null,
-      period: billingType === 'mensal' ? '/mês' : '/ano',
+      id: 'personalizado',
+      name: "Personalizado",
+      subtitle: "Projeto sob medida para a sua operação",
+      monthly: null,
+      customPrice: "Sob consulta",
       icon: <FaChartLine />,
       color: '#8b5cf6',
       popular: false,
       features: [
-        "Tudo do plano premium",
+        "Tudo do plano Normal",
         "Campanhas avançadas de remarketing multi-plataforma",
         "Copywriting profissional para anúncios",
         "Desenvolvedor dedicado para landing pages",
@@ -89,6 +81,13 @@ const PlanosPage = () => {
       ]
     }
   ];
+
+  /* Preço exibido conforme o período; o anual tem 2 meses de desconto. */
+  const getPrice = (plan) => {
+    if (!plan.monthly) return null;
+    if (billingType === 'mensal') return plan.monthly;
+    return Math.round(plan.monthly * 10);
+  };
 
   const funcionalidades = [
     {
@@ -138,20 +137,27 @@ const PlanosPage = () => {
       answer: "Configuração de campanhas, criação de criativos, otimização, relatórios e suporte especializado."
     },
     {
+      question: "Como funciona o plano Personalizado?",
+      answer: "O valor é definido sob consulta. Montamos uma proposta específica para operações com múltiplas unidades, sazonalidade forte ou necessidade de landing pages dedicadas."
+    },
+    {
       question: "Como funciona o processo de aprovação das publicações?",
       answer: "Enviamos um calendário mensal para aprovação. Você pode pedir ajustes antes da publicação."
     }
   ];
 
-  const handleContactPlan = (planId) => {
-    const plan = plans.find(p => p.id === planId);
-    const message = encodeURIComponent(`Olá! Gostaria de contratar o plano ${plan.name}. Podem me ajudar?`);
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+  const handleContactPlan = (plan) => {
+    const message = plan.monthly
+      ? `Olá! Gostaria de contratar o plano ${plan.name} (R$ ${plan.monthly}/mês) de gestão de tráfego pago. Podem me ajudar?`
+      : `Olá! Gostaria de um orçamento para o plano Personalizado de gestão de tráfego pago, com escopo sob medida.`;
+    window.open(buildWhatsAppUrl(message), '_blank');
   };
 
   const handleWhatsApp = (action) => {
-    const message = encodeURIComponent(`Olá! Gostaria de ${action === 'Informações' ? 'mais informações sobre os planos' : 'falar com vocês'}.`);
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    const message = action === 'Informações'
+      ? 'Olá! Gostaria de mais informações sobre os planos de gestão de tráfego pago da Turvia.'
+      : 'Olá! Gostaria de falar com a Turvia sobre gestão de tráfego pago.';
+    window.open(buildWhatsAppUrl(message), '_blank');
   };
 
   return (
@@ -163,26 +169,26 @@ const PlanosPage = () => {
           <div className="planos-header-blob planos-header-blob-2"></div>
           <div className="planos-header-blob planos-header-blob-3"></div>
         </div>
-        
+
         <button className="back-button" onClick={() => navigate('/')}>
           <FaHome /> Voltar ao Início
         </button>
-        
+
         <div className="planos-header-content">
           <h1>Gestão de Tráfego Pago para Agências de Turismo</h1>
           <p>Especialistas em anúncios pagos para maximizar suas vendas e reservas</p>
-          
+
           {/* Billing Toggle */}
           <div className="billing-toggle">
             <span className="billing-label">Escolha o período:</span>
             <div className="toggle-buttons">
-              <button 
+              <button
                 className={billingType === 'mensal' ? 'active' : ''}
                 onClick={() => setBillingType('mensal')}
               >
                 Mensal
               </button>
-              <button 
+              <button
                 className={billingType === 'anual' ? 'active' : ''}
                 onClick={() => setBillingType('anual')}
               >
@@ -199,7 +205,7 @@ const PlanosPage = () => {
           {/* Planos Grid */}
           <section className="planos-grid">
             {plans.map((plano) => (
-              <div 
+              <div
                 key={plano.id}
                 className={`plano-card ${plano.popular ? 'popular' : ''}`}
                 style={{ '--accent-color': plano.color }}
@@ -209,7 +215,7 @@ const PlanosPage = () => {
                     <FaStar /> Mais Popular
                   </div>
                 )}
-                
+
                 <div className="plano-header">
                   <div className="plano-icon" style={{ background: plano.color }}>
                     {plano.icon}
@@ -222,23 +228,15 @@ const PlanosPage = () => {
                   {plano.customPrice ? (
                     <div className="custom-price">{plano.customPrice}</div>
                   ) : (
-                    <>
-                      {plano.originalPrice && (
-                        <div className="original-price">
-                          De R${plano.originalPrice.toLocaleString('pt-BR')}
-                        </div>
-                      )}
-                      <div className="plano-price">
-                        <span className="currency">R$</span>
-                        <span className="amount">{plano.price.toLocaleString('pt-BR')}</span>
-                        <span className="period">{plano.period}</span>
-                      </div>
-                      {plano.originalPrice && (
-                        <div className="savings">
-                          Economize R${(plano.originalPrice - plano.price).toLocaleString('pt-BR')}
-                        </div>
-                      )}
-                    </>
+                    <div className="plano-price">
+                      <span className="currency">R$</span>
+                      <span className="amount">
+                        {getPrice(plano).toLocaleString('pt-BR')}
+                      </span>
+                      <span className="period">
+                        {billingType === 'mensal' ? '/mês' : '/ano'}
+                      </span>
+                    </div>
                   )}
                 </div>
 
@@ -251,11 +249,11 @@ const PlanosPage = () => {
                   ))}
                 </ul>
 
-                <button 
+                <button
                   className={`plano-button ${plano.popular ? 'primary' : 'secondary'}`}
-                  onClick={() => handleContactPlan(plano.id)}
+                  onClick={() => handleContactPlan(plano)}
                 >
-                  <FaRocket /> 
+                  <FaRocket />
                   {plano.customPrice ? 'Falar com Vendas' : 'Escolher Plano'}
                 </button>
               </div>
@@ -297,7 +295,7 @@ const PlanosPage = () => {
             <h2>Ainda tem dúvidas?</h2>
             <p>Entre em contato conosco e tire todas as suas dúvidas</p>
             <div className="cta-buttons">
-              <button className="cta-primary" onClick={() => handleWhatsApp('Contato')}>
+              <button className="cta-primary" onClick={() => navigate('/contato')}>
                 <FaEnvelope /> Falar Conosco
               </button>
               <button className="cta-whatsapp" onClick={() => handleWhatsApp('Informações')}>
